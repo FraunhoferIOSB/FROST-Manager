@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerEntity">
+   <top>
+      <FlowPane hgap="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="labelType" text="Thing" />
+            <Label fx:id="labelId" text="XX" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" />
+         </padding>
+      </FlowPane>
+   </top>
+   <center>
+      <SplitPane dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <center>
+                  <GridPane fx:id="gridProperties" BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                      <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="10.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                  </GridPane>
+               </center>
+               <bottom>
+                  <FlowPane alignment="BOTTOM_LEFT" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="buttonSave" alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#actionSave" text="Save" />
+                     </children>
+                  </FlowPane>
+               </bottom>
+            </BorderPane>
+            <Accordion fx:id="accordionLinks" />
+        </items>
+      </SplitPane>
+   </center>
+</BorderPane>

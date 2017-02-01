@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane prefHeight="395.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerCollection">
+    <children>
+        <SplitPane dividerPositions="0.3" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <items>
+                <BorderPane SplitPane.resizableWithParent="false">
+                    <top>
+                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                            <children>
+                                <Button fx:id="buttonReload" accessibleHelp="Load First Set" accessibleRoleDescription="Load First Set" accessibleText="Load First Set" mnemonicParsing="false" onAction="#actionButtonReload" text="↧">
+                           <tooltip>
+                              <Tooltip text="Load the first set." />
+                           </tooltip></Button>
+                                <Button fx:id="buttonNext" accessibleHelp="Load Next Set" accessibleRoleDescription="Load Next Set" accessibleText="Load Next Set" disable="true" mnemonicParsing="false" onAction="#actionButtonNext" text="⇊">
+                           <tooltip>
+                              <Tooltip text="Load the next set." />
+                           </tooltip></Button>
+                                <Button fx:id="buttonAll" accessibleHelp="Load All" accessibleRoleDescription="Load All" accessibleText="Load All" mnemonicParsing="false" onAction="#actionButtonAll" text="⤓">
+                           <tooltip>
+                              <Tooltip text="Load all entities." />
+                           </tooltip></Button>
+                            </children>
+                        </HBox>
+                    </top>
+                    <center>
+                        <ListView fx:id="entityList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                    </center>
+               <bottom>
+                  <FlowPane BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionDelete" text="Delete" />
+                     </children>
+                  </FlowPane>
+               </bottom>
+                </BorderPane>
+            <BorderPane fx:id="paneSelected" />
+            </items>
+        </SplitPane>
+    </children>
+</AnchorPane>
