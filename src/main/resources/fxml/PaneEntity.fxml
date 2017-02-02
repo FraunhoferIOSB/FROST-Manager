@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerEntity">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerEntity">
    <top>
       <FlowPane hgap="5.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="labelType" text="Thing" />
+            <Label fx:id="labelType" text="TypeName" />
             <Label fx:id="labelId" text="XX" />
          </children>
          <padding>
@@ -23,7 +23,7 @@
       </FlowPane>
    </top>
    <center>
-      <SplitPane dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPaneMain" dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
             <BorderPane prefHeight="200.0" prefWidth="200.0">
                <center>
@@ -35,7 +35,7 @@
                   </GridPane>
                </center>
                <bottom>
-                  <FlowPane alignment="BOTTOM_LEFT" BorderPane.alignment="CENTER">
+                  <FlowPane alignment="BOTTOM_RIGHT" columnHalignment="RIGHT" BorderPane.alignment="CENTER">
                      <children>
                         <Button fx:id="buttonSave" alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#actionSave" text="Save" />
                      </children>

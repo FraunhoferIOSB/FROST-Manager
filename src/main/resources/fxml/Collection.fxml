@@ -39,6 +39,7 @@
                   <FlowPane BorderPane.alignment="CENTER">
                      <children>
                         <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionDelete" text="Delete" />
+                        <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="New" />
                      </children>
                   </FlowPane>
                </bottom>

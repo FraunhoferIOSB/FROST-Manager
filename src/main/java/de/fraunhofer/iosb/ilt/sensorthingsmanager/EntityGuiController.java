@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.geojson.GeoJsonObject;
 import org.geojson.Polygon;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
+import de.fraunhofer.iosb.ilt.sta.model.EntityType;
 import de.fraunhofer.iosb.ilt.sta.model.FeatureOfInterest;
 import de.fraunhofer.iosb.ilt.sta.model.HistoricalLocation;
 import de.fraunhofer.iosb.ilt.sta.model.Location;
@@ -30,13 +32,20 @@ import de.fraunhofer.iosb.ilt.sta.model.Thing;
 import de.fraunhofer.iosb.ilt.sta.model.TimeObject;
 import de.fraunhofer.iosb.ilt.sta.model.ext.UnitOfMeasurement;
 import de.fraunhofer.iosb.ilt.sta.query.Query;
+import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
@@ -69,7 +78,18 @@ public interface EntityGuiController<T extends Entity<T>> {
      */
     public void saveFields();
 
-    public void init(T entity, GridPane gridProperties, Accordion accordionLinks, Label labelId);
+    public EntityType getType();
+
+    /**
+     *
+     * @param service The service the entity belongs to.
+     * @param entity the entity.
+     * @param gridProperties the grid for entity properties.
+     * @param accordionLinks The accordion for navigation properties.
+     * @param labelId The label that shows the entity id.
+     * @param editable is the entity editable.
+     */
+    public void init(SensorThingsService service, T entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable);
 
     public static class GuiControllerDatastream implements EntityGuiController<Datastream> {
 
@@ -91,6 +111,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -98,6 +121,10 @@ public interface EntityGuiController<T extends Entity<T>> {
             textDescription.setText(entity.getDescription());
             textObservationType.setText(entity.getObservationType());
             UnitOfMeasurement uom = entity.getUnitOfMeasurement();
+            if (uom == null) {
+                uom = new UnitOfMeasurement();
+                entity.setUnitOfMeasurement(uom);
+            }
             textUomName.setText(uom.getName());
             textUomSymbol.setText(uom.getSymbol());
             textUomDefinition.setText(uom.getDefinition());
@@ -129,34 +156,37 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(Datastream entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.DATASTREAM;
+        }
+
+        @Override
+        public void init(SensorThingsService service, Datastream entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
-            textObservationType = addFieldTo(gridProperties, ++i, "ObservationType", new TextField(), false);
-            textUomName = addFieldTo(gridProperties, ++i, "UoM: Name", new TextField(), false);
-            textUomSymbol = addFieldTo(gridProperties, ++i, "UoM: Symbol", new TextField(), false);
-            textUomDefinition = addFieldTo(gridProperties, ++i, "UoM: Definition", new TextField(), false);
-            textObservedArea = addFieldTo(gridProperties, ++i, "ObservedArea", new TextField(), false);
-            textObservedArea.setDisable(true);
-            textPhenomenonTime = addFieldTo(gridProperties, ++i, "PhenomenonTime", new TextField(), false);
-            textPhenomenonTime.setDisable(true);
-            textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false);
-            textResultTime.setDisable(true);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textObservationType = addFieldTo(gridProperties, ++i, "ObservationType", new TextField(), false, editable);
+            textUomName = addFieldTo(gridProperties, ++i, "UoM: Name", new TextField(), false, editable);
+            textUomSymbol = addFieldTo(gridProperties, ++i, "UoM: Symbol", new TextField(), false, editable);
+            textUomDefinition = addFieldTo(gridProperties, ++i, "UoM: Definition", new TextField(), false, editable);
+            textObservedArea = addFieldTo(gridProperties, ++i, "ObservedArea", new TextField(), false, false);
+            textPhenomenonTime = addFieldTo(gridProperties, ++i, "PhenomenonTime", new TextField(), false, false);
+            textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false, false);
 
-            try {
-                TitledPane tp = new TitledPane("Thing", FactoryEntityPanel.getThingPane(entity.getThing()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("Sensor", FactoryEntityPanel.getSensorPane(entity.getSensor()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("ObservedProperty", FactoryEntityPanel.getObsPropPane(entity.getObservedProperty()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
-                accordionLinks.getPanes().add(tp);
-            } catch (IOException | ServiceFailureException ex) {
-                LOGGER.error("Failed to create panel.", ex);
+            if (accordionLinks != null) {
+                try {
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), entity::setThing));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getSensor(), service.sensors().query(), entity::setSensor));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getObservedProperty(), service.observedProperties().query(), entity::setObservedProperty));
+                    accordionLinks.getPanes().add(new TitledPane("Observations", createCollectionPaneFor(entity.observations().query())));
+                } catch (IOException | ServiceFailureException ex) {
+                    LOGGER.error("Failed to create panel.", ex);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                    LOGGER.trace("Failed to create panel.", e);
+                }
             }
         }
     }
@@ -223,32 +253,37 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(MultiDatastream entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.MULTIDATASTREAM;
+        }
+
+        @Override
+        public void init(SensorThingsService service, MultiDatastream entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
-            textObservationType = addFieldTo(gridProperties, ++i, "ObservationType", new TextField(), false);
-            textUoms = addFieldTo(gridProperties, ++i, "UoMs", new TextArea(), false);
-            textObservedArea = addFieldTo(gridProperties, ++i, "ObservedArea", new TextField(), false);
-            textObservedArea.setDisable(true);
-            textPhenomenonTime = addFieldTo(gridProperties, ++i, "PhenomenonTime", new TextField(), false);
-            textPhenomenonTime.setDisable(true);
-            textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false);
-            textResultTime.setDisable(true);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textObservationType = addFieldTo(gridProperties, ++i, "ObservationType", new TextField(), false, editable);
+            textUoms = addFieldTo(gridProperties, ++i, "UoMs", new TextArea(), false, editable);
+            textObservedArea = addFieldTo(gridProperties, ++i, "ObservedArea", new TextField(), false, false);
+            textPhenomenonTime = addFieldTo(gridProperties, ++i, "PhenomenonTime", new TextField(), false, false);
+            textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false, false);
 
-            try {
-                TitledPane tp = new TitledPane("Thing", FactoryEntityPanel.getThingPane(entity.getThing()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("Sensor", FactoryEntityPanel.getSensorPane(entity.getSensor()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("ObservedProperties", createCollectionPaneFor(entity.observedProperties().query()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
-                accordionLinks.getPanes().add(tp);
-            } catch (IOException | ServiceFailureException ex) {
-                LOGGER.error("Failed to create panel.", ex);
+            if (accordionLinks != null) {
+                try {
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), entity::setThing));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getSensor(), service.sensors().query(), entity::setSensor));
+
+                    TitledPane tp = new TitledPane("ObservedProperties", createCollectionPaneFor(entity.observedProperties().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (IOException | ServiceFailureException ex) {
+                    LOGGER.error("Failed to create panel.", ex);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                }
             }
         }
     }
@@ -268,6 +303,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -299,17 +337,28 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(FeatureOfInterest entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.FEATURE_OF_INTEREST;
+        }
+
+        @Override
+        public void init(SensorThingsService service, FeatureOfInterest entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
-            textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false);
-            textFeature = addFieldTo(gridProperties, ++i, "Feature", new TextArea(), false);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false, editable);
+            textFeature = addFieldTo(gridProperties, ++i, "Feature", new TextArea(), false, editable);
 
-            TitledPane tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
-            accordionLinks.getPanes().add(tp);
+            if (accordionLinks != null) {
+                try {
+                    TitledPane tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                }
+            }
         }
     }
 
@@ -325,6 +374,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -337,19 +389,27 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(HistoricalLocation entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.HISTORICAL_LOCATION;
+        }
+
+        @Override
+        public void init(SensorThingsService service, HistoricalLocation entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textTime = addFieldTo(gridProperties, i, "Time", new TextField(), false);
+            textTime = addFieldTo(gridProperties, i, "Time", new TextField(), false, editable);
 
-            try {
-                TitledPane tp = new TitledPane("Thing", FactoryEntityPanel.getThingPane(entity.getThing()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query()));
-                accordionLinks.getPanes().add(tp);
-            } catch (IOException | ServiceFailureException ex) {
-                LOGGER.error("Failed to create panel.", ex);
+            if (accordionLinks != null) {
+                try {
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), entity::setThing));
+                    TitledPane tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (IOException | ServiceFailureException ex) {
+                    LOGGER.error("Failed to create panel.", ex);
+                } catch (NullPointerException ex) {
+                    // Happens when entity is new.
+                }
             }
         }
     }
@@ -369,6 +429,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -400,19 +463,30 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(Location entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.LOCATION;
+        }
+
+        @Override
+        public void init(SensorThingsService service, Location entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
-            textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false);
-            textLocation = addFieldTo(gridProperties, ++i, "Location", new TextArea(), false);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false, editable);
+            textLocation = addFieldTo(gridProperties, ++i, "Location", new TextArea(), false, editable);
 
-            TitledPane tp = new TitledPane("Things", createCollectionPaneFor(entity.things().query()));
-            accordionLinks.getPanes().add(tp);
-            tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
-            accordionLinks.getPanes().add(tp);
+            if (accordionLinks != null) {
+                try {
+                    TitledPane tp = new TitledPane("Things", createCollectionPaneFor(entity.things().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                }
+            }
         }
     }
 
@@ -433,6 +507,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -493,26 +570,30 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(Observation entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.OBSERVATION;
+        }
+
+        @Override
+        public void init(SensorThingsService service, Observation entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textPhenomenonTime = addFieldTo(gridProperties, i, "PhenomenonTime", new TextField(), false);
-            textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false);
-            textResult = addFieldTo(gridProperties, ++i, "Result", new TextArea(), true);
-            textResultQuality = addFieldTo(gridProperties, ++i, "ResultQuality", new TextField(), false);
-            textValidTime = addFieldTo(gridProperties, ++i, "ValidTime", new TextField(), false);
-            textParameters = addFieldTo(gridProperties, ++i, "Parameters", new TextArea(), true);
+            textPhenomenonTime = addFieldTo(gridProperties, i, "PhenomenonTime", new TextField(), false, editable);
+            textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false, editable);
+            textResult = addFieldTo(gridProperties, ++i, "Result", new TextArea(), true, editable);
+            textResultQuality = addFieldTo(gridProperties, ++i, "ResultQuality", new TextField(), false, editable);
+            textValidTime = addFieldTo(gridProperties, ++i, "ValidTime", new TextField(), false, editable);
+            textParameters = addFieldTo(gridProperties, ++i, "Parameters", new TextArea(), true, editable);
 
-            try {
-                TitledPane tp = new TitledPane("Datastream", FactoryEntityPanel.getDatastreamPane(entity.getDatastream()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("MultiDatastream", FactoryEntityPanel.getMultiDatastreamPane(entity.getMultiDatastream()));
-                accordionLinks.getPanes().add(tp);
-                tp = new TitledPane("FeatureOfInterest", FactoryEntityPanel.getFeatureOfInterestPane(entity.getFeatureOfInterest()));
-                accordionLinks.getPanes().add(tp);
-            } catch (IOException | ServiceFailureException ex) {
-                LOGGER.error("Failed to create panel.", ex);
+            if (accordionLinks != null) {
+                try {
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getDatastream(), service.datastreams().query(), entity::setDatastream));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getMultiDatastream(), service.multiDatastreams().query(), entity::setMultiDatastream));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getFeatureOfInterest(), service.featuresOfInterest().query(), entity::setFeatureOfInterest));
+                } catch (IOException | ServiceFailureException ex) {
+                    LOGGER.error("Failed to create panel.", ex);
+                }
             }
         }
     }
@@ -532,6 +613,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -548,18 +632,29 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(ObservedProperty entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.OBSERVED_PROPERTY;
+        }
+
+        @Override
+        public void init(SensorThingsService service, ObservedProperty entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDefinition = addFieldTo(gridProperties, ++i, "Definition", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDefinition = addFieldTo(gridProperties, ++i, "Definition", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
 
-            TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
-            accordionLinks.getPanes().add(tp);
-            tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
-            accordionLinks.getPanes().add(tp);
+            if (accordionLinks != null) {
+                try {
+                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                }
+            }
         }
     }
 
@@ -579,6 +674,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -608,19 +706,30 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(Sensor entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.SENSOR;
+        }
+
+        @Override
+        public void init(SensorThingsService service, Sensor entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
-            textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false);
-            textMetadata = addFieldTo(gridProperties, ++i, "Metadata", new TextArea(), true);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false, editable);
+            textMetadata = addFieldTo(gridProperties, ++i, "Metadata", new TextArea(), true, editable);
 
-            TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
-            accordionLinks.getPanes().add(tp);
-            tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
-            accordionLinks.getPanes().add(tp);
+            if (accordionLinks != null) {
+                try {
+                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                }
+            }
         }
     }
 
@@ -638,6 +747,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void loadFields() {
+            if (entity == null) {
+                return;
+            }
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
@@ -668,29 +780,87 @@ public interface EntityGuiController<T extends Entity<T>> {
         }
 
         @Override
-        public void init(Thing entity, GridPane gridProperties, Accordion accordionLinks, Label labelId) {
+        public EntityType getType() {
+            return EntityType.THING;
+        }
+
+        @Override
+        public void init(SensorThingsService service, Thing entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
             this.labelId = labelId;
             this.entity = entity;
             int i = 0;
-            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false);
-            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true);
-            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true);
+            textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
+            textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
-            TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
-            accordionLinks.getPanes().add(tp);
-            tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
-            accordionLinks.getPanes().add(tp);
-            tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query()));
-            accordionLinks.getPanes().add(tp);
-            tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
-            accordionLinks.getPanes().add(tp);
+            if (accordionLinks != null) {
+                try {
+                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query()));
+                    accordionLinks.getPanes().add(tp);
+                    tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
+                    accordionLinks.getPanes().add(tp);
+                } catch (NullPointerException e) {
+                    // Happens when entity is new.
+                }
+            }
         }
     }
 
-    public static <T extends Node> T addFieldTo(GridPane gp, int row, String title, T node, boolean fillHeight) {
+    public static interface ChildSetter<C extends Entity<C>> {
+
+        public void setChild(C child);
+    }
+
+    public static <C extends Entity<C>, P extends Entity<P>> TitledPane createEditableEntityPane(
+            final P parentEntity,
+            final C childEntity,
+            final Query<C> childQuery,
+            final ChildSetter<C> setter) throws IOException {
+
+        EntityType type = EntityType.singleForClass(childQuery.getEntityType().getType());
+        String paneTitle;
+        if (childEntity == null) {
+            paneTitle = type.getName() + ": None selected";
+        } else {
+            paneTitle = childEntity.getType().getName() + ": " + childEntity.toString();
+        }
+        Node pane = FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, false);
+        TitledPane tp = new TitledPane(paneTitle, pane);
+        Button edit = new Button("🔧");
+        tp.setGraphic(edit);
+        edit.setOnAction((ActionEvent event) -> {
+            Optional<C> result = entitySearchDialog(childQuery);
+            if (result.isPresent()) {
+                C newChild = result.get();
+                setter.setChild(newChild);
+                try {
+                    tp.setContent(FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, false));
+                } catch (IOException ex) {
+                    LoggerFactory.getLogger(EntityGuiController.class).error("Failed to load Collection Pane.", ex);
+                }
+                tp.setText(newChild.getType().getName() + ": " + newChild.toString());
+            }
+        });
+
+        return tp;
+    }
+
+    public static <T extends Node> T addFieldTo(GridPane gp, int row, String title, T node, boolean fillHeight, boolean editable) {
         gp.getRowConstraints().add(new RowConstraints(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE, Priority.NEVER, VPos.BASELINE, fillHeight));
         gp.add(new Label(title), 0, row);
         gp.add(node, 1, row);
+        if (node instanceof TextArea) {
+            ((TextArea) node).setPrefRowCount(4);
+        }
+        if (node instanceof TextInputControl) {
+            ((TextInputControl) node).setEditable(editable);
+        } else {
+            node.setDisable(!editable);
+        }
         return node;
     }
 
@@ -699,7 +869,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.<ControllerCollection>getController();
-            controller.setQuery(query, false);
+            controller.setQuery(query, true);
             return content;
         } catch (IOException ex) {
             LoggerFactory.getLogger(EntityGuiController.class).error("Failed to load Collection Pane.", ex);
@@ -707,4 +877,33 @@ public interface EntityGuiController<T extends Entity<T>> {
         return null;
     }
 
+    public static <T extends Entity<T>> Optional<T> entitySearchDialog(Query<T> query) {
+        try {
+            FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
+            AnchorPane content = (AnchorPane) loader.load();
+            final ControllerCollection<T> controller = loader.<ControllerCollection<T>>getController();
+            controller.setQuery(query, false);
+
+            Dialog<T> dialog = new Dialog<>();
+            dialog.setHeight(800);
+            dialog.setTitle("Choose a " + EntityType.singleForClass(query.getEntityType().getType()).getName());
+            dialog.setResizable(true);
+            dialog.getDialogPane().setContent(content);
+            ButtonType buttonTypeOk = new ButtonType("Set", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+            dialog.setResultConverter((ButtonType button) -> {
+                if (button == buttonTypeOk) {
+                    return controller.getSelectedEntity();
+                }
+                return null;
+            });
+            return dialog.showAndWait();
+
+        } catch (IOException ex) {
+            LoggerFactory.getLogger(EntityGuiController.class).error("Failed to load Tab.", ex);
+            return Optional.empty();
+        }
+    }
 }

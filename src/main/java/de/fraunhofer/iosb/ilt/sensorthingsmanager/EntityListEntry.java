@@ -5,10 +5,11 @@ import de.fraunhofer.iosb.ilt.sta.model.Entity;
 /**
  *
  * @author scf
+ * @param <T> The entity type.
  */
-public class EntityListEntry {
+public class EntityListEntry<T extends Entity<T>> {
 
-    private Entity entity;
+    private T entity;
     private boolean changed = false;
 
     @Override
@@ -19,7 +20,7 @@ public class EntityListEntry {
     /**
      * @return the entity
      */
-    public Entity getEntity() {
+    public T getEntity() {
         return entity;
     }
 
@@ -27,7 +28,7 @@ public class EntityListEntry {
      * @param entity the entity to set.
      * @return this EntityListEntry.
      */
-    public EntityListEntry setEntity(Entity<?> entity) {
+    public EntityListEntry<T> setEntity(T entity) {
         this.entity = entity;
         return this;
     }
@@ -43,7 +44,7 @@ public class EntityListEntry {
      * @param changed the changed to set.
      * @return this EntityListEntry.
      */
-    public EntityListEntry setChanged(boolean changed) {
+    public EntityListEntry<T> setChanged(boolean changed) {
         this.changed = changed;
         return this;
     }

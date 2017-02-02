@@ -12,7 +12,6 @@ import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
 import de.fraunhofer.iosb.ilt.sta.query.Query;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,9 +28,14 @@ import javafx.scene.layout.BorderPane;
 /**
  *
  * @author scf
+ * @param <T> The entity type of the collection.
  */
-public class ControllerCollection implements Initializable {
+public class ControllerCollection<T extends Entity<T>> implements Initializable {
 
+    public static interface EntityFactory<T extends Entity<T>> {
+
+        public T createEntity();
+    }
     /**
      * The logger for this class.
      */
@@ -45,13 +49,22 @@ public class ControllerCollection implements Initializable {
     @FXML
     private Button buttonDelete;
     @FXML
+    private Button buttonNew;
+    @FXML
     private BorderPane paneSelected;
     @FXML
-    private ListView<EntityListEntry> entityList;
-    private final ObservableList<EntityListEntry> entities = FXCollections.observableArrayList();
-    private EntityList<? extends Entity<?>> currentQueryList;
+    private ListView<EntityListEntry<T>> entityList;
+    private final ObservableList<EntityListEntry<T>> entities = FXCollections.observableArrayList();
+    private EntityList<T> currentQueryList;
 
     private Query query;
+    private boolean canEdit = false;
+    private EntityFactory<T> entityFactory;
+    /**
+     * Should navigation properties of the selected Entity be shown, or just
+     * entityProperties.
+     */
+    private boolean showNavigationProperties = true;
 
     @FXML
     private void actionButtonReload(ActionEvent event) {
@@ -60,6 +73,9 @@ public class ControllerCollection implements Initializable {
             loadEntities();
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to fetch entity list.", ex);
+        } catch (IllegalArgumentException ex) {
+            // Happens with new entities.
+            LOGGER.trace("Failed to fetch entity list.", ex);
         }
     }
 
@@ -84,6 +100,9 @@ public class ControllerCollection implements Initializable {
 
     @FXML
     private void actionDelete(ActionEvent event) {
+        if (!canEdit) {
+            return;
+        }
         EntityListEntry selectedItem = entityList.getSelectionModel().getSelectedItem();
         Entity entity = selectedItem.getEntity();
 
@@ -106,10 +125,20 @@ public class ControllerCollection implements Initializable {
         }
     }
 
+    @FXML
+    private void actionNew(ActionEvent event) {
+        if (!canEdit) {
+            return;
+        }
+        EntityListEntry newItem = new EntityListEntry().setEntity(entityFactory.createEntity());
+        entities.add(newItem);
+        entityList.getSelectionModel().select(newItem);
+    }
+
     private void loadEntities() {
         entities.clear();
-        for (Entity<?> entity : currentQueryList) {
-            entities.add(new EntityListEntry().setEntity(entity));
+        for (T entity : currentQueryList) {
+            entities.add(new EntityListEntry<T>().setEntity(entity));
         }
         buttonNext.setDisable(!currentQueryList.hasNextLink());
         buttonDelete.setDisable(true);
@@ -118,9 +147,9 @@ public class ControllerCollection implements Initializable {
     private void loadAllEntities() {
         int i = 0;
         entities.clear();
-        for (Iterator<? extends Entity<?>> it = currentQueryList.fullIterator(); it.hasNext();) {
-            Entity<?> entity = it.next();
-            entities.add(new EntityListEntry().setEntity(entity));
+        for (Iterator<T> it = currentQueryList.fullIterator(); it.hasNext();) {
+            T entity = it.next();
+            entities.add(new EntityListEntry<T>().setEntity(entity));
             i++;
             if (i >= 500) {
                 LOGGER.warn("Aborted loading all entities after {}.", entities.size());
@@ -131,13 +160,14 @@ public class ControllerCollection implements Initializable {
         buttonDelete.setDisable(true);
     }
 
-    private void entitySelected(EntityListEntry newValue) {
+    private void entitySelected(EntityListEntry<T> newValue) {
         if (newValue == null) {
             buttonDelete.setDisable(true);
             return;
         }
         try {
-            Node pane = FactoryEntityPanel.getPane(newValue.getEntity());
+            T entity = newValue.getEntity();
+            Node pane = FactoryEntityPanel.getPane(query.getService(), entity.getType(), entity, showNavigationProperties);
             paneSelected.setCenter(pane);
             buttonDelete.setDisable(false);
         } catch (IOException ex) {
@@ -148,12 +178,10 @@ public class ControllerCollection implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         entityList.setItems(entities);
-        entityList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EntityListEntry>() {
-            @Override
-            public void changed(ObservableValue<? extends EntityListEntry> observable, EntityListEntry oldValue, EntityListEntry newValue) {
-                entitySelected(newValue);
-            }
-        });
+        entityList.getSelectionModel().selectedItemProperty().addListener(
+                (ObservableValue<? extends EntityListEntry<T>> observable, EntityListEntry<T> oldValue, EntityListEntry<T> newValue) -> {
+                    entitySelected(newValue);
+                });
     }
 
     /**
@@ -165,12 +193,38 @@ public class ControllerCollection implements Initializable {
 
     /**
      * @param query the query to set.
-     * @param canEdit flag if editing (add/delete) is allowed.
+     * @param entityFactory The factory to use to generate new entities.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, boolean canEdit) {
+    public ControllerCollection setQuery(Query query, EntityFactory<T> entityFactory) {
         this.query = query;
+        this.canEdit = true;
+        this.entityFactory = entityFactory;
         buttonDelete.setVisible(canEdit);
+        buttonNew.setVisible(canEdit);
         return this;
+    }
+
+    /**
+     * @param query the query to set.
+     * @param showNavigationProperties Should navigation properties of the
+     * selected Entity be shown, or just entityProperties.
+     * @return this ControllerCollection.
+     */
+    public ControllerCollection setQuery(Query query, boolean showNavigationProperties) {
+        this.query = query;
+        this.canEdit = false;
+        this.showNavigationProperties = showNavigationProperties;
+        buttonDelete.setVisible(canEdit);
+        buttonNew.setVisible(canEdit);
+        return this;
+    }
+
+    public T getSelectedEntity() {
+        EntityListEntry<T> item = entityList.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            return null;
+        }
+        return item.getEntity();
     }
 }
