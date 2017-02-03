@@ -3,6 +3,7 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -91,7 +92,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private void actionButtonAll(ActionEvent event) {
         try {
-            currentQueryList = query.list();
+            currentQueryList = query.top(500).list();
             loadAllEntities();
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to fetch entity list.", ex);
@@ -152,8 +153,12 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
             entities.add(new EntityListEntry<T>().setEntity(entity));
             i++;
             if (i >= 500) {
-                LOGGER.warn("Aborted loading all entities after {}.", entities.size());
-                break;
+                LOGGER.warn("Warning after {}. Total: {}.", i, entities.size());
+                Optional<ButtonType> result = new Alert(Alert.AlertType.WARNING, "Already loaded " + entities.size() + " Entities.\nContinue loading?", ButtonType.CANCEL, ButtonType.YES).showAndWait();
+                if (!result.isPresent() || result.get() != ButtonType.YES) {
+                    break;
+                }
+                i = 0;
             }
         }
         buttonNext.setDisable(!currentQueryList.hasNextLink());
