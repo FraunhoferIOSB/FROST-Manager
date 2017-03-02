@@ -123,7 +123,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>SensorThingsClient</artifactId>
-            <version>0.8-SNAPSHOT</version>
+            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
