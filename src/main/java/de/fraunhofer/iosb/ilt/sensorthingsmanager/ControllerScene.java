@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.SwingUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +19,12 @@ import de.fraunhofer.iosb.ilt.sta.jackson.ObjectMapperFactory;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
@@ -29,7 +33,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
 
 public class ControllerScene implements Initializable {
 
@@ -61,7 +65,10 @@ public class ControllerScene implements Initializable {
     @FXML
     private TabPane serverTabs;
     @FXML
-    private Pane paneServers;
+    private Node paneServers;
+    @FXML
+    private BorderPane paneAuth;
+    private ServerListEntry activeItem = new ServerListEntry();
 
     @FXML
     private void toggleServersAction(ActionEvent event) {
@@ -80,7 +87,12 @@ public class ControllerScene implements Initializable {
 
     @FXML
     private void actionServerAdd(ActionEvent event) {
-        servers.add(new ServerListEntry().setName(serverName.getText()).setUrl(serverUrl.getText()));
+        ServerListEntry entry = new ServerListEntry()
+                .setName(serverName.getText())
+                .setUrl(serverUrl.getText())
+                .setConfig(activeItem.updateConfig().getConfig());
+        entry.updateConfig();
+        servers.add(entry);
         sortServers();
         saveServerList();
     }
@@ -92,6 +104,7 @@ public class ControllerScene implements Initializable {
             return;
         }
         server.setName(serverName.getText()).setUrl(serverUrl.getText());
+        server.updateConfig();
         sortServers();
         saveServerList();
     }
@@ -111,9 +124,11 @@ public class ControllerScene implements Initializable {
             buttonDelete.setDisable(true);
             return;
         }
+        activeItem = server;
         serverName.setText(server.getName());
         serverUrl.setText(server.getUrl());
         buttonDelete.setDisable(false);
+        paneAuth.setCenter(server.getConfigEditor(null, null).getNode());
     }
 
     @FXML
@@ -131,7 +146,9 @@ public class ControllerScene implements Initializable {
             controller.setServerEntry(
                     new ServerListEntry()
                     .setName(serverName.getText())
-                    .setUrl(serverUrl.getText()));
+                    .setUrl(serverUrl.getText())
+                    .setConfig(activeItem.getConfig())
+            );
 
             Tab tab = new Tab(name);
             tab.setContent(content);
@@ -172,6 +189,7 @@ public class ControllerScene implements Initializable {
         serverList.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends ServerListEntry> observable, ServerListEntry oldValue, ServerListEntry newValue) -> {
             actionServerSelected(newValue);
         });
+
     }
 
     private void sortServers() {

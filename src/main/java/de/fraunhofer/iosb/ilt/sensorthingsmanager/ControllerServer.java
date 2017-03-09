@@ -55,6 +55,7 @@ public class ControllerServer implements Initializable {
         serverTitle.setText(entry.getName() + " @ " + entry.getUrl());
         try {
             service = new SensorThingsService(new URL(entry.getUrl()));
+            entry.getAuthMethod().setAuth(service);
 
             addTabFor("Things", service.things().query(), () -> {
                 Thing entity = new Thing();
