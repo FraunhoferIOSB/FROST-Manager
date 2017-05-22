@@ -1,5 +1,6 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
+import de.fraunhofer.iosb.ilt.configurable.Reflection;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +20,7 @@ public class MainApp extends Application {
         stage.setTitle("SensorThings Manager");
         stage.setScene(scene);
         stage.show();
+        new Thread(Reflection::getReflections).start();
     }
 
     /**
