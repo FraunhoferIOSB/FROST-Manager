@@ -1,18 +1,16 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.ResourceBundle;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
 import de.fraunhofer.iosb.ilt.sta.query.Query;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,7 +22,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.BorderPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,14 +53,30 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private Button buttonNew;
     @FXML
+    private Button buttonAdd;
+    @FXML
     private BorderPane paneSelected;
     @FXML
     private ListView<EntityListEntry<T>> entityList;
     private final ObservableList<EntityListEntry<T>> entities = FXCollections.observableArrayList();
     private EntityList<T> currentQueryList;
 
-    private Query query;
+    private Query<T> query;
+    /**
+     * Can new entities be created, or existing be deleted.
+     */
     private boolean canEdit = false;
+    /**
+     * Can existing entities not in this collection be linked into this
+     * collection.
+     */
+    private boolean canLinkNew = false;
+    /**
+     * The setter used to link newly selected items to the owner of the
+     * collection.
+     */
+    private EntityGuiController.ChildSetter<T> childSetter;
+    private boolean canMultiSelect = false;
     private EntityFactory<T> entityFactory;
     /**
      * Should navigation properties of the selected Entity be shown, or just
@@ -136,6 +153,21 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         entityList.getSelectionModel().select(newItem);
     }
 
+    @FXML
+    private void actionAdd(ActionEvent event) {
+        if (childSetter == null) {
+            new Alert(Alert.AlertType.ERROR, "No childSetter defined.", ButtonType.CLOSE).showAndWait();
+            return;
+        }
+        Class<T> entityClass = query.getEntityClass();
+        Query<T> allQuery = new Query<>(query.getService(), entityClass);
+        Optional<List<T>> result = EntityGuiController.entitySearchDialog(allQuery, true);
+        if (result.isPresent() && !result.get().isEmpty()) {
+            List<T> newChildren = result.get();
+            childSetter.setChildren(newChildren);
+        }
+    }
+
     private void loadEntities() {
         entities.clear();
         for (T entity : currentQueryList) {
@@ -207,6 +239,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         this.entityFactory = entityFactory;
         buttonDelete.setVisible(canEdit);
         buttonNew.setVisible(canEdit);
+        buttonAdd.setVisible(canLinkNew);
         return this;
     }
 
@@ -214,22 +247,52 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * @param query the query to set.
      * @param showNavigationProperties Should navigation properties of the
      * selected Entity be shown, or just entityProperties.
+     * @param canLinkNew Can new entities be linked into this collection.
+     * @param multiSelect Can more than one entity be selected.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, boolean showNavigationProperties) {
+    public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canLinkNew, boolean multiSelect) {
         this.query = query;
         this.canEdit = false;
+        this.canLinkNew = canLinkNew;
         this.showNavigationProperties = showNavigationProperties;
+        this.canMultiSelect = multiSelect;
         buttonDelete.setVisible(canEdit);
         buttonNew.setVisible(canEdit);
+        buttonAdd.setVisible(canLinkNew);
+        entityList.getSelectionModel().setSelectionMode(canMultiSelect ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
         return this;
     }
 
+    public void setChildSetter(EntityGuiController.ChildSetter<T> childSetter) {
+        this.childSetter = childSetter;
+    }
+
+    /**
+     * @return the currently selected entity for single-select mode, or the last
+     * selected entity for multi select mode.
+     */
     public T getSelectedEntity() {
         EntityListEntry<T> item = entityList.getSelectionModel().getSelectedItem();
         if (item == null) {
             return null;
         }
         return item.getEntity();
+    }
+
+    /**
+     * @return the currently selected entity for single-select mode, or the last
+     * selected entity for multi select mode.
+     */
+    public List<T> getSelectedEntities() {
+        ObservableList<EntityListEntry<T>> items = entityList.getSelectionModel().getSelectedItems();
+        if (items == null) {
+            return null;
+        }
+        List<T> values = new ArrayList<>();
+        for (EntityListEntry<T> item : items) {
+            values.add(item.getEntity());
+        }
+        return values;
     }
 }

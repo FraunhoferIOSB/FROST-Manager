@@ -18,33 +18,37 @@
                         <HBox alignment="CENTER" BorderPane.alignment="CENTER">
                             <children>
                                 <Button fx:id="buttonReload" accessibleHelp="Load First Set" accessibleRoleDescription="Load First Set" accessibleText="Load First Set" mnemonicParsing="false" onAction="#actionButtonReload" text="↧">
-                           <tooltip>
-                              <Tooltip text="Load the first set." />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Load the first set." />
+                                    </tooltip>
+                                </Button>
                                 <Button fx:id="buttonNext" accessibleHelp="Load Next Set" accessibleRoleDescription="Load Next Set" accessibleText="Load Next Set" disable="true" mnemonicParsing="false" onAction="#actionButtonNext" text="⇊">
-                           <tooltip>
-                              <Tooltip text="Load the next set." />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Load the next set." />
+                                    </tooltip>
+                                </Button>
                                 <Button fx:id="buttonAll" accessibleHelp="Load All" accessibleRoleDescription="Load All" accessibleText="Load All" mnemonicParsing="false" onAction="#actionButtonAll" text="⤓">
-                           <tooltip>
-                              <Tooltip text="Load all entities." />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Load all entities." />
+                                    </tooltip>
+                                </Button>
                             </children>
                         </HBox>
                     </top>
                     <center>
                         <ListView fx:id="entityList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                     </center>
-               <bottom>
-                  <FlowPane BorderPane.alignment="CENTER">
-                     <children>
-                        <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionDelete" text="Delete" />
-                        <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="New" />
-                     </children>
-                  </FlowPane>
-               </bottom>
+                    <bottom>
+                        <FlowPane BorderPane.alignment="CENTER">
+                            <children>
+                                <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionDelete" text="Delete" />
+                                <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="New" />
+                                <Button fx:id="buttonAdd" mnemonicParsing="false" onAction="#actionAdd" text="Add" />
+                            </children>
+                        </FlowPane>
+                    </bottom>
                 </BorderPane>
-            <BorderPane fx:id="paneSelected" />
+                <BorderPane fx:id="paneSelected" />
             </items>
         </SplitPane>
     </children>

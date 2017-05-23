@@ -1,22 +1,9 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.geojson.GeoJsonObject;
-import org.geojson.Polygon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.threeten.extra.Interval;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
@@ -30,9 +17,15 @@ import de.fraunhofer.iosb.ilt.sta.model.ObservedProperty;
 import de.fraunhofer.iosb.ilt.sta.model.Sensor;
 import de.fraunhofer.iosb.ilt.sta.model.Thing;
 import de.fraunhofer.iosb.ilt.sta.model.TimeObject;
+import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
 import de.fraunhofer.iosb.ilt.sta.model.ext.UnitOfMeasurement;
 import de.fraunhofer.iosb.ilt.sta.query.Query;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.VPos;
@@ -53,6 +46,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import org.geojson.GeoJsonObject;
+import org.geojson.Polygon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.threeten.extra.Interval;
 
 /**
  *
@@ -799,7 +797,22 @@ public interface EntityGuiController<T extends Entity<T>> {
                     accordionLinks.getPanes().add(tp);
                     tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query()));
+                    ChildSetter<Location> locationChildSetter = new ChildSetter<Location>() {
+                        @Override
+                        public void setChild(Location child) {
+                            throw new UnsupportedOperationException("This setter only deals with multiple childs.");
+                        }
+
+                        @Override
+                        public void setChildren(List<Location> children) {
+                            EntityList<Location> locations = entity.getLocations();
+                            locations.clear();
+                            for (Location child : children) {
+                                locations.add(child.withOnlyId());
+                            }
+                        }
+                    };
+                    tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query(), true, locationChildSetter));
                     accordionLinks.getPanes().add(tp);
                     tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
                     accordionLinks.getPanes().add(tp);
@@ -813,6 +826,10 @@ public interface EntityGuiController<T extends Entity<T>> {
     public static interface ChildSetter<C extends Entity<C>> {
 
         public void setChild(C child);
+
+        default public void setChildren(List<C> children) {
+            // Does nothing by default.
+        }
     }
 
     public static <C extends Entity<C>, P extends Entity<P>> TitledPane createEditableEntityPane(
@@ -833,9 +850,9 @@ public interface EntityGuiController<T extends Entity<T>> {
         Button edit = new Button("🔧");
         tp.setGraphic(edit);
         edit.setOnAction((ActionEvent event) -> {
-            Optional<C> result = entitySearchDialog(childQuery);
-            if (result.isPresent()) {
-                C newChild = result.get();
+            Optional<List<C>> result = entitySearchDialog(childQuery, false);
+            if (result.isPresent() && !result.get().isEmpty()) {
+                C newChild = result.get().get(0);
                 setter.setChild(newChild);
                 try {
                     tp.setContent(FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, false));
@@ -864,12 +881,19 @@ public interface EntityGuiController<T extends Entity<T>> {
         return node;
     }
 
-    public static Pane createCollectionPaneFor(Query<? extends Entity<?>> query) {
+    public static <C extends Entity<C>> Pane createCollectionPaneFor(Query<C> query) {
+        return createCollectionPaneFor(query, false, null);
+    }
+
+    public static <C extends Entity<C>> Pane createCollectionPaneFor(Query<C> query, boolean canLinkNew, ChildSetter<C> childSetter) {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.<ControllerCollection>getController();
-            controller.setQuery(query, true);
+            controller.setQuery(query, true, canLinkNew, false);
+            if (childSetter != null) {
+                controller.setChildSetter(childSetter);
+            }
             return content;
         } catch (IOException ex) {
             LoggerFactory.getLogger(EntityGuiController.class).error("Failed to load Collection Pane.", ex);
@@ -877,16 +901,20 @@ public interface EntityGuiController<T extends Entity<T>> {
         return null;
     }
 
-    public static <T extends Entity<T>> Optional<T> entitySearchDialog(Query<T> query) {
+    public static <T extends Entity<T>> Optional<List<T>> entitySearchDialog(Query<T> query, boolean multiSelect) {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             final ControllerCollection<T> controller = loader.<ControllerCollection<T>>getController();
-            controller.setQuery(query, false);
+            controller.setQuery(query, false, false, multiSelect);
 
-            Dialog<T> dialog = new Dialog<>();
+            Dialog<List<T>> dialog = new Dialog<>();
             dialog.setHeight(800);
-            dialog.setTitle("Choose a " + EntityType.singleForClass(query.getEntityType().getType()).getName());
+            if (multiSelect) {
+                dialog.setTitle("Choose one or more " + EntityType.singleForClass(query.getEntityType().getType()).getName());
+            } else {
+                dialog.setTitle("Choose a " + EntityType.singleForClass(query.getEntityType().getType()).getName());
+            }
             dialog.setResizable(true);
             dialog.getDialogPane().setContent(content);
             ButtonType buttonTypeOk = new ButtonType("Set", ButtonBar.ButtonData.OK_DONE);
@@ -895,7 +923,9 @@ public interface EntityGuiController<T extends Entity<T>> {
             dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
             dialog.setResultConverter((ButtonType button) -> {
                 if (button == buttonTypeOk) {
-                    return controller.getSelectedEntity();
+                    if (multiSelect) {
+                        return controller.getSelectedEntities();
+                    }
                 }
                 return null;
             });
