@@ -122,9 +122,14 @@
 
     <repositories>
         <repository>
-            <id>bintray-fraunhoferiosb-Maven</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com/fraunhoferiosb/Maven</url>
+            <id>bintray</id>
+            <url>https://jcenter.bintray.com</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -148,6 +153,11 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Configurable</artifactId>
+            <version>0.1</version>
         </dependency>
     </dependencies>
 </project>
