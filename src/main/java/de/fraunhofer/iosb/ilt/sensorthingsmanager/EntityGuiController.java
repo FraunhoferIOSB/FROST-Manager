@@ -23,6 +23,7 @@ import de.fraunhofer.iosb.ilt.sta.query.Query;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -926,6 +927,9 @@ public interface EntityGuiController<T extends Entity<T>> {
                     if (multiSelect) {
                         return controller.getSelectedEntities();
                     }
+                    List<T> list = new ArrayList<>();
+                    list.add(controller.getSelectedEntity());
+                    return list;
                 }
                 return null;
             });
