@@ -1,17 +1,15 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
 import de.fraunhofer.iosb.ilt.configurable.Configurable;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorSubclass;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.auth.AuthMethod;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.auth.AuthNone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,15 +29,15 @@ public class ServerListEntry implements Configurable<Object, Object> {
 
     @Override
     public void configure(JsonElement config, Object context, Object edtCtx) {
-        getConfigEditor(context, edtCtx).setConfig(config, context, edtCtx);
+        getConfigEditor(context, edtCtx).setConfig(config);
     }
 
     @Override
-    public EditorMap<Object, Object, ?> getConfigEditor(Object context, Object edtCtx) {
+    public EditorMap<?> getConfigEditor(Object context, Object edtCtx) {
         if (configEditor == null) {
             configEditor = new EditorMap();
 
-            editorAuthMethod = new EditorSubclass<>(AuthMethod.class, "Auth", "The method to use for authentication", false, "authClass")
+            editorAuthMethod = new EditorSubclass<>(context, edtCtx, AuthMethod.class, "Auth", "The method to use for authentication", false, "authClass")
                     .setSelectLabel("");
             configEditor.addOption("authMethod", editorAuthMethod, false);
         }

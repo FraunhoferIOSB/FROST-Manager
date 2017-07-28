@@ -512,7 +512,9 @@ public interface EntityGuiController<T extends Entity<T>> {
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
-            textPhenomenonTime.setText(entity.getPhenomenonTime().toString());
+            if (entity.getPhenomenonTime() != null) {
+                textPhenomenonTime.setText(entity.getPhenomenonTime().toString());
+            }
             if (entity.getResultTime() != null) {
                 textResultTime.setText(entity.getResultTime().toString());
             }
@@ -544,9 +546,15 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setPhenomenonTime(TimeObject.parse(textPhenomenonTime.getText()));
-            entity.setResultTime(ZonedDateTime.parse(textResultTime.getText()));
-            entity.setValidTime(Interval.parse(textValidTime.getText()));
+            if (!textPhenomenonTime.getText().isEmpty()) {
+                entity.setPhenomenonTime(TimeObject.parse(textPhenomenonTime.getText()));
+            }
+            if (!textResultTime.getText().isEmpty()) {
+                entity.setResultTime(ZonedDateTime.parse(textResultTime.getText()));
+            }
+            if (!textValidTime.getText().isEmpty()) {
+                entity.setValidTime(Interval.parse(textValidTime.getText()));
+            }
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
                 JsonNode tree = mapper.readTree(textResult.getText());

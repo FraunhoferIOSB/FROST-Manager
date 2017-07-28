@@ -1,8 +1,11 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
+import com.google.gson.JsonElement;
+import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
+import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
+import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -10,12 +13,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonElement;
-
-import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
-import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 
 /**
  *
@@ -33,11 +30,11 @@ public class AuthBasic implements AuthMethod {
 
     @Override
     public void configure(JsonElement config, Object context, Object edtCtx) {
-        getConfigEditor(context, edtCtx).setConfig(config, context, edtCtx);
+        getConfigEditor(context, edtCtx).setConfig(config);
     }
 
     @Override
-    public EditorMap<Object, Object, ?> getConfigEditor(Object context, Object edtCtx) {
+    public EditorMap<?> getConfigEditor(Object context, Object edtCtx) {
         if (configEditor == null) {
             configEditor = new EditorMap();
             editorUsername = new EditorString("username", 1, "Username", "The username to use for authentication.");
