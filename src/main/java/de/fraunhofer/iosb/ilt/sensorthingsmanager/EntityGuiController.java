@@ -899,7 +899,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.<ControllerCollection>getController();
-            controller.setQuery(query, true, canLinkNew, false);
+            controller.setQuery(query, true, true, canLinkNew, false);
             if (childSetter != null) {
                 controller.setChildSetter(childSetter);
             }
@@ -915,7 +915,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             final ControllerCollection<T> controller = loader.<ControllerCollection<T>>getController();
-            controller.setQuery(query, false, false, multiSelect);
+            controller.setQuery(query, false, false, false, multiSelect);
 
             Dialog<List<T>> dialog = new Dialog<>();
             dialog.setHeight(800);

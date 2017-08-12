@@ -23,6 +23,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +57,9 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private Button buttonAdd;
     @FXML
+    private ToggleButton buttonFilter;
+    private String filter = "";
+    @FXML
     private BorderPane paneSelected;
     @FXML
     private ListView<EntityListEntry<T>> entityList;
@@ -63,9 +68,13 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
 
     private Query<T> query;
     /**
-     * Can new entities be created, or existing be deleted.
+     * Can new entities be created.
      */
-    private boolean canEdit = false;
+    private boolean canCreate = false;
+    /**
+     * Can entities be deleted.
+     */
+    private boolean canDelete = false;
     /**
      * Can existing entities not in this collection be linked into this
      * collection.
@@ -87,6 +96,11 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private void actionButtonReload(ActionEvent event) {
         try {
+            if (buttonFilter.isSelected() && !filter.isEmpty()) {
+                query.filter(filter);
+            } else {
+                query.filter("");
+            }
             currentQueryList = query.list();
             loadEntities();
         } catch (ServiceFailureException ex) {
@@ -109,6 +123,11 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private void actionButtonAll(ActionEvent event) {
         try {
+            if (buttonFilter.isSelected() && !filter.isEmpty()) {
+                query.filter(filter);
+            } else {
+                query.filter("");
+            }
             currentQueryList = query.top(500).list();
             loadAllEntities();
         } catch (ServiceFailureException ex) {
@@ -117,8 +136,24 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     }
 
     @FXML
+    private void actionButtonFilter(ActionEvent event) {
+        LOGGER.info("Filter button clicked.");
+        if (buttonFilter.isSelected()) {
+            TextInputDialog textInputDialog = new TextInputDialog(filter);
+            textInputDialog.setHeaderText("Set filter");
+            textInputDialog.setResizable(true);
+            Optional<String> filterOptional = textInputDialog.showAndWait();
+            if (filterOptional.isPresent()) {
+                this.filter = filterOptional.get();
+            } else {
+                this.filter = "";
+            }
+        }
+    }
+
+    @FXML
     private void actionDelete(ActionEvent event) {
-        if (!canEdit) {
+        if (!canDelete) {
             return;
         }
         EntityListEntry selectedItem = entityList.getSelectionModel().getSelectedItem();
@@ -145,7 +180,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
 
     @FXML
     private void actionNew(ActionEvent event) {
-        if (!canEdit) {
+        if (!canCreate) {
             return;
         }
         EntityListEntry newItem = new EntityListEntry().setEntity(entityFactory.createEntity());
@@ -235,10 +270,11 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      */
     public ControllerCollection setQuery(Query query, EntityFactory<T> entityFactory) {
         this.query = query;
-        this.canEdit = true;
+        this.canCreate = true;
+        this.canDelete = true;
         this.entityFactory = entityFactory;
-        buttonDelete.setVisible(canEdit);
-        buttonNew.setVisible(canEdit);
+        buttonDelete.setVisible(canDelete);
+        buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);
         return this;
     }
@@ -247,18 +283,20 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * @param query the query to set.
      * @param showNavigationProperties Should navigation properties of the
      * selected Entity be shown, or just entityProperties.
+     * @param canDelete Can entities be deleted from this collection.
      * @param canLinkNew Can new entities be linked into this collection.
      * @param multiSelect Can more than one entity be selected.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canLinkNew, boolean multiSelect) {
+    public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect) {
         this.query = query;
-        this.canEdit = false;
+        this.canCreate = false;
         this.canLinkNew = canLinkNew;
+        this.canDelete = canDelete;
         this.showNavigationProperties = showNavigationProperties;
         this.canMultiSelect = multiSelect;
-        buttonDelete.setVisible(canEdit);
-        buttonNew.setVisible(canEdit);
+        buttonDelete.setVisible(canDelete);
+        buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);
         entityList.getSelectionModel().setSelectionMode(canMultiSelect ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
         return this;
