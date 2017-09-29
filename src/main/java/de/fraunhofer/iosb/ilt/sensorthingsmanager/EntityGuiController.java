@@ -107,6 +107,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         private TextField textObservedArea;
         private TextField textPhenomenonTime;
         private TextField textResultTime;
+        private TextArea textProperties;
 
         @Override
         public void loadFields() {
@@ -140,7 +141,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             if (entity.getResultTime() != null) {
                 textResultTime.setText(entity.getResultTime().toString());
             }
-
+            try {
+                String props = mapper.writeValueAsString(entity.getProperties());
+                textProperties.setText(props);
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Properties can not be converted to JSON.", ex);
+            }
         }
 
         @Override
@@ -152,6 +158,13 @@ public interface EntityGuiController<T extends Entity<T>> {
             uom.setName(textUomName.getText());
             uom.setSymbol(textUomSymbol.getText());
             uom.setDefinition(textUomDefinition.getText());
+            final ObjectMapper mapper = ObjectMapperFactory.get();
+            try {
+                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                entity.setProperties(properties);
+            } catch (IOException ex) {
+                LOGGER.error("Not valid json.", ex);
+            }
         }
 
         @Override
@@ -173,6 +186,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textObservedArea = addFieldTo(gridProperties, ++i, "ObservedArea", new TextField(), false, false);
             textPhenomenonTime = addFieldTo(gridProperties, ++i, "PhenomenonTime", new TextField(), false, false);
             textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false, false);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
             if (accordionLinks != null) {
                 try {
@@ -205,6 +219,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         private TextField textObservedArea;
         private TextField textPhenomenonTime;
         private TextField textResultTime;
+        private TextArea textProperties;
 
         @Override
         public void loadFields() {
@@ -234,7 +249,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             if (entity.getResultTime() != null) {
                 textResultTime.setText(entity.getResultTime().toString());
             }
-
+            try {
+                String props = mapper.writeValueAsString(entity.getProperties());
+                textProperties.setText(props);
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Properties can not be converted to JSON.", ex);
+            }
         }
 
         @Override
@@ -246,6 +266,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             try {
                 List<UnitOfMeasurement> properties = mapper.readValue(textUoms.getText(), TYPE_LIST_UOM);
                 entity.setUnitOfMeasurements(properties);
+            } catch (IOException ex) {
+                LOGGER.error("Not valid json.", ex);
+            }
+            try {
+                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                entity.setProperties(properties);
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -268,6 +294,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textObservedArea = addFieldTo(gridProperties, ++i, "ObservedArea", new TextField(), false, false);
             textPhenomenonTime = addFieldTo(gridProperties, ++i, "PhenomenonTime", new TextField(), false, false);
             textResultTime = addFieldTo(gridProperties, ++i, "ResultTime", new TextField(), false, false);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
             if (accordionLinks != null) {
                 try {
@@ -299,6 +326,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         private TextArea textDescription;
         private TextField textEncodingType;
         private TextArea textFeature;
+        private TextArea textProperties;
 
         @Override
         public void loadFields() {
@@ -319,6 +347,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
+            try {
+                String props = mapper.writeValueAsString(entity.getProperties());
+                textProperties.setText(props);
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Properties can not be converted to JSON.", ex);
+            }
         }
 
         @Override
@@ -332,6 +366,12 @@ public interface EntityGuiController<T extends Entity<T>> {
                 entity.setFeature(feature);
             } catch (IOException ex) {
                 LOGGER.error("Not valid geojson.", ex);
+            }
+            try {
+                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                entity.setProperties(properties);
+            } catch (IOException ex) {
+                LOGGER.error("Not valid json.", ex);
             }
         }
 
@@ -349,6 +389,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
             textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false, editable);
             textFeature = addFieldTo(gridProperties, ++i, "Feature", new TextArea(), false, editable);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
             if (accordionLinks != null) {
                 try {
@@ -425,6 +466,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         private TextArea textDescription;
         private TextField textEncodingType;
         private TextArea textLocation;
+        private TextArea textProperties;
 
         @Override
         public void loadFields() {
@@ -445,6 +487,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
+            try {
+                String props = mapper.writeValueAsString(entity.getProperties());
+                textProperties.setText(props);
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Properties can not be converted to JSON.", ex);
+            }
         }
 
         @Override
@@ -458,6 +506,12 @@ public interface EntityGuiController<T extends Entity<T>> {
                 entity.setLocation(feature);
             } catch (IOException ex) {
                 LOGGER.error("Not valid geojson.", ex);
+            }
+            try {
+                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                entity.setProperties(properties);
+            } catch (IOException ex) {
+                LOGGER.error("Not valid json.", ex);
             }
         }
 
@@ -475,6 +529,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
             textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false, editable);
             textLocation = addFieldTo(gridProperties, ++i, "Location", new TextArea(), false, editable);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
             if (accordionLinks != null) {
                 try {
@@ -617,6 +672,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         private TextField textName;
         private TextField textDefinition;
         private TextArea textDescription;
+        private TextArea textProperties;
 
         @Override
         public void loadFields() {
@@ -629,6 +685,13 @@ public interface EntityGuiController<T extends Entity<T>> {
             textName.setText(entity.getName());
             textDefinition.setText(entity.getDefinition());
             textDescription.setText(entity.getDescription());
+            final ObjectMapper mapper = ObjectMapperFactory.get();
+            try {
+                String props = mapper.writeValueAsString(entity.getProperties());
+                textProperties.setText(props);
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Properties can not be converted to JSON.", ex);
+            }
         }
 
         @Override
@@ -636,6 +699,13 @@ public interface EntityGuiController<T extends Entity<T>> {
             entity.setName(textName.getText());
             entity.setDefinition(textDefinition.getText());
             entity.setDescription(textDescription.getText());
+            final ObjectMapper mapper = ObjectMapperFactory.get();
+            try {
+                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                entity.setProperties(properties);
+            } catch (IOException ex) {
+                LOGGER.error("Not valid json.", ex);
+            }
         }
 
         @Override
@@ -651,6 +721,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
             textDefinition = addFieldTo(gridProperties, ++i, "Definition", new TextField(), false, editable);
             textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
             if (accordionLinks != null) {
                 try {
@@ -678,6 +749,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         private TextArea textDescription;
         private TextField textEncodingType;
         private TextArea textMetadata;
+        private TextArea textProperties;
 
         @Override
         public void loadFields() {
@@ -696,6 +768,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Metadata can not be converted to JSON.", ex);
             }
+            try {
+                String props = mapper.writeValueAsString(entity.getProperties());
+                textProperties.setText(props);
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Properties can not be converted to JSON.", ex);
+            }
         }
 
         @Override
@@ -707,6 +785,12 @@ public interface EntityGuiController<T extends Entity<T>> {
             try {
                 JsonNode json = mapper.readTree(textMetadata.getText());
                 entity.setMetadata(json);
+            } catch (IOException ex) {
+                LOGGER.error("Not valid json.", ex);
+            }
+            try {
+                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                entity.setProperties(properties);
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -726,6 +810,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
             textEncodingType = addFieldTo(gridProperties, ++i, "EncodingType", new TextField(), false, editable);
             textMetadata = addFieldTo(gridProperties, ++i, "Metadata", new TextArea(), true, editable);
+            textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
 
             if (accordionLinks != null) {
                 try {
@@ -763,9 +848,8 @@ public interface EntityGuiController<T extends Entity<T>> {
             textName.setText(entity.getName());
             textDescription.setText(entity.getDescription());
             final ObjectMapper mapper = ObjectMapperFactory.get();
-            String props;
             try {
-                props = mapper.writeValueAsString(entity.getProperties());
+                String props = mapper.writeValueAsString(entity.getProperties());
                 textProperties.setText(props);
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
