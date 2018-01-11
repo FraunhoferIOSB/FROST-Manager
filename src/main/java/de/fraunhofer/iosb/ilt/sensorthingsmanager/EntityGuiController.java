@@ -983,7 +983,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.<ControllerCollection>getController();
-            controller.setQuery(query, true, true, canLinkNew, false);
+            controller.setQuery(query, true, true, canLinkNew, true);
             if (childSetter != null) {
                 controller.setChildSetter(childSetter);
             }

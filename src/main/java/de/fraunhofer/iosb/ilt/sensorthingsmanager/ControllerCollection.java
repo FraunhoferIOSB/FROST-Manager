@@ -156,22 +156,29 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (!canDelete) {
             return;
         }
-        EntityListEntry selectedItem = entityList.getSelectionModel().getSelectedItem();
-        Entity entity = selectedItem.getEntity();
-
-        if (entity.getId() == null) {
-            // entity doesn't exist yet.
-            entities.remove(selectedItem);
-            return;
+        ObservableList<EntityListEntry<T>> selectedItems = entityList.getSelectionModel().getSelectedItems();
+        List<EntityListEntry<T>> toDelete = new ArrayList<>();
+        for (EntityListEntry<T> selectedItem : selectedItems) {
+            toDelete.add(selectedItem);
         }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + entity.getId().toString() + " ?", ButtonType.YES, ButtonType.NO);
+        String what = selectedItems.size() == 1 ? "Item " + selectedItems.get(0).getEntity().getId().toString() : "all " + selectedItems.size() + " items";
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + what + " ?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait();
 
         if (alert.getResult() == ButtonType.YES) {
             try {
-                entity.getService().delete(entity);
-                entities.remove(selectedItem);
+                // ToDo: Add progress dialog.
+                for (EntityListEntry<T> selectedItem : toDelete) {
+                    Entity entity = selectedItem.getEntity();
+                    if (entity.getId() == null) {
+                        // entity doesn't exist yet.
+                        entities.remove(selectedItem);
+                    } else {
+                        LOGGER.info("Deleting " + entity);
+                        entity.getService().delete(entity);
+                        entities.remove(selectedItem);
+                    }
+                }
             } catch (ServiceFailureException ex) {
                 LOGGER.warn("Failed to delete entity.", ex);
             }
@@ -250,6 +257,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         entityList.setItems(entities);
+        entityList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         entityList.getSelectionModel().selectedItemProperty().addListener(
                 (ObservableValue<? extends EntityListEntry<T>> observable, EntityListEntry<T> oldValue, EntityListEntry<T> newValue) -> {
                     entitySelected(newValue);
