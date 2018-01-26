@@ -59,6 +59,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private ToggleButton buttonFilter;
     private String filter = "";
+    private String orderby = "";
     @FXML
     private BorderPane paneSelected;
     @FXML
@@ -101,6 +102,9 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
             } else {
                 query.filter("");
             }
+            if (!orderby.isEmpty()) {
+                query.orderBy(orderby);
+            }
             currentQueryList = query.list();
             loadEntities();
         } catch (ServiceFailureException ex) {
@@ -127,6 +131,9 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                 query.filter(filter);
             } else {
                 query.filter("");
+            }
+            if (!orderby.isEmpty()) {
+                query.orderBy(orderby);
             }
             currentQueryList = query.top(500).list();
             loadAllEntities();
@@ -203,11 +210,15 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         }
         Class<T> entityClass = query.getEntityClass();
         Query<T> allQuery = new Query<>(query.getService(), entityClass);
-        Optional<List<T>> result = EntityGuiController.entitySearchDialog(allQuery, true);
+        Optional<List<T>> result = EntityGuiController.entitySearchDialog(allQuery, true, orderby);
         if (result.isPresent() && !result.get().isEmpty()) {
             List<T> newChildren = result.get();
             childSetter.setChildren(newChildren);
         }
+    }
+
+    public void setOrderby(String orderby) {
+        this.orderby = orderby;
     }
 
     private void loadEntities() {
@@ -274,12 +285,14 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     /**
      * @param query the query to set.
      * @param entityFactory The factory to use to generate new entities.
+     * @param orderBy The ordering to use.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, EntityFactory<T> entityFactory) {
+    public ControllerCollection setQuery(Query query, EntityFactory<T> entityFactory, String orderBy) {
         this.query = query;
         this.canCreate = true;
         this.canDelete = true;
+        this.orderby = orderBy;
         this.entityFactory = entityFactory;
         buttonDelete.setVisible(canDelete);
         buttonNew.setVisible(canCreate);
@@ -296,13 +309,14 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * @param multiSelect Can more than one entity be selected.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect) {
+    public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect, String orderBy) {
         this.query = query;
         this.canCreate = false;
         this.canLinkNew = canLinkNew;
         this.canDelete = canDelete;
         this.showNavigationProperties = showNavigationProperties;
         this.canMultiSelect = multiSelect;
+        this.orderby = orderBy;
         buttonDelete.setVisible(canDelete);
         buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);

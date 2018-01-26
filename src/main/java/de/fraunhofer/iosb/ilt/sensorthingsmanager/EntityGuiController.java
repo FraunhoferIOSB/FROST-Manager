@@ -190,10 +190,10 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), entity::setThing));
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getSensor(), service.sensors().query(), entity::setSensor));
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getObservedProperty(), service.observedProperties().query(), entity::setObservedProperty));
-                    accordionLinks.getPanes().add(new TitledPane("Observations", createCollectionPaneFor(entity.observations().query())));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), "name asc", entity::setThing));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getSensor(), service.sensors().query(), "name asc", entity::setSensor));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getObservedProperty(), service.observedProperties().query(), "name asc", entity::setObservedProperty));
+                    accordionLinks.getPanes().add(new TitledPane("Observations", createCollectionPaneFor(entity.observations().query(), "phenomenonTime asc")));
                 } catch (IOException | ServiceFailureException ex) {
                     LOGGER.error("Failed to create panel.", ex);
                 } catch (NullPointerException e) {
@@ -298,12 +298,12 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), entity::setThing));
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getSensor(), service.sensors().query(), entity::setSensor));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), "name asc", entity::setThing));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getSensor(), service.sensors().query(), "name asc", entity::setSensor));
 
-                    TitledPane tp = new TitledPane("ObservedProperties", createCollectionPaneFor(entity.observedProperties().query()));
+                    TitledPane tp = new TitledPane("ObservedProperties", createCollectionPaneFor(entity.observedProperties().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
+                    tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query(), "phenomenonTime asc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (IOException | ServiceFailureException ex) {
                     LOGGER.error("Failed to create panel.", ex);
@@ -393,7 +393,7 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    TitledPane tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query()));
+                    TitledPane tp = new TitledPane("Observations", createCollectionPaneFor(entity.observations().query(), "phenomenonTime asc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (NullPointerException e) {
                     // Happens when entity is new.
@@ -442,8 +442,8 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), entity::setThing));
-                    TitledPane tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query()));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getThing(), service.things().query(), "name asc", entity::setThing));
+                    TitledPane tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (IOException | ServiceFailureException ex) {
                     LOGGER.error("Failed to create panel.", ex);
@@ -533,9 +533,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    TitledPane tp = new TitledPane("Things", createCollectionPaneFor(entity.things().query()));
+                    TitledPane tp = new TitledPane("Things", createCollectionPaneFor(entity.things().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
+                    tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query(), "time desc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (NullPointerException e) {
                     // Happens when entity is new.
@@ -650,9 +650,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getDatastream(), service.datastreams().query(), entity::setDatastream));
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getMultiDatastream(), service.multiDatastreams().query(), entity::setMultiDatastream));
-                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getFeatureOfInterest(), service.featuresOfInterest().query(), entity::setFeatureOfInterest));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getDatastream(), service.datastreams().query(), "name asc", entity::setDatastream));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getMultiDatastream(), service.multiDatastreams().query(), "name asc", entity::setMultiDatastream));
+                    accordionLinks.getPanes().add(createEditableEntityPane(entity, entity.getFeatureOfInterest(), service.featuresOfInterest().query(), "name asc", entity::setFeatureOfInterest));
                 } catch (IOException | ServiceFailureException ex) {
                     LOGGER.error("Failed to create panel.", ex);
                 }
@@ -725,9 +725,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
+                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
+                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (NullPointerException e) {
                     // Happens when entity is new.
@@ -814,9 +814,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
+                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
+                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (NullPointerException e) {
                     // Happens when entity is new.
@@ -886,9 +886,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             if (accordionLinks != null) {
                 try {
-                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query()));
+                    TitledPane tp = new TitledPane("Datastreams", createCollectionPaneFor(entity.datastreams().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query()));
+                    tp = new TitledPane("MultiDatastreams", createCollectionPaneFor(entity.multiDatastreams().query(), "name asc"));
                     accordionLinks.getPanes().add(tp);
                     ChildSetter<Location> locationChildSetter = new ChildSetter<Location>() {
                         @Override
@@ -905,9 +905,9 @@ public interface EntityGuiController<T extends Entity<T>> {
                             }
                         }
                     };
-                    tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query(), true, locationChildSetter));
+                    tp = new TitledPane("Locations", createCollectionPaneFor(entity.locations().query(), "name asc", true, locationChildSetter));
                     accordionLinks.getPanes().add(tp);
-                    tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query()));
+                    tp = new TitledPane("HistoricalLocations", createCollectionPaneFor(entity.historicalLocations().query(), "time desc"));
                     accordionLinks.getPanes().add(tp);
                 } catch (NullPointerException e) {
                     // Happens when entity is new.
@@ -929,6 +929,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             final P parentEntity,
             final C childEntity,
             final Query<C> childQuery,
+            String orderby,
             final ChildSetter<C> setter) throws IOException {
 
         EntityType type = EntityType.singleForClass(childQuery.getEntityType().getType());
@@ -943,7 +944,7 @@ public interface EntityGuiController<T extends Entity<T>> {
         Button edit = new Button("🔧");
         tp.setGraphic(edit);
         edit.setOnAction((ActionEvent event) -> {
-            Optional<List<C>> result = entitySearchDialog(childQuery, false);
+            Optional<List<C>> result = entitySearchDialog(childQuery, false, orderby);
             if (result.isPresent() && !result.get().isEmpty()) {
                 C newChild = result.get().get(0);
                 setter.setChild(newChild);
@@ -974,16 +975,16 @@ public interface EntityGuiController<T extends Entity<T>> {
         return node;
     }
 
-    public static <C extends Entity<C>> Pane createCollectionPaneFor(Query<C> query) {
-        return createCollectionPaneFor(query, false, null);
+    public static <C extends Entity<C>> Pane createCollectionPaneFor(Query<C> query, String orderBy) {
+        return createCollectionPaneFor(query, orderBy, false, null);
     }
 
-    public static <C extends Entity<C>> Pane createCollectionPaneFor(Query<C> query, boolean canLinkNew, ChildSetter<C> childSetter) {
+    public static <C extends Entity<C>> Pane createCollectionPaneFor(Query<C> query, String orderBy, boolean canLinkNew, ChildSetter<C> childSetter) {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.<ControllerCollection>getController();
-            controller.setQuery(query, true, true, canLinkNew, true);
+            controller.setQuery(query, true, true, canLinkNew, true, orderBy);
             if (childSetter != null) {
                 controller.setChildSetter(childSetter);
             }
@@ -994,12 +995,12 @@ public interface EntityGuiController<T extends Entity<T>> {
         return null;
     }
 
-    public static <T extends Entity<T>> Optional<List<T>> entitySearchDialog(Query<T> query, boolean multiSelect) {
+    public static <T extends Entity<T>> Optional<List<T>> entitySearchDialog(Query<T> query, boolean multiSelect, String orderBy) {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             final ControllerCollection<T> controller = loader.<ControllerCollection<T>>getController();
-            controller.setQuery(query, false, false, false, multiSelect);
+            controller.setQuery(query, false, false, false, multiSelect, orderBy);
 
             Dialog<List<T>> dialog = new Dialog<>();
             dialog.setHeight(800);
