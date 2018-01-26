@@ -1,25 +1,17 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.fraunhofer.iosb.ilt.sta.jackson.ObjectMapperFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import javax.swing.SwingUtilities;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import de.fraunhofer.iosb.ilt.sta.jackson.ObjectMapperFactory;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,6 +26,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ControllerScene implements Initializable {
 
@@ -128,7 +122,7 @@ public class ControllerScene implements Initializable {
         serverName.setText(server.getName());
         serverUrl.setText(server.getUrl());
         buttonDelete.setDisable(false);
-        paneAuth.setCenter(server.getConfigEditor(null, null).getNode());
+        paneAuth.setCenter(server.getConfigEditor(null, null).getGuiFactoryFx().getNode());
     }
 
     @FXML
@@ -145,9 +139,9 @@ public class ControllerScene implements Initializable {
             ControllerServer controller = loader.<ControllerServer>getController();
             controller.setServerEntry(
                     new ServerListEntry()
-                    .setName(serverName.getText())
-                    .setUrl(serverUrl.getText())
-                    .setConfig(activeItem.getConfig())
+                            .setName(serverName.getText())
+                            .setUrl(serverUrl.getText())
+                            .setConfig(activeItem.getConfig())
             );
 
             Tab tab = new Tab(name);
