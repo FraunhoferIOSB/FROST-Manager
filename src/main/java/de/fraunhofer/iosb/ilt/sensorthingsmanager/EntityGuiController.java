@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
@@ -142,8 +143,10 @@ public interface EntityGuiController<T extends Entity<T>> {
                 textResultTime.setText(entity.getResultTime().toString());
             }
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                if (entity.getProperties() != null) {
+                    String props = mapper.writeValueAsString(entity.getProperties());
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -151,17 +154,29 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDescription(textDescription.getText());
-            entity.setObservationType(textObservationType.getText());
-            UnitOfMeasurement uom = entity.getUnitOfMeasurement();
-            uom.setName(textUomName.getText());
-            uom.setSymbol(textUomSymbol.getText());
-            uom.setDefinition(textUomDefinition.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
+            if (!Strings.isNullOrEmpty(textObservationType.getText())) {
+                entity.setObservationType(textObservationType.getText());
+            }
+            if (!Strings.isNullOrEmpty(textUomName.getText())
+                    || !Strings.isNullOrEmpty(textUomSymbol.getText())
+                    || !Strings.isNullOrEmpty(textUomDefinition.getText())) {
+                UnitOfMeasurement uom = entity.getUnitOfMeasurement();
+                uom.setName(textUomName.getText());
+                uom.setSymbol(textUomSymbol.getText());
+                uom.setDefinition(textUomDefinition.getText());
+            }
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                    Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -226,20 +241,30 @@ public interface EntityGuiController<T extends Entity<T>> {
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
-            textName.setText(entity.getName());
-            textDescription.setText(entity.getDescription());
-            textObservationType.setText(entity.getObservationType());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                textName.setText(entity.getName());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                textDescription.setText(entity.getDescription());
+            }
+            if (!Strings.isNullOrEmpty(textObservationType.getText())) {
+                textObservationType.setText(entity.getObservationType());
+            }
 
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
                 List<UnitOfMeasurement> uoms = entity.getUnitOfMeasurements();
-                textUoms.setText(mapper.writeValueAsString(uoms));
+                if (uoms != null && !uoms.isEmpty()) {
+                    textUoms.setText(mapper.writeValueAsString(uoms));
+                }
             } catch (IOException ex) {
                 LOGGER.error("Failed to load fields.", ex);
             }
             try {
                 Polygon oa = entity.getObservedArea();
-                textObservedArea.setText(mapper.writeValueAsString(oa));
+                if (oa != null) {
+                    textObservedArea.setText(mapper.writeValueAsString(oa));
+                }
             } catch (IOException ex) {
                 LOGGER.error("Failed to load fields.", ex);
             }
@@ -250,8 +275,10 @@ public interface EntityGuiController<T extends Entity<T>> {
                 textResultTime.setText(entity.getResultTime().toString());
             }
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                if (entity.getProperties() != null) {
+                    String props = mapper.writeValueAsString(entity.getProperties());
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -259,9 +286,16 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDescription(textDescription.getText());
-            entity.setObservationType(textObservationType.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
+            if (!Strings.isNullOrEmpty(textObservationType.getText())) {
+                entity.setObservationType(textObservationType.getText());
+            }
+
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
                 List<UnitOfMeasurement> properties = mapper.readValue(textUoms.getText(), TYPE_LIST_UOM);
@@ -270,8 +304,10 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Not valid json.", ex);
             }
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                    Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -348,8 +384,10 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                if (entity.getProperties() != null) {
+                    String props = mapper.writeValueAsString(entity.getProperties());
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -357,19 +395,30 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDescription(textDescription.getText());
-            entity.setEncodingType(textEncodingType.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
+            if (!Strings.isNullOrEmpty(textEncodingType.getText())) {
+                entity.setEncodingType(textEncodingType.getText());
+            }
+
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                GeoJsonObject feature = mapper.readValue(textFeature.getText(), GeoJsonObject.class);
-                entity.setFeature(feature);
+                if (!Strings.isNullOrEmpty(textFeature.getText())) {
+                    GeoJsonObject feature = mapper.readValue(textFeature.getText(), GeoJsonObject.class);
+                    entity.setFeature(feature);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid geojson.", ex);
             }
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                    Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -425,7 +474,9 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setTime(ZonedDateTime.parse(textTime.getText()));
+            if (!Strings.isNullOrEmpty(textTime.getText())) {
+                entity.setTime(ZonedDateTime.parse(textTime.getText()));
+            }
         }
 
         @Override
@@ -488,8 +539,10 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                if (entity.getProperties() != null) {
+                    String props = mapper.writeValueAsString(entity.getProperties());
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -497,19 +550,30 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDescription(textDescription.getText());
-            entity.setEncodingType(textEncodingType.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
+            if (!Strings.isNullOrEmpty(textEncodingType.getText())) {
+                entity.setEncodingType(textEncodingType.getText());
+            }
+
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                GeoJsonObject feature = mapper.readValue(textLocation.getText(), GeoJsonObject.class);
-                entity.setLocation(feature);
+                if (!Strings.isNullOrEmpty(textLocation.getText())) {
+                    GeoJsonObject feature = mapper.readValue(textLocation.getText(), GeoJsonObject.class);
+                    entity.setLocation(feature);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid geojson.", ex);
             }
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                    Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -579,20 +643,26 @@ public interface EntityGuiController<T extends Entity<T>> {
             final ObjectMapper mapper = ObjectMapperFactory.get();
             String json;
             try {
-                json = mapper.writeValueAsString(entity.getResult());
-                textResult.setText(json);
+                if (entity.getResult() != null) {
+                    json = mapper.writeValueAsString(entity.getResult());
+                    textResult.setText(json);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
             try {
-                json = mapper.writeValueAsString(entity.getResultQuality());
-                textResultQuality.setText(json);
+                if (entity.getResultQuality() != null) {
+                    json = mapper.writeValueAsString(entity.getResultQuality());
+                    textResultQuality.setText(json);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
             try {
-                json = mapper.writeValueAsString(entity.getParameters());
-                textParameters.setText(json);
+                if (entity.getParameters() != null) {
+                    json = mapper.writeValueAsString(entity.getParameters());
+                    textParameters.setText(json);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -610,22 +680,29 @@ public interface EntityGuiController<T extends Entity<T>> {
             if (!textValidTime.getText().isEmpty()) {
                 entity.setValidTime(Interval.parse(textValidTime.getText()));
             }
+
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                JsonNode tree = mapper.readTree(textResult.getText());
-                entity.setResult(tree);
+                if (!Strings.isNullOrEmpty(textResult.getText())) {
+                    JsonNode tree = mapper.readTree(textResult.getText());
+                    entity.setResult(tree);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
             try {
-                JsonNode tree = mapper.readTree(textResultQuality.getText());
-                entity.setResultQuality(tree);
+                if (!Strings.isNullOrEmpty(textResultQuality.getText())) {
+                    JsonNode tree = mapper.readTree(textResultQuality.getText());
+                    entity.setResultQuality(tree);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
             try {
-                Map<String, Object> map = mapper.readValue(textParameters.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setParameters(map);
+                if (!Strings.isNullOrEmpty(textParameters.getText())) {
+                    Map<String, Object> map = mapper.readValue(textParameters.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setParameters(map);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -687,8 +764,10 @@ public interface EntityGuiController<T extends Entity<T>> {
             textDescription.setText(entity.getDescription());
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                if (entity.getProperties() != null) {
+                    String props = mapper.writeValueAsString(entity.getProperties());
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -696,13 +775,21 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDefinition(textDefinition.getText());
-            entity.setDescription(textDescription.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDefinition.getText())) {
+                entity.setDefinition(textDefinition.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                    Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -769,8 +856,10 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Metadata can not be converted to JSON.", ex);
             }
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                if (entity.getProperties() != null) {
+                    String props = mapper.writeValueAsString(entity.getProperties());
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -778,19 +867,29 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDescription(textDescription.getText());
-            entity.setEncodingType(textEncodingType.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
+            if (!Strings.isNullOrEmpty(textEncodingType.getText())) {
+                entity.setEncodingType(textEncodingType.getText());
+            }
+
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
                 JsonNode json = mapper.readTree(textMetadata.getText());
                 entity.setMetadata(json);
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
+                entity.setMetadata(textMetadata.getText());
             }
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                    Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
@@ -849,8 +948,11 @@ public interface EntityGuiController<T extends Entity<T>> {
             textDescription.setText(entity.getDescription());
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                String props = mapper.writeValueAsString(entity.getProperties());
-                textProperties.setText(props);
+                Map<String, Object> properties = entity.getProperties();
+                if (properties != null) {
+                    String props = mapper.writeValueAsString(properties);
+                    textProperties.setText(props);
+                }
             } catch (JsonProcessingException ex) {
                 LOGGER.error("Properties can not be converted to JSON.", ex);
             }
@@ -859,12 +961,19 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            entity.setName(textName.getText());
-            entity.setDescription(textDescription.getText());
+            if (!Strings.isNullOrEmpty(textName.getText())) {
+                entity.setName(textName.getText());
+            }
+            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+                entity.setDescription(textDescription.getText());
+            }
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
-                entity.setProperties(properties);
+                String jsonText = textProperties.getText();
+                if (!jsonText.isEmpty()) {
+                    Map<String, Object> properties = mapper.readValue(jsonText, TYPE_MAP_STRING_OBJECT);
+                    entity.setProperties(properties);
+                }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
             }
