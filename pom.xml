@@ -23,7 +23,7 @@
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
         <configurable.version>0.8</configurable.version>
         <logback.version>1.1.8</logback.version>
-        <sensorThingsClient.version>0.14</sensorThingsClient.version>
+        <FROST-Client.version>0.18-SNAPSHOT</FROST-Client.version>
     </properties>
 
     <description>A simple manager for servers implementing the OGC SensorThings API.</description>
@@ -82,8 +82,8 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>SensorThingsClient</artifactId>
-            <version>${sensorThingsClient.version}</version>
+            <artifactId>FROST-Client</artifactId>
+            <version>${FROST-Client.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

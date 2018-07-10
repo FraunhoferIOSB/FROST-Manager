@@ -56,9 +56,15 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     private Button buttonNew;
     @FXML
     private Button buttonAdd;
+
     @FXML
     private ToggleButton buttonFilter;
     private String filter = "";
+
+    @FXML
+    private ToggleButton buttonSelect;
+    private String select = "";
+
     private String orderby = "";
     @FXML
     private BorderPane paneSelected;
@@ -97,14 +103,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private void actionButtonReload(ActionEvent event) {
         try {
-            if (buttonFilter.isSelected() && !filter.isEmpty()) {
-                query.filter(filter);
-            } else {
-                query.filter("");
-            }
-            if (!orderby.isEmpty()) {
-                query.orderBy(orderby);
-            }
+            addOptionsToQuery();
             currentQueryList = query.list();
             loadEntities();
         } catch (ServiceFailureException ex) {
@@ -127,14 +126,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private void actionButtonAll(ActionEvent event) {
         try {
-            if (buttonFilter.isSelected() && !filter.isEmpty()) {
-                query.filter(filter);
-            } else {
-                query.filter("");
-            }
-            if (!orderby.isEmpty()) {
-                query.orderBy(orderby);
-            }
+            addOptionsToQuery();
             currentQueryList = query.top(500).list();
             loadAllEntities();
         } catch (ServiceFailureException ex) {
@@ -154,6 +146,22 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                 this.filter = filterOptional.get();
             } else {
                 this.filter = "";
+            }
+        }
+    }
+
+    @FXML
+    private void actionButtonSelect(ActionEvent event) {
+        LOGGER.info("Select button clicked.");
+        if (buttonSelect.isSelected()) {
+            TextInputDialog textInputDialog = new TextInputDialog(select);
+            textInputDialog.setHeaderText("Set select");
+            textInputDialog.setResizable(true);
+            Optional<String> selectOptional = textInputDialog.showAndWait();
+            if (selectOptional.isPresent()) {
+                this.select = selectOptional.get();
+            } else {
+                this.select = "";
             }
         }
     }
@@ -214,6 +222,22 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (result.isPresent() && !result.get().isEmpty()) {
             List<T> newChildren = result.get();
             childSetter.setChildren(newChildren);
+        }
+    }
+
+    private void addOptionsToQuery() {
+        if (buttonFilter.isSelected() && !filter.isEmpty()) {
+            query.filter(filter);
+        } else {
+            query.filter("");
+        }
+        if (buttonSelect.isSelected() && !select.isEmpty()) {
+            query.select(select);
+        } else {
+            query.select();
+        }
+        if (!orderby.isEmpty()) {
+            query.orderBy(orderby);
         }
     }
 
