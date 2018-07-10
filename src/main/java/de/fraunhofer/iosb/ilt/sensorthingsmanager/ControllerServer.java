@@ -36,7 +36,7 @@ public class ControllerServer implements Initializable {
      * The logger for this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ControllerServer.class);
-    private ServerListEntry entry;
+    private Server entry;
     @FXML
     private Label serverTitle;
     @FXML
@@ -48,7 +48,7 @@ public class ControllerServer implements Initializable {
 
     }
 
-    public void setServerEntry(ServerListEntry entry) {
+    public void setServerEntry(Server entry) {
         this.entry = entry;
         serverTitle.setText(entry.getName() + " @ " + entry.getUrl());
         try {

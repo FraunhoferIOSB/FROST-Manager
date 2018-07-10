@@ -1,11 +1,15 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.fraunhofer.iosb.ilt.sta.jackson.ObjectMapperFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -22,15 +26,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ControllerScene implements Initializable {
 
+    public static final Charset UTF8 = Charset.forName("UTF-8");
     /**
      * The logger for this class.
      */
@@ -49,10 +54,7 @@ public class ControllerScene implements Initializable {
     private Button buttonConnect;
     @FXML
     private Button buttonDelete;
-    @FXML
-    private TextField serverName;
-    @FXML
-    private TextField serverUrl;
+
     @FXML
     private ListView<ServerListEntry> serverList;
     private ObservableList<ServerListEntry> servers;
@@ -63,6 +65,8 @@ public class ControllerScene implements Initializable {
     @FXML
     private BorderPane paneAuth;
     private ServerListEntry activeItem = new ServerListEntry();
+
+    private EditorMap<?> configEditor;
 
     @FXML
     private void toggleServersAction(ActionEvent event) {
@@ -79,13 +83,20 @@ public class ControllerScene implements Initializable {
         }
     }
 
+    private Server createConfiguredServer() {
+        JsonElement config = configEditor.getConfig();
+        Server server = new Server();
+        server.configure(config, null, null);
+        return server;
+    }
+
     @FXML
     private void actionServerAdd(ActionEvent event) {
+        Server server = createConfiguredServer();
+
         ServerListEntry entry = new ServerListEntry()
-                .setName(serverName.getText())
-                .setUrl(serverUrl.getText())
-                .setConfig(activeItem.updateConfig().getConfig());
-        entry.updateConfig();
+                .setName(server.getName())
+                .setJsonElement(configEditor.getConfig());
         servers.add(entry);
         sortServers();
         saveServerList();
@@ -93,12 +104,13 @@ public class ControllerScene implements Initializable {
 
     @FXML
     private void actionServerUpdate(ActionEvent event) {
-        ServerListEntry server = serverList.getSelectionModel().getSelectedItem();
-        if (server == null) {
+        ServerListEntry serverEntry = serverList.getSelectionModel().getSelectedItem();
+        if (serverEntry == null) {
             return;
         }
-        server.setName(serverName.getText()).setUrl(serverUrl.getText());
-        server.updateConfig();
+        Server server = createConfiguredServer();
+        serverEntry.setName(server.getName())
+                .setJsonElement(configEditor.getConfig());
         sortServers();
         saveServerList();
     }
@@ -119,30 +131,25 @@ public class ControllerScene implements Initializable {
             return;
         }
         activeItem = server;
-        serverName.setText(server.getName());
-        serverUrl.setText(server.getUrl());
         buttonDelete.setDisable(false);
-        paneAuth.setCenter(server.getConfigEditor(null, null).getGuiFactoryFx().getNode());
+        configEditor.setConfig(server.getJsonElement());
     }
 
     @FXML
     private void actionServerConnect(ActionEvent event) {
         try {
-            String name = serverName.getText();
+            Server server = createConfiguredServer();
+
+            String name = server.getName();
             if (name.isEmpty()) {
-                name = serverUrl.getText();
+                name = server.getUrl();
             }
-            LOGGER.info("Connecting to {} at {}.", serverName.getText(), serverUrl.getText());
+            LOGGER.info("Connecting to {} at {}.", name, server.getUrl());
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Server.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerServer controller = loader.<ControllerServer>getController();
-            controller.setServerEntry(
-                    new ServerListEntry()
-                            .setName(serverName.getText())
-                            .setUrl(serverUrl.getText())
-                            .setConfig(activeItem.getConfig())
-            );
+            controller.setServerEntry(server);
 
             Tab tab = new Tab(name);
             tab.setContent(content);
@@ -155,28 +162,11 @@ public class ControllerScene implements Initializable {
         }
     }
 
-    private void nameChanged(String newServerName) {
-        int selectedIndex = serverList.getSelectionModel().getSelectedIndex();
-        boolean empty = newServerName.isEmpty();
-        buttonAdd.setDisable(empty);
-        buttonUpdate.setDisable(empty || selectedIndex < 0);
-        buttonDelete.setDisable(empty);
-
-    }
-
-    private void urlChanged(String newServerUrl) {
-        boolean empty = newServerUrl.isEmpty();
-        buttonConnect.setDisable(empty);
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        serverName.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            nameChanged(newValue);
-        });
-        serverUrl.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            urlChanged(newValue);
-        });
+        configEditor = new Server().getConfigEditor(null, null);
+        paneAuth.setCenter(configEditor.getGuiFactoryFx().getNode());
+
         servers = FXCollections.observableArrayList();
         loadServerList();
         serverList.setItems(servers);
@@ -198,9 +188,10 @@ public class ControllerScene implements Initializable {
     private void loadServerList() {
         try {
             File serversFile = new File("servers.json");
-            final ObjectMapper mapper = ObjectMapperFactory.get();
-            List<ServerListEntry> serversFromFile = mapper.readValue(serversFile, new TypeReference<List<ServerListEntry>>() {
-            });
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            List<ServerListEntry> serversFromFile = gson.fromJson(new FileReader(serversFile), new TypeReference<List<ServerListEntry>>() {
+            }.getType());
             servers.addAll(serversFromFile);
             sortServers();
         } catch (IOException ex) {
@@ -211,8 +202,9 @@ public class ControllerScene implements Initializable {
     private void saveServerList() {
         try {
             File serversFile = new File("servers.json");
-            final ObjectMapper mapper = ObjectMapperFactory.get();
-            mapper.writeValue(serversFile, servers);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String toJson = gson.toJson(servers);
+            FileUtils.write(serversFile, toJson, UTF8);
         } catch (IOException ex) {
             LOGGER.error("Failed to save server list.", ex);
         }
