@@ -2,6 +2,7 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
+import de.fraunhofer.iosb.ilt.sta.model.Id;
 import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
 import de.fraunhofer.iosb.ilt.sta.query.Query;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,8 +23,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
@@ -69,7 +72,12 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private BorderPane paneSelected;
     @FXML
-    private ListView<EntityListEntry<T>> entityList;
+    private TableView<EntityListEntry<T>> entityTable;
+    @FXML
+    private TableColumn<EntityListEntry<T>, String> columnId;
+    @FXML
+    private TableColumn<EntityListEntry<T>, String> columnName;
+
     private final ObservableList<EntityListEntry<T>> entities = FXCollections.observableArrayList();
     private EntityList<T> currentQueryList;
 
@@ -171,7 +179,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (!canDelete) {
             return;
         }
-        ObservableList<EntityListEntry<T>> selectedItems = entityList.getSelectionModel().getSelectedItems();
+        ObservableList<EntityListEntry<T>> selectedItems = entityTable.getSelectionModel().getSelectedItems();
         List<EntityListEntry<T>> toDelete = new ArrayList<>();
         for (EntityListEntry<T> selectedItem : selectedItems) {
             toDelete.add(selectedItem);
@@ -207,7 +215,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         }
         EntityListEntry newItem = new EntityListEntry().setEntity(entityFactory.createEntity());
         entities.add(newItem);
-        entityList.getSelectionModel().select(newItem);
+        entityTable.getSelectionModel().select(newItem);
     }
 
     @FXML
@@ -291,9 +299,22 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        entityList.setItems(entities);
-        entityList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        entityList.getSelectionModel().selectedItemProperty().addListener(
+        columnId.setCellValueFactory(
+                (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param)
+                -> new ReadOnlyObjectWrapper<>(param.getValue().getEntity().getId().toString()));
+        columnName.setCellValueFactory(
+                (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param) -> {
+                    T entity = param.getValue().getEntity();
+                    Id id = entity.getId();
+                    String entityString = entity.toString();
+                    if (entityString.startsWith(id.toString())) {
+                        entityString = entityString.substring(id.toString().length()).trim();
+                    }
+                    return new ReadOnlyObjectWrapper<>(entityString);
+                });
+        entityTable.setItems(entities);
+        entityTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        entityTable.getSelectionModel().selectedItemProperty().addListener(
                 (ObservableValue<? extends EntityListEntry<T>> observable, EntityListEntry<T> oldValue, EntityListEntry<T> newValue) -> {
                     entitySelected(newValue);
                 });
@@ -344,7 +365,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         buttonDelete.setVisible(canDelete);
         buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);
-        entityList.getSelectionModel().setSelectionMode(canMultiSelect ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
+        entityTable.getSelectionModel().setSelectionMode(canMultiSelect ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
         return this;
     }
 
@@ -357,7 +378,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * selected entity for multi select mode.
      */
     public T getSelectedEntity() {
-        EntityListEntry<T> item = entityList.getSelectionModel().getSelectedItem();
+        EntityListEntry<T> item = entityTable.getSelectionModel().getSelectedItem();
         if (item == null) {
             return null;
         }
@@ -369,7 +390,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * selected entity for multi select mode.
      */
     public List<T> getSelectedEntities() {
-        ObservableList<EntityListEntry<T>> items = entityList.getSelectionModel().getSelectedItems();
+        ObservableList<EntityListEntry<T>> items = entityTable.getSelectionModel().getSelectedItems();
         if (items == null) {
             return null;
         }
