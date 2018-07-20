@@ -241,15 +241,9 @@ public interface EntityGuiController<T extends Entity<T>> {
             if (entity.getId() != null) {
                 labelId.setText(entity.getId().toString());
             }
-            if (!Strings.isNullOrEmpty(textName.getText())) {
-                textName.setText(entity.getName());
-            }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
-                textDescription.setText(entity.getDescription());
-            }
-            if (!Strings.isNullOrEmpty(textObservationType.getText())) {
-                textObservationType.setText(entity.getObservationType());
-            }
+            textName.setText(entity.getName());
+            textDescription.setText(entity.getDescription());
+            textObservationType.setText(entity.getObservationType());
 
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
