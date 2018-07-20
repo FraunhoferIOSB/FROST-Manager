@@ -55,8 +55,7 @@
                <center>
                   <TableView fx:id="entityTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <columns>
-                        <TableColumn fx:id="columnId" editable="false" prefWidth="50.0" text="ID" />
-                        <TableColumn fx:id="columnName" editable="false" prefWidth="200.0" text="Name" />
+                        <TableColumn fx:id="columnName" editable="false" prefWidth="300.0" text="Name" />
                     </columns>
                   </TableView>
                </center>

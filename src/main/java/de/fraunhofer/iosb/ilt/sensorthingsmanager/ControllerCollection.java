@@ -74,9 +74,8 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     @FXML
     private TableView<EntityListEntry<T>> entityTable;
     @FXML
-    private TableColumn<EntityListEntry<T>, String> columnId;
-    @FXML
     private TableColumn<EntityListEntry<T>, String> columnName;
+    private TableColumn<EntityListEntry<T>, ?> columnId;
 
     private final ObservableList<EntityListEntry<T>> entities = FXCollections.observableArrayList();
     private EntityList<T> currentQueryList;
@@ -258,8 +257,10 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         for (T entity : currentQueryList) {
             entities.add(new EntityListEntry<T>().setEntity(entity));
         }
+        createIdColumn();
         buttonNext.setDisable(!currentQueryList.hasNextLink());
         buttonDelete.setDisable(true);
+        entityTable.sort();
     }
 
     private void loadAllEntities() {
@@ -278,8 +279,10 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                 i = 0;
             }
         }
+        createIdColumn();
         buttonNext.setDisable(!currentQueryList.hasNextLink());
         buttonDelete.setDisable(true);
+        entityTable.sort();
     }
 
     private void entitySelected(EntityListEntry<T> newValue) {
@@ -299,9 +302,6 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        columnId.setCellValueFactory(
-                (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param)
-                -> new ReadOnlyObjectWrapper<>(param.getValue().getEntity().getId().toString()));
         columnName.setCellValueFactory(
                 (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param) -> {
                     T entity = param.getValue().getEntity();
@@ -318,6 +318,30 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                 (ObservableValue<? extends EntityListEntry<T>> observable, EntityListEntry<T> oldValue, EntityListEntry<T> newValue) -> {
                     entitySelected(newValue);
                 });
+    }
+
+    private void createIdColumn() {
+        if (entities.isEmpty() || columnId != null) {
+            return;
+        }
+        Id id = entities.get(0).getEntity().getId();
+        if (id == null) {
+            return;
+        }
+        if (id.getValue() instanceof Number) {
+            TableColumn<EntityListEntry<T>, Number> column = new TableColumn<>("ID");
+            column.setCellValueFactory(
+                    (TableColumn.CellDataFeatures<EntityListEntry<T>, Number> param)
+                    -> new ReadOnlyObjectWrapper<>((Number) param.getValue().getEntity().getId().getValue()));
+            columnId = column;
+        } else {
+            TableColumn<EntityListEntry<T>, String> column = new TableColumn<>("ID");
+            column.setCellValueFactory(
+                    (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param)
+                    -> new ReadOnlyObjectWrapper<>(param.getValue().getEntity().getId().toString()));
+            columnId = column;
+        }
+        entityTable.getColumns().add(0, columnId);
     }
 
     /**
