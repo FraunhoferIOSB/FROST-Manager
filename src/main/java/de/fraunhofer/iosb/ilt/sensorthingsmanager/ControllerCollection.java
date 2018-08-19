@@ -307,7 +307,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                     T entity = param.getValue().getEntity();
                     Id id = entity.getId();
                     String entityString = entity.toString();
-                    if (entityString.startsWith(id.toString())) {
+                    if (id != null && entityString.startsWith(id.toString())) {
                         entityString = entityString.substring(id.toString().length()).trim();
                     }
                     return new ReadOnlyObjectWrapper<>(entityString);
@@ -330,15 +330,21 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         }
         if (id.getValue() instanceof Number) {
             TableColumn<EntityListEntry<T>, Number> column = new TableColumn<>("ID");
-            column.setCellValueFactory(
-                    (TableColumn.CellDataFeatures<EntityListEntry<T>, Number> param)
-                    -> new ReadOnlyObjectWrapper<>((Number) param.getValue().getEntity().getId().getValue()));
+            column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry<T>, Number> param) -> {
+                if (param.getValue().getEntity().getId() == null) {
+                    return new ReadOnlyObjectWrapper<>(-1);
+                }
+                return new ReadOnlyObjectWrapper<>((Number) param.getValue().getEntity().getId().getValue());
+            });
             columnId = column;
         } else {
             TableColumn<EntityListEntry<T>, String> column = new TableColumn<>("ID");
-            column.setCellValueFactory(
-                    (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param)
-                    -> new ReadOnlyObjectWrapper<>(param.getValue().getEntity().getId().toString()));
+            column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry<T>, String> param) -> {
+                if (param.getValue().getEntity().getId() == null) {
+                    return new ReadOnlyObjectWrapper<>("");
+                }
+                return new ReadOnlyObjectWrapper<>(param.getValue().getEntity().getId().toString());
+            });
             columnId = column;
         }
         entityTable.getColumns().add(0, columnId);
