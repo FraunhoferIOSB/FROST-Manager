@@ -18,6 +18,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
 
+        <bintray.subject>fraunhoferiosb</bintray.subject>
+        <bintray.repo>Maven</bintray.repo>
+        <bintray.package>FROST-Manager</bintray.package>
+
         <commons-io.version>2.5</commons-io.version>
         <configurable.version>0.9</configurable.version>
         <logback.version>1.1.8</logback.version>
