@@ -55,7 +55,7 @@ public class ControllerEntity<T extends Entity<T>> implements Initializable {
                 controller.loadFields();
             }
         } catch (ServiceFailureException ex) {
-            LOGGER.error("Failed to update entity.");
+            LOGGER.error("Failed to update entity.", ex);
         }
     }
 

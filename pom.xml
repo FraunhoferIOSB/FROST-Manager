@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.fraunhofer.iosb.ilt</groupId>
-    <artifactId>SensorThingsManager</artifactId>
-    <version>0.1</version>
+    <artifactId>FROST-Manager</artifactId>
+    <version>0.2</version>
     <packaging>jar</packaging>
-    <name>SensorThingsManager</name>
+    <name>FROST-Manager</name>
 
     <licenses>
         <license>
@@ -21,6 +21,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
+
+        <commons-io.version>2.5</commons-io.version>
         <configurable.version>0.9</configurable.version>
         <logback.version>1.1.8</logback.version>
         <FROST-Client.version>0.18</FROST-Client.version>
@@ -98,7 +100,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>${commons-io.version}</version>
         </dependency>
     </dependencies>
 </project>
