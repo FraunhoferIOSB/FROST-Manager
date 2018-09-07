@@ -68,11 +68,16 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     private ToggleButton buttonSelect;
     private String select = "";
 
+    @FXML
+    private ToggleButton buttonOrder;
     private String orderby = "";
+
     @FXML
     private BorderPane paneSelected;
+
     @FXML
     private TableView<EntityListEntry<T>> entityTable;
+
     @FXML
     private TableColumn<EntityListEntry<T>, String> columnName;
     private TableColumn<EntityListEntry<T>, ?> columnId;
@@ -169,6 +174,22 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                 this.select = selectOptional.get();
             } else {
                 this.select = "";
+            }
+        }
+    }
+
+    @FXML
+    private void actionButtonOrder(ActionEvent event) {
+        LOGGER.info("Order button clicked.");
+        if (buttonOrder.isSelected()) {
+            TextInputDialog textInputDialog = new TextInputDialog(orderby);
+            textInputDialog.setHeaderText("Set OrderBy");
+            textInputDialog.setResizable(true);
+            Optional<String> orderByOptional = textInputDialog.showAndWait();
+            if (orderByOptional.isPresent()) {
+                this.orderby = orderByOptional.get();
+            } else {
+                this.orderby = "";
             }
         }
     }

@@ -39,7 +39,16 @@
                                         <Tooltip text="Set the filter." />
                                     </tooltip>
                                 </ToggleButton>
-                        <ToggleButton fx:id="buttonSelect" mnemonicParsing="false" onAction="#actionButtonSelect" text="S" />
+                                <ToggleButton fx:id="buttonSelect" mnemonicParsing="false" onAction="#actionButtonSelect" text="S" >
+                                    <tooltip>
+                                        <Tooltip text="Set the Select." />
+                                    </tooltip>
+                                </ToggleButton>
+                                <ToggleButton fx:id="buttonOrder" mnemonicParsing="false" onAction="#actionButtonOrder" text="O" >
+                                    <tooltip>
+                                        <Tooltip text="Set the OrderBy." />
+                                    </tooltip>
+                                </ToggleButton>
                             </children>
                         </HBox>
                     </top>
@@ -52,13 +61,13 @@
                             </children>
                         </FlowPane>
                     </bottom>
-               <center>
-                  <TableView fx:id="entityTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <columns>
-                        <TableColumn fx:id="columnName" editable="false" prefWidth="300.0" text="Name" />
-                    </columns>
-                  </TableView>
-               </center>
+                    <center>
+                        <TableView fx:id="entityTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <columns>
+                                <TableColumn fx:id="columnName" editable="false" prefWidth="300.0" text="Name" />
+                            </columns>
+                        </TableView>
+                    </center>
                 </BorderPane>
                 <BorderPane fx:id="paneSelected" />
             </items>
