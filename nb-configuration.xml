@@ -8,13 +8,11 @@ Without this configuration present, some functionality in the IDE may be limited
 -->
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <!--
-Properties that influence various parts of the IDE, especially code formatting and the like. 
+Properties that influence various parts of the IDE, especially code formatting and the like.
 You can copy and paste the single properties, into the pom.xml file and the IDE will pick them up.
 That way multiple projects can share the same settings (useful for formatting rules for example).
 Any value defined here will override the pom.xml file value but is only applicable to the current project.
 -->
-        <netbeans.compile.on.save>none</netbeans.compile.on.save>
-        <netbeans.hint.license>gpl30</netbeans.hint.license>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-line-wrap>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indent-shift-width>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indent-shift-width>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaces-per-tab>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaces-per-tab>
@@ -28,5 +26,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
         <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
         <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
+        <netbeans.hint.license>gpl30</netbeans.hint.license>
     </properties>
 </project-shared-configuration>

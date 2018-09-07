@@ -7,22 +7,22 @@
 <?import javafx.scene.layout.HBox?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerServer">
-   <children>
-      <BorderPane layoutX="3.0" layoutY="7.0" prefHeight="264.0" prefWidth="312.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
-            <AnchorPane styleClass="titled-pane" BorderPane.alignment="CENTER">
-               <children>
-                  <HBox styleClass="title" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Label fx:id="serverTitle" styleClass="text" text="Label" />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-         </top>
-         <center>
-            <TabPane fx:id="collectionTabs" prefHeight="200.0" prefWidth="200.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-         </center>
-      </BorderPane>
-   </children>
+    <children>
+        <BorderPane layoutX="3.0" layoutY="7.0" prefHeight="264.0" prefWidth="312.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane styleClass="titled-pane" BorderPane.alignment="CENTER">
+                    <children>
+                        <HBox styleClass="title" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <Label fx:id="serverTitle" styleClass="text" text="Label" />
+                            </children>
+                        </HBox>
+                    </children>
+                </AnchorPane>
+            </top>
+            <center>
+                <TabPane fx:id="collectionTabs" prefHeight="200.0" prefWidth="200.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+            </center>
+        </BorderPane>
+    </children>
 </AnchorPane>

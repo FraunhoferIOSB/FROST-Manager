@@ -15,64 +15,65 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <AnchorPane id="AnchorPane" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerScene">
-   <children>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <center>
-            <SplitPane fx:id="mainSplit" dividerPositions="0.45" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <items>
-                  <BorderPane fx:id="paneServers" prefHeight="200.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
-                     <bottom>
-                        <FlowPane alignment="BOTTOM_RIGHT" BorderPane.alignment="CENTER">
-                           <children>
-                              <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionServerDelete" text="Delete" />
-                           </children>
-                        </FlowPane>
-                     </bottom>
-                     <center>
-                        <ListView fx:id="serverList" prefHeight="571.0" prefWidth="224.0" BorderPane.alignment="CENTER" />
-                     </center>
-                     <top>
-                        <GridPane BorderPane.alignment="CENTER">
-                          <columnConstraints>
-                            <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" minWidth="10.0" />
-                            <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="10.0" />
-                              <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Button fx:id="buttonAdd" disable="false" mnemonicParsing="false" onAction="#actionServerAdd" text="Add" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                              <Button fx:id="buttonConnect" disable="false" mnemonicParsing="false" onAction="#actionServerConnect" text="Connect" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
-                              <Button fx:id="buttonUpdate" disable="false" mnemonicParsing="false" onAction="#actionServerUpdate" text="Update" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
-                              <BorderPane fx:id="paneAuth" GridPane.columnSpan="3" GridPane.vgrow="ALWAYS" />
-                           </children>
-                        </GridPane>
-                     </top>
-                  </BorderPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                     <children>
-                        <TabPane fx:id="serverTabs" layoutX="14.0" layoutY="14.0" prefHeight="577.0" prefWidth="513.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children></AnchorPane>
-              </items>
-            </SplitPane>
-         </center>
-         <left>
-            <FlowPane orientation="VERTICAL" BorderPane.alignment="CENTER">
-               <children>
-                  <ToggleButton fx:id="buttonServers" mnemonicParsing="false" onAction="#toggleServersAction" selected="true">
-                     <graphic>
-                        <Group>
-                           <children>
-                              <Label rotate="-90.0" text="Servers" />
-                           </children>
-                        </Group>
-                     </graphic>
-                  </ToggleButton>
-               </children>
-            </FlowPane>
-         </left>
-      </BorderPane>
-   </children>
+    <children>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <center>
+                <SplitPane fx:id="mainSplit" dividerPositions="0.45" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <items>
+                        <BorderPane fx:id="paneServers" prefHeight="200.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
+                            <bottom>
+                                <FlowPane alignment="BOTTOM_RIGHT" BorderPane.alignment="CENTER">
+                                    <children>
+                                        <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionServerDelete" text="Delete" />
+                                    </children>
+                                </FlowPane>
+                            </bottom>
+                            <center>
+                                <ListView fx:id="serverList" prefHeight="571.0" prefWidth="224.0" BorderPane.alignment="CENTER" />
+                            </center>
+                            <top>
+                                <GridPane BorderPane.alignment="CENTER">
+                                    <columnConstraints>
+                                        <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" minWidth="10.0" />
+                                        <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="10.0" />
+                                        <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Button fx:id="buttonAdd" disable="false" mnemonicParsing="false" onAction="#actionServerAdd" text="Add" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                        <Button fx:id="buttonConnect" disable="false" mnemonicParsing="false" onAction="#actionServerConnect" text="Connect" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                        <Button fx:id="buttonUpdate" disable="false" mnemonicParsing="false" onAction="#actionServerUpdate" text="Update" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                        <BorderPane fx:id="paneAuth" GridPane.columnSpan="3" GridPane.vgrow="ALWAYS" />
+                                    </children>
+                                </GridPane>
+                            </top>
+                        </BorderPane>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                            <children>
+                                <TabPane fx:id="serverTabs" layoutX="14.0" layoutY="14.0" prefHeight="577.0" prefWidth="513.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                            </children>
+                        </AnchorPane>
+                    </items>
+                </SplitPane>
+            </center>
+            <left>
+                <FlowPane orientation="VERTICAL" BorderPane.alignment="CENTER">
+                    <children>
+                        <ToggleButton fx:id="buttonServers" mnemonicParsing="false" onAction="#toggleServersAction" selected="true">
+                            <graphic>
+                                <Group>
+                                    <children>
+                                        <Label rotate="-90.0" text="Servers" />
+                                    </children>
+                                </Group>
+                            </graphic>
+                        </ToggleButton>
+                    </children>
+                </FlowPane>
+            </left>
+        </BorderPane>
+    </children>
 </AnchorPane>
