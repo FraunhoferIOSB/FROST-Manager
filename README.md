@@ -13,5 +13,5 @@ The compiled jar is hosted on bintray: [FROST-Manager-0.3-jar-with-dependencies.
 
 ## Running
 Start it with the command
-```java -jar FROST-Manager-0.2-jar-with-dependencies.jar```
+```java -jar FROST-Manager-0.3-jar-with-dependencies.jar```
 Or double-click the jar
