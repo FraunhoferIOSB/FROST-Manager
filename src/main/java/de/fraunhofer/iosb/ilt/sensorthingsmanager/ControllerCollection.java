@@ -1,6 +1,7 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.sta.StatusCodeException;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.Id;
 import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
@@ -120,6 +121,11 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
             loadEntities();
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to fetch entity list.", ex);
+            Utils.showAlert(
+                    Alert.AlertType.ERROR,
+                    "Failed to reload",
+                    "Reloading the set of entities failed.",
+                    ex);
         } catch (IllegalArgumentException ex) {
             // Happens with new entities.
             LOGGER.trace("Failed to fetch entity list.", ex);
@@ -131,7 +137,16 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (currentQueryList == null || !currentQueryList.hasNextLink()) {
             return;
         }
-        currentQueryList.fetchNext();
+        try {
+            currentQueryList.fetchNext();
+        } catch (StatusCodeException ex) {
+            LOGGER.error("Failed to fetch next set of entities.", ex);
+            Utils.showAlert(
+                    Alert.AlertType.ERROR,
+                    "Failed to fetch",
+                    "Fetching the next set of entities failed.",
+                    ex);
+        }
         loadEntities();
     }
 
@@ -143,6 +158,11 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
             loadAllEntities();
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to fetch entity list.", ex);
+            Utils.showAlert(
+                    Alert.AlertType.ERROR,
+                    "Failed to fetch",
+                    "Fetching the set of all entities failed.",
+                    ex);
         }
     }
 
@@ -224,6 +244,11 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                 }
             } catch (ServiceFailureException ex) {
                 LOGGER.warn("Failed to delete entity.", ex);
+                Utils.showAlert(
+                        Alert.AlertType.ERROR,
+                        "Failed to delete",
+                        "Failed to delete an entity.",
+                        ex);
             }
         }
     }
@@ -403,6 +428,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * @param canDelete Can entities be deleted from this collection.
      * @param canLinkNew Can new entities be linked into this collection.
      * @param multiSelect Can more than one entity be selected.
+     * @param orderBy The ordering to use for the query.
      * @return this ControllerCollection.
      */
     public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect, String orderBy) {

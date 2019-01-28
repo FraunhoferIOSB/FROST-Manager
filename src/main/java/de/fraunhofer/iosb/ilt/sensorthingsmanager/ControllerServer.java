@@ -13,7 +13,6 @@ import de.fraunhofer.iosb.ilt.sta.query.Query;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -96,7 +95,7 @@ public class ControllerServer implements Initializable {
                 return entity;
             });
 
-        } catch (URISyntaxException | MalformedURLException ex) {
+        } catch (MalformedURLException ex) {
             LOGGER.error("Failed to create service url.", ex);
         }
     }

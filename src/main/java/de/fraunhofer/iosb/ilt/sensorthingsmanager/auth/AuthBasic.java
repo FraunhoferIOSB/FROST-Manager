@@ -5,7 +5,6 @@ import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -64,7 +63,7 @@ public class AuthBasic implements AuthMethod {
         try {
 
             CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            URL url = service.getEndpoint().toURL();
+            URL url = service.getEndpoint();
             credsProvider.setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(editorUsername.getValue(), editorPassword.getValue()));
@@ -81,7 +80,7 @@ public class AuthBasic implements AuthMethod {
             CloseableHttpClient httpclient = clientBuilder.build();
 
             service.setClient(httpclient);
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException | MalformedURLException ex) {
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
             LOGGER.error("Failed to initialise basic auth.", ex);
         }
     }
