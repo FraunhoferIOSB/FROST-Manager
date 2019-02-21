@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.ControllerCleaner">
+    <center>
+        <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Clean" />
+                        <CheckBox fx:id="cleanThings" mnemonicParsing="false" text="Things ((Multi)Datastreams)" />
+                        <CheckBox fx:id="cleanDatastreams" mnemonicParsing="false" text="Datastreams (Observations)" />
+                  <CheckBox fx:id="cleanMultiDatastreams" mnemonicParsing="false" text="MultiDatastreams (Observations)" />
+                        <CheckBox fx:id="cleanSensors" mnemonicParsing="false" text="Sensors (Datastreams)" />
+                        <CheckBox fx:id="cleanObservedProperties" mnemonicParsing="false" text="ObservedProperties (Datastreams)" />
+                        <CheckBox fx:id="cleanFeatures" mnemonicParsing="false" text="FeaturesOfInterest (Observations)" />
+                        <CheckBox fx:id="cleanLocations" mnemonicParsing="false" text="Locations (Things)" />
+                        <Button mnemonicParsing="false" onAction="#actionClean" text="Clean">
+                            <VBox.margin>
+                                <Insets left="10.0" top="10.0" />
+                            </VBox.margin>
+                        </Button>
+                    </children>
+                </VBox>
+                <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Delete" />
+                        <CheckBox fx:id="deleteThings" mnemonicParsing="false" text="Things" />
+                        <CheckBox fx:id="deleteSensors" mnemonicParsing="false" text="Sensors" />
+                        <CheckBox fx:id="deleteObservedProperties" mnemonicParsing="false" text="ObservedProperties" />
+                        <CheckBox fx:id="deleteFeatures" mnemonicParsing="false" text="FeaturesOfInterest" />
+                        <CheckBox fx:id="deleteLocations" mnemonicParsing="false" text="Locations" />
+                        <CheckBox fx:id="deleteDatastreams" mnemonicParsing="false" text="Datastreams" />
+                  <CheckBox fx:id="deleteMultiDatastreams" mnemonicParsing="false" text="MultiDatastreams" />
+                        <CheckBox fx:id="deleteObservations" mnemonicParsing="false" text="Observations" />
+                        <Button mnemonicParsing="false" onAction="#actionDelete" text="Delete">
+                            <VBox.margin>
+                                <Insets left="10.0" top="10.0" />
+                            </VBox.margin>
+                        </Button>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </center>
+</BorderPane>

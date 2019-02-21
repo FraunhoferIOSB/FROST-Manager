@@ -22,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ public class ControllerServer implements Initializable {
                 Observation entity = new Observation();
                 return entity;
             });
-
+            addCleanerTab();
         } catch (MalformedURLException ex) {
             LOGGER.error("Failed to create service url.", ex);
         }
@@ -108,6 +109,21 @@ public class ControllerServer implements Initializable {
             controller.setQuery(query, factory, orderBy);
 
             Tab tab = new Tab(title);
+            tab.setContent(content);
+            collectionTabs.getTabs().add(tab);
+        } catch (IOException ex) {
+            LOGGER.error("Failed to load Tab.", ex);
+        }
+    }
+
+    private void addCleanerTab() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Cleaner.fxml"));
+            BorderPane content = (BorderPane) loader.load();
+            ControllerCleaner controller = loader.<ControllerCleaner>getController();
+            controller.setService(service);
+
+            Tab tab = new Tab("Cleaner");
             tab.setContent(content);
             collectionTabs.getTabs().add(tab);
         } catch (IOException ex) {
