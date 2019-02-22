@@ -1,8 +1,8 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
-import com.google.gson.JsonElement;
+import de.fraunhofer.iosb.ilt.configurable.AbstractConfigurable;
+import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
-import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.net.URL;
@@ -25,38 +25,24 @@ import org.slf4j.LoggerFactory;
  *
  * @author scf
  */
-public class AuthBasic implements AuthMethod {
+public class AuthBasic extends AbstractConfigurable<Void, Void> implements AuthMethod {
 
     /**
      * The logger for this class.
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AuthBasic.class);
-    private EditorMap configEditor;
-    private EditorString editorUsername;
-    private EditorString editorPassword;
-    private EditorBoolean editorIgnoreSslErrors;
 
-    @Override
-    public void configure(JsonElement config, Object context, Object edtCtx) {
-        getConfigEditor(context, edtCtx).setConfig(config);
-    }
+    @ConfigurableField(editor = EditorString.class, label = "Username", description = "The username to use for authentication")
+    @EditorString.EdOptsString()
+    private String username;
 
-    @Override
-    public EditorMap<?> getConfigEditor(Object context, Object edtCtx) {
-        if (configEditor == null) {
-            configEditor = new EditorMap();
+    @ConfigurableField(editor = EditorString.class, label = "Password", description = "The password to use for authentication")
+    @EditorString.EdOptsString()
+    private String password;
 
-            editorUsername = new EditorString("username", 1, "Username", "The username to use for authentication.");
-            configEditor.addOption("username", editorUsername, false);
-
-            editorPassword = new EditorString("*****", 1, "Password", "The password to use for authentication.");
-            configEditor.addOption("password", editorPassword, false);
-
-            editorIgnoreSslErrors = new EditorBoolean(false, "Ignore SSL Errors", "Ignore SSL certificate errors. This is a bad idea unless you know what you are doing.");
-            configEditor.addOption("ignoreSslErrors", editorIgnoreSslErrors, true);
-        }
-        return configEditor;
-    }
+    @ConfigurableField(editor = EditorBoolean.class, label = "IgnoreSslErrors", description = "Ignore SSL certificate errors. This is a bad idea unless you know what you are doing.")
+    @EditorBoolean.EdOptsBool()
+    private boolean ignoreSslErrors;
 
     @Override
     public void setAuth(SensorThingsService service) {
@@ -66,13 +52,13 @@ public class AuthBasic implements AuthMethod {
             URL url = service.getEndpoint();
             credsProvider.setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
-                    new UsernamePasswordCredentials(editorUsername.getValue(), editorPassword.getValue()));
+                    new UsernamePasswordCredentials(username, password));
 
             HttpClientBuilder clientBuilder = HttpClients.custom()
                     .useSystemProperties()
                     .setDefaultCredentialsProvider(credsProvider);
 
-            if (editorIgnoreSslErrors.getValue()) {
+            if (ignoreSslErrors) {
                 SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(new SSLContextBuilder().loadTrustMaterial((X509Certificate[] chain, String authType) -> true).build());
                 clientBuilder.setSSLSocketFactory(sslsf);
             }

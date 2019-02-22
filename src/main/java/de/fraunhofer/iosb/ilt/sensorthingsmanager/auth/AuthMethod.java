@@ -7,7 +7,7 @@ import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
  *
  * @author scf
  */
-public interface AuthMethod extends Configurable<Object, Object> {
+public interface AuthMethod extends Configurable<Void, Void> {
 
     public void setAuth(SensorThingsService service);
 }
