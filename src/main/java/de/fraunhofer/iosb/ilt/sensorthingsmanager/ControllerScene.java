@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import de.fraunhofer.iosb.ilt.configurable.ConfigurationException;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import java.io.File;
 import java.io.FileReader;
@@ -21,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
@@ -83,16 +85,23 @@ public class ControllerScene implements Initializable {
         }
     }
 
-    private Server createConfiguredServer() {
+    private Server createConfiguredServer() throws ConfigurationException {
         JsonElement config = configEditor.getConfig();
         Server server = new Server();
-        server.configure(config, null, null);
+        server.configure(config, null, null, null);
         return server;
     }
 
     @FXML
     private void actionServerAdd(ActionEvent event) {
-        Server server = createConfiguredServer();
+        Server server;
+        try {
+            server = createConfiguredServer();
+        } catch (ConfigurationException ex) {
+            LOGGER.error("Failed to configure server.", ex);
+            Utils.showAlert(Alert.AlertType.ERROR, "Failed to configure server", "Failed to configure server.", ex);
+            return;
+        }
 
         ServerListEntry entry = new ServerListEntry()
                 .setName(server.getName())
@@ -108,7 +117,15 @@ public class ControllerScene implements Initializable {
         if (serverEntry == null) {
             return;
         }
-        Server server = createConfiguredServer();
+        Server server;
+        try {
+            server = createConfiguredServer();
+        } catch (ConfigurationException ex) {
+            LOGGER.error("Failed to configure server.", ex);
+            Utils.showAlert(Alert.AlertType.ERROR, "Failed to configure server", "Failed to configure server.", ex);
+            return;
+        }
+
         serverEntry.setName(server.getName())
                 .setJsonElement(configEditor.getConfig());
         sortServers();
@@ -138,7 +155,14 @@ public class ControllerScene implements Initializable {
     @FXML
     private void actionServerConnect(ActionEvent event) {
         try {
-            Server server = createConfiguredServer();
+            Server server;
+            try {
+                server = createConfiguredServer();
+            } catch (ConfigurationException ex) {
+                LOGGER.error("Failed to configure server.", ex);
+                Utils.showAlert(Alert.AlertType.ERROR, "Failed to configure server", "Failed to configure server.", ex);
+                return;
+            }
 
             String name = server.getName();
             if (name.isEmpty()) {

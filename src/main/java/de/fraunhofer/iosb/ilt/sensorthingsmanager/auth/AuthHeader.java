@@ -16,7 +16,7 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
-import de.fraunhofer.iosb.ilt.configurable.AbstractConfigurable;
+import de.fraunhofer.iosb.ilt.configurable.AnnotatedConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
@@ -28,13 +28,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
  *
  * @author scf
  */
-public class AuthHeader extends AbstractConfigurable<Void, Void> implements AuthMethod {
+public class AuthHeader implements AnnotatedConfigurable<Void, Void>, AuthMethod {
 
-    @ConfigurableField(editor = EditorString.class, label = "Header Name", description = "The name of the authentication header to use.")
+    @ConfigurableField(editor = EditorString.class,
+            label = "Header Name",
+            description = "The name of the authentication header to use.")
     @EditorString.EdOptsString()
     private String headerName;
 
-    @ConfigurableField(editor = EditorString.class, label = "Header Value", description = "The value of the authentication header to use.")
+    @ConfigurableField(editor = EditorString.class,
+            label = "Header Value",
+            description = "The value of the authentication header to use.")
     @EditorString.EdOptsString()
     private String headerValue;
 

@@ -1,8 +1,10 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
 import de.fraunhofer.iosb.ilt.configurable.AbstractConfigurable;
+import de.fraunhofer.iosb.ilt.configurable.AnnotatedConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
+import de.fraunhofer.iosb.ilt.configurable.editor.EditorPassword;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.net.URL;
@@ -25,22 +27,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author scf
  */
-public class AuthBasic extends AbstractConfigurable<Void, Void> implements AuthMethod {
+public class AuthBasic implements AnnotatedConfigurable<Void, Void>, AuthMethod {
 
     /**
      * The logger for this class.
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AuthBasic.class);
 
-    @ConfigurableField(editor = EditorString.class, label = "Username", description = "The username to use for authentication")
+    @ConfigurableField(editor = EditorString.class,
+            label = "Username",
+            description = "The username to use for authentication")
     @EditorString.EdOptsString()
     private String username;
 
-    @ConfigurableField(editor = EditorString.class, label = "Password", description = "The password to use for authentication")
-    @EditorString.EdOptsString()
+    @ConfigurableField(editor = EditorPassword.class,
+            label = "Password",
+            description = "The password to use for authentication")
+    @EditorPassword.EdOptsPassword()
     private String password;
 
-    @ConfigurableField(editor = EditorBoolean.class, label = "IgnoreSslErrors", description = "Ignore SSL certificate errors. This is a bad idea unless you know what you are doing.")
+    @ConfigurableField(editor = EditorBoolean.class,
+            label = "IgnoreSslErrors",
+            description = "Ignore SSL certificate errors. This is a bad idea unless you know what you are doing.")
     @EditorBoolean.EdOptsBool()
     private boolean ignoreSslErrors;
 

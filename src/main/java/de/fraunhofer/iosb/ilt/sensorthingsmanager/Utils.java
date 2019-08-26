@@ -43,6 +43,16 @@ public class Utils {
         // Utility class, not to be instantiated.
     }
 
+    /**
+     * Returns true if the given string is null, or empty.
+     *
+     * @param string the string to check.
+     * @return true if string == null || string.isEmpty()
+     */
+    public static boolean isNullOrEmpty(String string) {
+        return string == null || string.isEmpty();
+    }
+
     public static void showAlert(Alert.AlertType type, String title, String text, Throwable exception) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

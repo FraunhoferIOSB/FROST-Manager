@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
@@ -49,7 +48,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import org.geojson.GeoJsonObject;
-import org.geojson.Polygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.extra.Interval;
@@ -131,7 +129,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textUomDefinition.setText(uom.getDefinition());
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                Polygon oa = entity.getObservedArea();
+                GeoJsonObject oa = entity.getObservedArea();
                 textObservedArea.setText(mapper.writeValueAsString(oa));
             } catch (IOException ex) {
                 LOGGER.error("Failed to load fields.", ex);
@@ -154,18 +152,18 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
-            if (!Strings.isNullOrEmpty(textObservationType.getText())) {
+            if (!Utils.isNullOrEmpty(textObservationType.getText())) {
                 entity.setObservationType(textObservationType.getText());
             }
-            if (!Strings.isNullOrEmpty(textUomName.getText())
-                    || !Strings.isNullOrEmpty(textUomSymbol.getText())
-                    || !Strings.isNullOrEmpty(textUomDefinition.getText())) {
+            if (!Utils.isNullOrEmpty(textUomName.getText())
+                    || !Utils.isNullOrEmpty(textUomSymbol.getText())
+                    || !Utils.isNullOrEmpty(textUomDefinition.getText())) {
                 UnitOfMeasurement uom = entity.getUnitOfMeasurement();
                 uom.setName(textUomName.getText());
                 uom.setSymbol(textUomSymbol.getText());
@@ -173,7 +171,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             }
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                if (!Utils.isNullOrEmpty(textProperties.getText())) {
                     Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setProperties(properties);
                 }
@@ -255,7 +253,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Failed to load fields.", ex);
             }
             try {
-                Polygon oa = entity.getObservedArea();
+                GeoJsonObject oa = entity.getObservedArea();
                 if (oa != null) {
                     textObservedArea.setText(mapper.writeValueAsString(oa));
                 }
@@ -280,13 +278,13 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
-            if (!Strings.isNullOrEmpty(textObservationType.getText())) {
+            if (!Utils.isNullOrEmpty(textObservationType.getText())) {
                 entity.setObservationType(textObservationType.getText());
             }
 
@@ -298,7 +296,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Not valid json.", ex);
             }
             try {
-                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                if (!Utils.isNullOrEmpty(textProperties.getText())) {
                     Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setProperties(properties);
                 }
@@ -389,19 +387,19 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
-            if (!Strings.isNullOrEmpty(textEncodingType.getText())) {
+            if (!Utils.isNullOrEmpty(textEncodingType.getText())) {
                 entity.setEncodingType(textEncodingType.getText());
             }
 
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                if (!Strings.isNullOrEmpty(textFeature.getText())) {
+                if (!Utils.isNullOrEmpty(textFeature.getText())) {
                     GeoJsonObject feature = mapper.readValue(textFeature.getText(), GeoJsonObject.class);
                     entity.setFeature(feature);
                 }
@@ -409,7 +407,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Not valid geojson.", ex);
             }
             try {
-                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                if (!Utils.isNullOrEmpty(textProperties.getText())) {
                     Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setProperties(properties);
                 }
@@ -468,7 +466,7 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textTime.getText())) {
+            if (!Utils.isNullOrEmpty(textTime.getText())) {
                 entity.setTime(ZonedDateTime.parse(textTime.getText()));
             }
         }
@@ -544,19 +542,19 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
-            if (!Strings.isNullOrEmpty(textEncodingType.getText())) {
+            if (!Utils.isNullOrEmpty(textEncodingType.getText())) {
                 entity.setEncodingType(textEncodingType.getText());
             }
 
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                if (!Strings.isNullOrEmpty(textLocation.getText())) {
+                if (!Utils.isNullOrEmpty(textLocation.getText())) {
                     GeoJsonObject feature = mapper.readValue(textLocation.getText(), GeoJsonObject.class);
                     entity.setLocation(feature);
                 }
@@ -564,7 +562,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Not valid geojson.", ex);
             }
             try {
-                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                if (!Utils.isNullOrEmpty(textProperties.getText())) {
                     Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setProperties(properties);
                 }
@@ -677,7 +675,7 @@ public interface EntityGuiController<T extends Entity<T>> {
 
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                if (!Strings.isNullOrEmpty(textResult.getText())) {
+                if (!Utils.isNullOrEmpty(textResult.getText())) {
                     JsonNode tree = mapper.readTree(textResult.getText());
                     entity.setResult(tree);
                 }
@@ -685,7 +683,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Not valid json.", ex);
             }
             try {
-                if (!Strings.isNullOrEmpty(textResultQuality.getText())) {
+                if (!Utils.isNullOrEmpty(textResultQuality.getText())) {
                     JsonNode tree = mapper.readTree(textResultQuality.getText());
                     entity.setResultQuality(tree);
                 }
@@ -693,7 +691,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 LOGGER.error("Not valid json.", ex);
             }
             try {
-                if (!Strings.isNullOrEmpty(textParameters.getText())) {
+                if (!Utils.isNullOrEmpty(textParameters.getText())) {
                     Map<String, Object> map = mapper.readValue(textParameters.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setParameters(map);
                 }
@@ -769,18 +767,18 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDefinition.getText())) {
+            if (!Utils.isNullOrEmpty(textDefinition.getText())) {
                 entity.setDefinition(textDefinition.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
             final ObjectMapper mapper = ObjectMapperFactory.get();
             try {
-                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                if (!Utils.isNullOrEmpty(textProperties.getText())) {
                     Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setProperties(properties);
                 }
@@ -861,13 +859,13 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
-            if (!Strings.isNullOrEmpty(textEncodingType.getText())) {
+            if (!Utils.isNullOrEmpty(textEncodingType.getText())) {
                 entity.setEncodingType(textEncodingType.getText());
             }
 
@@ -880,7 +878,7 @@ public interface EntityGuiController<T extends Entity<T>> {
                 entity.setMetadata(textMetadata.getText());
             }
             try {
-                if (!Strings.isNullOrEmpty(textProperties.getText())) {
+                if (!Utils.isNullOrEmpty(textProperties.getText())) {
                     Map<String, Object> properties = mapper.readValue(textProperties.getText(), TYPE_MAP_STRING_OBJECT);
                     entity.setProperties(properties);
                 }
@@ -955,10 +953,10 @@ public interface EntityGuiController<T extends Entity<T>> {
 
         @Override
         public void saveFields() {
-            if (!Strings.isNullOrEmpty(textName.getText())) {
+            if (!Utils.isNullOrEmpty(textName.getText())) {
                 entity.setName(textName.getText());
             }
-            if (!Strings.isNullOrEmpty(textDescription.getText())) {
+            if (!Utils.isNullOrEmpty(textDescription.getText())) {
                 entity.setDescription(textDescription.getText());
             }
             final ObjectMapper mapper = ObjectMapperFactory.get();
