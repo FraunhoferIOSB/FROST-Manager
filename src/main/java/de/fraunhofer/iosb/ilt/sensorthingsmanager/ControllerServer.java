@@ -2,6 +2,7 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
+import de.fraunhofer.iosb.ilt.sta.model.FeatureOfInterest;
 import de.fraunhofer.iosb.ilt.sta.model.HistoricalLocation;
 import de.fraunhofer.iosb.ilt.sta.model.Location;
 import de.fraunhofer.iosb.ilt.sta.model.MultiDatastream;
@@ -93,6 +94,11 @@ public class ControllerServer implements Initializable {
             });
             addTabFor("Observations", "phenomenonTime asc", service.observations().query(), () -> {
                 Observation entity = new Observation();
+                return entity;
+            });
+            addTabFor("FoIs", "name asc", service.featuresOfInterest().query(), () -> {
+                FeatureOfInterest entity = new FeatureOfInterest();
+                entity.setName("New FeatureOfInterest");
                 return entity;
             });
             addCleanerTab();
