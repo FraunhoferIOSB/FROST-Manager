@@ -368,7 +368,7 @@ public class AggregationData {
     private boolean checkProperty(Map<String, Object> properties, String property, Object value) {
         boolean changed = false;
         Object oldValue = properties.get(property);
-        if (!(value instanceof Number) && !(value instanceof Boolean) && !(value instanceof String)) {
+        if (!(value instanceof Number) && !(value instanceof Boolean) && !(value instanceof String) && value != null) {
             value = value.toString();
         }
         if (!value.equals(oldValue)) {
@@ -386,8 +386,8 @@ public class AggregationData {
             aggregate.setProperties(properties);
         }
         boolean changed = false;
-        changed = changed || checkProperty(properties, Utils.KEY_AGGREGATE_AMOUNT, level.amount);
-        changed = changed || checkProperty(properties, Utils.KEY_AGGREGATE_UNIT, level.unit);
+        changed = changed | checkProperty(properties, Utils.KEY_AGGREGATE_AMOUNT, level.amount);
+        changed = changed | checkProperty(properties, Utils.KEY_AGGREGATE_UNIT, level.unit);
 
         String aggFor = Objects.toString(properties.get(Utils.KEY_AGGREGATE_FOR));
         if (!expectedAggFor.equals(aggFor)) {
