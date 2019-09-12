@@ -23,7 +23,7 @@
         </FlowPane>
     </top>
     <center>
-        <SplitPane fx:id="splitPaneMain" dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <SplitPane fx:id="splitPaneMain" dividerPositions="0.3" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
                 <BorderPane prefHeight="200.0" prefWidth="200.0">
                     <center>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane minHeight="400.0" minWidth="500.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.ControllerAggManager">
+   <left>
+      <GridPane minWidth="10.0" BorderPane.alignment="CENTER">
+         <columnConstraints>
+            <ColumnConstraints fillWidth="false" halignment="CENTER" hgrow="NEVER" minWidth="10.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" valignment="TOP" vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" valignment="BOTTOM" vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" valignment="BOTTOM" vgrow="NEVER" />
+         </rowConstraints>
+         <children>
+            <Button fx:id="buttonReload" mnemonicParsing="false" onAction="#actionReload" text="Reload" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
+            <BorderPane fx:id="paneAddLevel" GridPane.hgrow="NEVER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="NEVER" />
+            <Button fx:id="buttonAddLevel" mnemonicParsing="false" onAction="#actionAddLevel" text="Add Level" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.vgrow="NEVER" />
+         </children>
+      </GridPane>
+   </left>
+   <bottom>
+      <Button fx:id="buttonApplyChanges" ellipsisString="…" mnemonicParsing="false" onAction="#actionApplyChanges" text="Make It So…" BorderPane.alignment="CENTER_RIGHT" />
+   </bottom>
+   <center>
+      <BorderPane BorderPane.alignment="CENTER">
+         <center>
+            <TableView fx:id="table" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tableMenuButtonVisible="true">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </center>
+         <top>
+            <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" BorderPane.alignment="CENTER" />
+         </top>
+      </BorderPane>
+   </center>
+</BorderPane>
