@@ -29,6 +29,7 @@
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 
         <commons-io.version>2.6</commons-io.version>
+        <commons-lang.version>3.9</commons-lang.version>
         <configurable.version>0.21</configurable.version>
         <logback.version>1.2.3</logback.version>
         <openjfx.version>13.0.2</openjfx.version>
@@ -168,6 +169,11 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>

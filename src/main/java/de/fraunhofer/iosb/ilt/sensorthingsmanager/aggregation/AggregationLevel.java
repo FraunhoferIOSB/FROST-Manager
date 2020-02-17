@@ -16,7 +16,6 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
-import com.google.common.collect.ComparisonChain;
 import de.fraunhofer.iosb.ilt.configurable.AbstractConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorEnum;
@@ -27,6 +26,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
 import java.util.Objects;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 /**
  *
@@ -171,7 +171,9 @@ public class AggregationLevel extends AbstractConfigurable<Void, Void> implement
 
     @Override
     public int compareTo(AggregationLevel o) {
-        return ComparisonChain.start().compare(duration, o.duration).result();
+        return new CompareToBuilder()
+                .append(duration, o.duration)
+                .toComparison();
     }
 
     public String toPostFix() {

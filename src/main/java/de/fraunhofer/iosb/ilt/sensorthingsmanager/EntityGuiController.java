@@ -59,10 +59,10 @@ import org.threeten.extra.Interval;
  */
 public interface EntityGuiController<T extends Entity<T>> {
 
-    public static TypeReference TYPE_MAP_STRING_OBJECT = new TypeReference<Map<String, Object>>() {
+    public static TypeReference<Map<String, Object>> TYPE_MAP_STRING_OBJECT = new TypeReference<Map<String, Object>>() {
         // Empty on purpose.
     };
-    public static TypeReference TYPE_LIST_UOM = new TypeReference<List<UnitOfMeasurement>>() {
+    public static TypeReference<List<UnitOfMeasurement>> TYPE_LIST_UOM = new TypeReference<List<UnitOfMeasurement>>() {
         // Empty on purpose.
     };
 

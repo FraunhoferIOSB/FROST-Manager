@@ -16,7 +16,6 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
-import com.google.common.base.Strings;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.AggregationLevels;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_FOR;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
@@ -77,7 +76,7 @@ public class SensorThingsUtils {
 
     public Thing findOrCreateThing(SensorThingsService service, String filter, String name, String description, double lon, double lat, Map<String, Object> properties) throws ServiceFailureException {
         EntityList<Thing> thingList;
-        if (Strings.isNullOrEmpty(filter)) {
+        if (Utils.isNullOrEmpty(filter)) {
             filter = "name eq " + quoteForUrl(name);
         }
         thingList = service.things()
@@ -137,7 +136,7 @@ public class SensorThingsUtils {
 
     public ObservedProperty findOrCreateOp(SensorThingsService service, String name, String def, String description, Map<String, Object> properties, String filter, boolean aggregates) throws ServiceFailureException {
         Query<ObservedProperty> query = service.observedProperties().query();
-        if (Strings.isNullOrEmpty(filter)) {
+        if (Utils.isNullOrEmpty(filter)) {
             query.filter("name eq '" + Utils.escapeForStringConstant(name) + "'");
         } else {
             query.filter(filter);
