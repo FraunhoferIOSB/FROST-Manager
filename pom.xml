@@ -32,7 +32,7 @@
         <commons-lang.version>3.9</commons-lang.version>
         <configurable.version>0.22</configurable.version>
         <logback.version>1.2.3</logback.version>
-        <openjfx.version>13.0.2</openjfx.version>
+        <openjfx.version>14</openjfx.version>
         <FROST-Client.version>0.28</FROST-Client.version>
     </properties>
 
