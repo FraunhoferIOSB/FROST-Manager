@@ -1,5 +1,6 @@
-package de.fraunhofer.iosb.ilt.sensorthingsmanager;
+package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.StatusCodeException;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;

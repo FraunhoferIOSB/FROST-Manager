@@ -1,5 +1,7 @@
-package de.fraunhofer.iosb.ilt.sensorthingsmanager;
+package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.EntityGuiController;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerEntity;
 import java.io.IOException;
 
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;

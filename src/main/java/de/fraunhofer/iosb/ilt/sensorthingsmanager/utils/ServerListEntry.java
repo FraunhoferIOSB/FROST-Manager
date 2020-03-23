@@ -1,4 +1,4 @@
-package de.fraunhofer.iosb.ilt.sensorthingsmanager;
+package de.fraunhofer.iosb.ilt.sensorthingsmanager.utils;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;

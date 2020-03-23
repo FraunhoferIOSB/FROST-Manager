@@ -1,11 +1,14 @@
-package de.fraunhofer.iosb.ilt.sensorthingsmanager;
+package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import de.fraunhofer.iosb.ilt.configurable.ConfigurationException;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Server;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ServerListEntry;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;

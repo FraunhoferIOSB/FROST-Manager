@@ -1,4 +1,4 @@
-package de.fraunhofer.iosb.ilt.sensorthingsmanager;
+package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
 
