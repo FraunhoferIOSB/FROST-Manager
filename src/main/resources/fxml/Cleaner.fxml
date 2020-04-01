@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCleaner">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCleaner">
     <center>
         <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
@@ -22,6 +22,7 @@
                         <CheckBox fx:id="cleanObservedProperties" mnemonicParsing="false" text="ObservedProperties (Datastreams)" />
                         <CheckBox fx:id="cleanFeatures" mnemonicParsing="false" text="FeaturesOfInterest (Observations)" />
                         <CheckBox fx:id="cleanLocations" mnemonicParsing="false" text="Locations (Things)" />
+                  <CheckBox fx:id="cleanDuplicateObsPhentime" mnemonicParsing="false" text="Duplicate Obs by phenTime" />
                         <Button mnemonicParsing="false" onAction="#actionClean" text="Clean">
                             <VBox.margin>
                                 <Insets left="10.0" top="10.0" />

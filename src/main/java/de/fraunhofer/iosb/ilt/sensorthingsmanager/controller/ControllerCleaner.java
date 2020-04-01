@@ -22,9 +22,11 @@ import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.FeatureOfInterest;
 import de.fraunhofer.iosb.ilt.sta.model.Location;
 import de.fraunhofer.iosb.ilt.sta.model.MultiDatastream;
+import de.fraunhofer.iosb.ilt.sta.model.Observation;
 import de.fraunhofer.iosb.ilt.sta.model.ObservedProperty;
 import de.fraunhofer.iosb.ilt.sta.model.Sensor;
 import de.fraunhofer.iosb.ilt.sta.model.Thing;
+import de.fraunhofer.iosb.ilt.sta.model.TimeObject;
 import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.net.URL;
@@ -64,6 +66,8 @@ public class ControllerCleaner implements Initializable {
     private CheckBox cleanFeatures;
     @FXML
     private CheckBox cleanLocations;
+    @FXML
+    private CheckBox cleanDuplicateObsPhentime;
     @FXML
     private CheckBox deleteThings;
     @FXML
@@ -106,6 +110,9 @@ public class ControllerCleaner implements Initializable {
             }
             if (cleanLocations.isSelected()) {
                 cleanLocations();
+            }
+            if (cleanDuplicateObsPhentime.isSelected()) {
+                cleanObservationsDuplicatePhentime();
             }
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to clean.", ex);
@@ -256,6 +263,51 @@ public class ControllerCleaner implements Initializable {
         for (Location item : toDelete) {
             LOGGER.debug("Deleting {}", item);
             service.delete(item.withOnlyId());
+        }
+    }
+
+    private void cleanObservationsDuplicatePhentime() throws ServiceFailureException {
+        EntityList<Datastream> list = service.datastreams()
+                .query()
+                .select("name", "id")
+                .orderBy("id asc")
+                .expand("Observations($select=id;$top=1)")
+                .filter("id ge 3699")
+                .list();
+        Iterator<Datastream> it;
+        for (it = list.fullIterator(); it.hasNext();) {
+            Datastream next = it.next();
+            cleanObsForDatastream(next);
+        }
+    }
+
+    private void cleanObsForDatastream(Datastream ds) throws ServiceFailureException {
+        List<Observation> toDelete = new ArrayList<>();
+        EntityList<Observation> list = ds.observations().query()
+                .orderBy("phenomenonTime asc,id asc")
+                .select("id,phenomenonTime")
+                .top(100000)
+                .list();
+        Iterator<Observation> it = list.fullIterator();
+        TimeObject last = null;
+        while (it.hasNext()) {
+            Observation next = it.next();
+            TimeObject cur = next.getPhenomenonTime();
+            if (last == null) {
+                last = cur;
+            } else {
+                if (last.equals(cur)) {
+                    toDelete.add(next);
+                }
+                last = cur;
+            }
+        }
+        if (toDelete.isEmpty()) {
+            return;
+        }
+        LOGGER.info("Deleting {} obs for Datastream {}", toDelete.size(), ds);
+        for (Observation obs : toDelete) {
+            service.delete(obs);
         }
     }
 
