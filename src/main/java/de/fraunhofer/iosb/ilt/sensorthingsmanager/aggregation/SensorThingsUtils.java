@@ -166,7 +166,7 @@ public class SensorThingsUtils {
 
     public void findOrCreateAggregateOps(SensorThingsService service, ObservedProperty op) throws ServiceFailureException {
         List<ObservedProperty> agList = aggregateProperties.get(op);
-        if (agList != null && agList.size() == 4) {
+        if (agList != null && agList.size() == 3) {
             return;
         }
         agList = new ArrayList<>();

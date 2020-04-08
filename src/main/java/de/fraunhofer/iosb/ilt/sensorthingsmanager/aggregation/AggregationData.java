@@ -119,7 +119,9 @@ public class AggregationData {
             Query<Thing> query = service.things()
                     .query()
                     .top(1000)
-                    .orderBy("id asc");
+                    .select("id,name,properties")
+                    .orderBy("id asc")
+                    .expand("MultiDatastreams($top=1000;$orderby=id asc;$select=id,name,properties)");
             if (hasListeners()) {
                 query.count();
             }
@@ -130,12 +132,7 @@ public class AggregationData {
             Iterator<Thing> thingIt = thingList.fullIterator();
             while (thingIt.hasNext()) {
                 Thing thing = thingIt.next();
-                EntityList<MultiDatastream> dsList = thing.multiDatastreams()
-                        .query()
-                        .filter("endsWith(name, ']')")
-                        .orderBy("id asc")
-                        .top(1000)
-                        .list();
+                EntityList<MultiDatastream> dsList = thing.getMultiDatastreams();
                 for (Iterator<MultiDatastream> it = dsList.fullIterator(); it.hasNext();) {
                     MultiDatastream mds = it.next();
                     String name = mds.getName();

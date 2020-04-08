@@ -60,7 +60,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -377,7 +376,9 @@ public class ControllerAggManager implements Initializable {
         }
 
         Map<String, Object> aggProps = new HashMap<>();
-        aggProps.put(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + op.getId().getUrl() + ")");
+        aggProps.put(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + baseDs.getId().getUrl() + ")");
+        aggProps.put(Utils.KEY_AGGREGATE_AMOUNT, level.amount);
+        aggProps.put(Utils.KEY_AGGREGATE_UNIT, level.unit);
         String mdsName = base.getBaseName() + " " + level.toPostFix();
         String mdsDesc = baseDs.getDescription() + " aggregated per " + level.amount + " " + level.unit;
         utils.findOrCreateMultiDatastream(service, mdsName, mdsDesc, uoms, baseDs.getThing(), ops, baseDs.getSensor(), aggProps);
