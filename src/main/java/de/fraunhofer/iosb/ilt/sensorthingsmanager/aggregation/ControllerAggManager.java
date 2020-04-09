@@ -227,7 +227,7 @@ public class ControllerAggManager implements Initializable {
         lastPickedEnd = endDateTime;
 
         if (confirmation.isPresent() && confirmation.get() == ButtonType.APPLY) {
-            LOGGER.info("Re-Calculating from {} to {} for {}", startDateTime, endDateTime, base.getBaseName());
+            LOGGER.info("Re-Calculating from {} to {} for {} ({})", startDateTime, endDateTime, base.getBaseName(), base.getBaseDatastream());
             reCalculateBase(base, startDateTime, endDateTime);
         } else {
             LOGGER.info("Cancelled...  {} to {} for {}", startDateTime, endDateTime, base.getBaseName());
@@ -271,9 +271,9 @@ public class ControllerAggManager implements Initializable {
         data = myData;
         baseColumn = new TableColumn("Base Name");
         baseColumn.setCellValueFactory((TableColumn.CellDataFeatures<AggregationBase, String> param) -> param.getValue().getFxProperties().getBaseNameProperty());
-        buttonColumn = new TableColumn<>("🔃");
+        buttonColumn = new TableColumn<>("↺");
         buttonColumn.setCellValueFactory((TableColumn.CellDataFeatures<AggregationBase, AggregationBase> param) -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        buttonColumn.setCellFactory((final TableColumn<AggregationBase, AggregationBase> param) -> new ButtonTableCell<AggregationBase, AggregationBase>("🔃") {
+        buttonColumn.setCellFactory((final TableColumn<AggregationBase, AggregationBase> param) -> new ButtonTableCell<AggregationBase, AggregationBase>("↺") {
             @Override
             public void onAction(TableRow<AggregationBase> row) {
                 reCalculateBase(row.getItem());
