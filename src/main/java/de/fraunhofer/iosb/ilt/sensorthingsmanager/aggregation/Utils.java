@@ -30,6 +30,9 @@ import java.util.regex.Pattern;
 public class Utils {
 
     public static final UnitOfMeasurement NULL_UNIT = new UnitOfMeasurement(null, null, null);
+    public static final String KEY_AGGREGATE_SOURCE = "aggregateSource";
+    public static final String KEY_AGGREGATE_SOURCE_D = KEY_AGGREGATE_SOURCE + ".Datastream@iot.id";
+    public static final String KEY_AGGREGATE_SOURCE_MD = KEY_AGGREGATE_SOURCE + ".MultiDatastream@iot.id";
     public static final String KEY_AGGREGATE_FOR = "aggregateFor";
     public static final String KEY_AGGREGATE_UNIT = "aggregateUnit";
     public static final String KEY_AGGREGATE_AMOUNT = "aggregateAmount";

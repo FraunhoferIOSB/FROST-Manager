@@ -1,11 +1,11 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
-import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ObjectMapperFactory;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
@@ -986,6 +986,7 @@ public interface EntityGuiController<T extends Entity<T>> {
             textName = addFieldTo(gridProperties, i, "Name", new TextField(), false, editable);
             textDescription = addFieldTo(gridProperties, ++i, "Description", new TextArea(), true, editable);
             textProperties = addFieldTo(gridProperties, ++i, "Properties", new TextArea(), true, editable);
+            textProperties.setPrefRowCount(10);
 
             if (accordionLinks != null) {
                 try {

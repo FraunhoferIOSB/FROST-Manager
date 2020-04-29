@@ -16,6 +16,8 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
+import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_SOURCE_D;
+import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_SOURCE_MD;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.MultiDatastream;
@@ -344,39 +346,52 @@ public class AggregationData {
 
     private void checkReference(Datastream source, MultiDatastream aggregate, AggregationLevel level) {
         String expectedAggFor;
+        String aggKey = null;
+        Object aggId = null;
         if (sourceEqualsTarget) {
             expectedAggFor = "/Datastreams(" + source.getId().getUrl() + ")";
+            aggKey = KEY_AGGREGATE_SOURCE_D;
+            aggId = source.getId().getValue();
         } else {
             expectedAggFor = source.getSelfLink().toString();
         }
-        checkReference(aggregate, expectedAggFor, level);
+        checkReference(aggregate, expectedAggFor, level, aggKey, aggId);
     }
 
     private void checkReference(MultiDatastream source, MultiDatastream aggregate, AggregationLevel level) {
         String expectedAggFor;
+        String aggKey = null;
+        Object aggId = null;
         if (sourceEqualsTarget) {
             expectedAggFor = "/MultiDatastreams(" + source.getId().getUrl() + ")";
+            aggKey = KEY_AGGREGATE_SOURCE_MD;
+            aggId = source.getId().getValue();
         } else {
             expectedAggFor = source.getSelfLink().toString();
         }
-        checkReference(aggregate, expectedAggFor, level);
+        checkReference(aggregate, expectedAggFor, level, aggKey, aggId);
     }
 
     private boolean checkProperty(Map<String, Object> properties, String property, Object value) {
+        Object checkValue = value;
         boolean changed = false;
         Object oldValue = properties.get(property);
         if (!(value instanceof Number) && !(value instanceof Boolean) && !(value instanceof String) && value != null) {
-            value = value.toString();
+            checkValue = value.toString();
         }
-        if (!value.equals(oldValue)) {
-            LOGGER.info("Fixing property {} not correct. Is {}, should be {}.", property, oldValue, value);
+        if (value instanceof Number && oldValue instanceof Number) {
+            checkValue = value.toString();
+            oldValue = oldValue.toString();
+        }
+        if (!checkValue.equals(oldValue)) {
+            LOGGER.info("Fixing property {}. Is {}, should be {}.", property, oldValue, value);
             properties.put(property, value);
             changed = true;
         }
         return changed;
     }
 
-    private void checkReference(MultiDatastream aggregate, String expectedAggFor, AggregationLevel level) {
+    private void checkReference(MultiDatastream aggregate, String expectedAggFor, AggregationLevel level, String aggSourceKey, Object aggSourceId) {
         Map<String, Object> properties = aggregate.getProperties();
         if (properties == null) {
             properties = new HashMap<>();
@@ -384,7 +399,10 @@ public class AggregationData {
         }
         boolean changed = false;
         changed = changed | checkProperty(properties, Utils.KEY_AGGREGATE_AMOUNT, level.amount);
-        changed = changed | checkProperty(properties, Utils.KEY_AGGREGATE_UNIT, level.unit);
+        changed = changed | checkProperty(properties, Utils.KEY_AGGREGATE_UNIT, level.unit.toString());
+        if (aggSourceKey != null) {
+            changed = changed | checkProperty(properties, aggSourceKey, aggSourceId);
+        }
 
         String aggFor = Objects.toString(properties.get(Utils.KEY_AGGREGATE_FOR));
         if (!expectedAggFor.equals(aggFor)) {
@@ -398,7 +416,11 @@ public class AggregationData {
         }
         if (changed && fixReferences) {
             try {
-                service.update(aggregate);
+                MultiDatastream copy = aggregate.withOnlyId();
+                copy.setProperties(aggregate.getProperties());
+                copy.setMultiObservationDataTypes(null);
+                copy.setUnitOfMeasurements(null);
+                service.update(copy);
             } catch (ServiceFailureException ex) {
                 LOGGER.error("Failed to update reference.", ex);
             }

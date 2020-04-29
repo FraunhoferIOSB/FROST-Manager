@@ -371,14 +371,15 @@ public class ControllerAggManager implements Initializable {
         ops.add(op);
         ops.addAll(utils.aggregateProperties.get(op));
         List<UnitOfMeasurement> uoms = new ArrayList<>();
-        for (int i = 0; i < ops.size(); i++) {
+        for (ObservedProperty op1 : ops) {
             uoms.add(uom);
         }
 
         Map<String, Object> aggProps = new HashMap<>();
+        aggProps.put(Utils.KEY_AGGREGATE_SOURCE_D, baseDs.getId().getValue());
         aggProps.put(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + baseDs.getId().getUrl() + ")");
         aggProps.put(Utils.KEY_AGGREGATE_AMOUNT, level.amount);
-        aggProps.put(Utils.KEY_AGGREGATE_UNIT, level.unit);
+        aggProps.put(Utils.KEY_AGGREGATE_UNIT, level.unit.toString());
         String mdsName = base.getBaseName() + " " + level.toPostFix();
         String mdsDesc = baseDs.getDescription() + " aggregated per " + level.amount + " " + level.unit;
         utils.findOrCreateMultiDatastream(service, mdsName, mdsDesc, uoms, baseDs.getThing(), ops, baseDs.getSensor(), aggProps);
