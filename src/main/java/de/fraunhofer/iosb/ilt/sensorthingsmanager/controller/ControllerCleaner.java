@@ -16,6 +16,7 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ChangingStatusLogger;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
@@ -52,6 +53,50 @@ public class ControllerCleaner implements Initializable {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ControllerCleaner.class);
 
+    private static class LogStatusCleaner extends ChangingStatusLogger.ChangingStatusDefault {
+
+        public LogStatusCleaner() {
+            super("Cleaning... {} T, {} L, {} S, {} Op, {} Ds, {} MDs, {} F, {} O. To Delete: {} ", 9);
+            setAllTo(Long.valueOf(0));
+        }
+
+        public void setThings(Long value) {
+            setObjectAt(0, value);
+        }
+
+        public void setLocations(Long value) {
+            setObjectAt(1, value);
+        }
+
+        public void setSensors(Long value) {
+            setObjectAt(2, value);
+        }
+
+        public void setObsProps(Long value) {
+            setObjectAt(3, value);
+        }
+
+        public void setDatastreams(Long value) {
+            setObjectAt(4, value);
+        }
+
+        public void setMultiDatastreams(Long value) {
+            setObjectAt(5, value);
+        }
+
+        public void setFeatures(Long value) {
+            setObjectAt(6, value);
+        }
+
+        public void setObservations(Long value) {
+            setObjectAt(7, value);
+        }
+
+        public void setToDelete(Long value) {
+            setObjectAt(8, value);
+        }
+    }
+
     @FXML
     private CheckBox cleanThings;
     @FXML
@@ -86,9 +131,14 @@ public class ControllerCleaner implements Initializable {
     private CheckBox deleteObservations;
 
     private SensorThingsService service;
+    private final LogStatusCleaner logStatusCleaner = new LogStatusCleaner();
+    private final ChangingStatusLogger statusLogger = new ChangingStatusLogger(LOGGER)
+            .addLogStatus(logStatusCleaner)
+            .setLogIntervalMs(2000);
 
     @FXML
     private void actionClean(ActionEvent event) {
+        statusLogger.start();
         try {
             if (cleanThings.isSelected()) {
                 cleanThings();
@@ -117,6 +167,7 @@ public class ControllerCleaner implements Initializable {
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to clean.", ex);
         }
+        statusLogger.stop();
     }
 
     private void cleanThings() throws ServiceFailureException {
@@ -124,18 +175,23 @@ public class ControllerCleaner implements Initializable {
                 .query()
                 .select("name", "id")
                 .expand("Datastreams($select=id;$top=1),MultiDatastreams($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
         List<Thing> toDelete = new ArrayList<>();
         Iterator<Thing> it;
+        long count = 0;
+        long toDel = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             Thing next = it.next();
+            logStatusCleaner.setThings(++count);
             if (next.getDatastreams().isEmpty() && next.getMultiDatastreams().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} Things", toDelete.size());
         for (Thing item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
@@ -145,18 +201,24 @@ public class ControllerCleaner implements Initializable {
                 .query()
                 .select("name", "id")
                 .expand("Datastreams($select=id;$top=1),MultiDatastreams($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
         List<Sensor> toDelete = new ArrayList<>();
         Iterator<Sensor> it;
+        long count = 0;
+        long toDel = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             Sensor next = it.next();
+            count++;
+            logStatusCleaner.setSensors(count);
             if (next.getDatastreams().isEmpty() && next.getMultiDatastreams().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} Sensors", toDelete.size());
         for (Sensor item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
@@ -166,81 +228,108 @@ public class ControllerCleaner implements Initializable {
                 .query()
                 .select("name", "id")
                 .expand("Datastreams($select=id;$top=1),MultiDatastreams($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
         List<ObservedProperty> toDelete = new ArrayList<>();
         Iterator<ObservedProperty> it;
+        long count = 0;
+        long toDel = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             ObservedProperty next = it.next();
+            count++;
+            logStatusCleaner.setObsProps(count);
             if (next.getDatastreams().isEmpty() && next.getMultiDatastreams().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} ObservedProperties", toDelete.size());
         for (ObservedProperty item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
 
     private void cleanDatastreams() throws ServiceFailureException {
+        LOGGER.info("Cleaning Datastreams");
         EntityList<Datastream> list = service.datastreams()
                 .query()
                 .select("name", "id")
                 .expand("Observations($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
         List<Datastream> toDelete = new ArrayList<>();
         Iterator<Datastream> it;
+        long count = 0;
+        long toDel = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             Datastream next = it.next();
+            count++;
+            logStatusCleaner.setDatastreams(count);
             if (next.getObservations().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} Datastreams", toDelete.size());
         for (Datastream item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
 
     private void cleanMultiDatastreams() throws ServiceFailureException {
+        LOGGER.info("Cleaning MultiDatastreams");
         EntityList<MultiDatastream> list = service.multiDatastreams()
                 .query()
                 .select("name", "id")
                 .expand("Observations($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
         List<MultiDatastream> toDelete = new ArrayList<>();
         Iterator<MultiDatastream> it;
+        long count = 0;
+        long toDel = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             MultiDatastream next = it.next();
+            count++;
+            logStatusCleaner.setMultiDatastreams(count);
             if (next.getObservations().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} MultiDatastream", toDelete.size());
         for (MultiDatastream item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
 
     private void cleanFeatures() throws ServiceFailureException {
+        LOGGER.info("Cleaning Features");
         EntityList<FeatureOfInterest> list = service.featuresOfInterest()
                 .query()
                 .select("name", "id")
                 .expand("Observations($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
+        long count = 0;
+        long toDel = 0;
         List<FeatureOfInterest> toDelete = new ArrayList<>();
         Iterator<FeatureOfInterest> it;
         for (it = list.fullIterator(); it.hasNext();) {
             FeatureOfInterest next = it.next();
+            count++;
+            logStatusCleaner.setFeatures(count);
             if (next.getObservations().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} FeaturesOfInterest", toDelete.size());
         for (FeatureOfInterest item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
@@ -250,18 +339,24 @@ public class ControllerCleaner implements Initializable {
                 .query()
                 .select("name", "id")
                 .expand("Things($select=id;$top=1)")
+                .orderBy("id asc")
                 .list();
         List<Location> toDelete = new ArrayList<>();
         Iterator<Location> it;
+        long count = 0;
+        long toDel = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             Location next = it.next();
+            count++;
+            logStatusCleaner.setLocations(count);
             if (next.getThings().isEmpty()) {
                 toDelete.add(next);
+                logStatusCleaner.setToDelete(++toDel);
             }
         }
         LOGGER.info("Deleting {} Locations", toDelete.size());
         for (Location item : toDelete) {
-            LOGGER.debug("Deleting {}", item);
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(item.withOnlyId());
         }
     }
@@ -275,8 +370,11 @@ public class ControllerCleaner implements Initializable {
                 .filter("id ge 3699")
                 .list();
         Iterator<Datastream> it;
+        long count = 0;
         for (it = list.fullIterator(); it.hasNext();) {
             Datastream next = it.next();
+            count++;
+            logStatusCleaner.setDatastreams(count);
             cleanObsForDatastream(next);
         }
     }
@@ -289,15 +387,20 @@ public class ControllerCleaner implements Initializable {
                 .top(100000)
                 .list();
         Iterator<Observation> it = list.fullIterator();
+        long count = 0;
+        long toDel = 0;
         TimeObject last = null;
         while (it.hasNext()) {
             Observation next = it.next();
+            count++;
+            logStatusCleaner.setObservations(count);
             TimeObject cur = next.getPhenomenonTime();
             if (last == null) {
                 last = cur;
             } else {
                 if (last.equals(cur)) {
                     toDelete.add(next);
+                    logStatusCleaner.setToDelete(++toDel);
                 }
                 last = cur;
             }
@@ -307,6 +410,7 @@ public class ControllerCleaner implements Initializable {
         }
         LOGGER.info("Deleting {} obs for Datastream {}", toDelete.size(), ds);
         for (Observation obs : toDelete) {
+            logStatusCleaner.setToDelete(--toDel);
             service.delete(obs);
         }
     }

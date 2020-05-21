@@ -9,7 +9,7 @@
     <logger name="de.fraunhofer.iosb.ilt.sta.dao.BaseDao" level="INFO"/>
     <logger name="org.reflections8.Reflections" level="ERROR"/>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
