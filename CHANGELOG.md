@@ -1,3 +1,8 @@
+# Release Version 0.5
+* Added tab for generating aggregate MultiDatastreams, for use in combination with the SensorThingsProcessor.
+* Fixed Locations being cleaned when HistoricalLocations still exist
+
+
 # Release Version 0.4
 
 **Updates**

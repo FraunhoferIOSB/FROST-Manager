@@ -338,7 +338,7 @@ public class ControllerCleaner implements Initializable {
         EntityList<Location> list = service.locations()
                 .query()
                 .select("name", "id")
-                .expand("Things($select=id;$top=1)")
+                .expand("Things($select=id;$top=1),HistoricalLocations($select=id;$top=1)")
                 .orderBy("id asc")
                 .list();
         List<Location> toDelete = new ArrayList<>();
@@ -349,7 +349,7 @@ public class ControllerCleaner implements Initializable {
             Location next = it.next();
             count++;
             logStatusCleaner.setLocations(count);
-            if (next.getThings().isEmpty()) {
+            if (next.getThings().isEmpty() && next.getHistoricalLocations().isEmpty()) {
                 toDelete.add(next);
                 logStatusCleaner.setToDelete(++toDel);
             }
