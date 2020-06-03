@@ -17,6 +17,7 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.utils;
 
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.sta.StatusCodeException;
 import de.fraunhofer.iosb.ilt.sta.dao.BaseDao;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
@@ -63,7 +64,12 @@ public class Utils {
             PrintWriter pw = new PrintWriter(sw);
             pw.append(exception.getMessage() + "\n");
             exception.printStackTrace(pw);
+
             String exceptionText = sw.toString();
+            if (exception instanceof StatusCodeException) {
+                StatusCodeException sce = (StatusCodeException) exception;
+                exceptionText = "Server Returned:" + sce.getReturnedContent() + "\n\nException:\n" + exceptionText;
+            }
             TextArea textArea = new TextArea(exceptionText);
             textArea.setEditable(false);
             textArea.setWrapText(false);

@@ -1,4 +1,12 @@
+# Future Version 0.6
+
+**Updates**
+* Improved server-error output
+
+
 # Release Version 0.5
+
+**Updates**
 * Added tab for generating aggregate MultiDatastreams, for use in combination with the SensorThingsProcessor.
 * Fixed Locations being cleaned when HistoricalLocations still exist
 
