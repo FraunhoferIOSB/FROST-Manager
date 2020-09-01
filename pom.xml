@@ -30,7 +30,7 @@
 
         <commons-io.version>2.7</commons-io.version>
         <commons-lang.version>3.11</commons-lang.version>
-        <configurable.version>0.27</configurable.version>
+        <configurable.version>0.28</configurable.version>
         <logback.version>1.2.3</logback.version>
         <openjfx.version>14.0.2.1</openjfx.version>
         <FROST-Client.version>0.32</FROST-Client.version>
