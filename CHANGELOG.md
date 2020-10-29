@@ -2,6 +2,7 @@
 
 **Updates**
 * Improved server-error output
+* Fixed FeatureOfInterest/feature not being of type Any.
 
 
 # Release Version 0.5

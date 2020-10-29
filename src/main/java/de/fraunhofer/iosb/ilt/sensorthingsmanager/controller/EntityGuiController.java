@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ObjectMapperFactory;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.sta.jackson.LocationDeserializer;
 import de.fraunhofer.iosb.ilt.sta.model.Datastream;
 import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.EntityType;
@@ -400,13 +401,13 @@ public interface EntityGuiController<T extends Entity<T>> {
             }
 
             final ObjectMapper mapper = ObjectMapperFactory.get();
-            try {
-                if (!Utils.isNullOrEmpty(textFeature.getText())) {
-                    GeoJsonObject feature = mapper.readValue(textFeature.getText(), GeoJsonObject.class);
+            if (!Utils.isNullOrEmpty(textFeature.getText())) {
+                try {
+                    Object feature = LocationDeserializer.deserialize(textFeature.getText(), mapper);
                     entity.setFeature(feature);
+                } catch (IOException ex) {
+                    LOGGER.error("Not valid geojson.", ex);
                 }
-            } catch (IOException ex) {
-                LOGGER.error("Not valid geojson.", ex);
             }
             try {
                 if (!Utils.isNullOrEmpty(textProperties.getText())) {

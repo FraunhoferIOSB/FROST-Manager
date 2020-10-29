@@ -16,7 +16,6 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
-import de.fraunhofer.iosb.ilt.configurable.AbstractConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.AnnotatedConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
