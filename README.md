@@ -1,4 +1,4 @@
-# FROST-Manager [![Build Status](https://travis-ci.org/FraunhoferIOSB/FROST-Manager.svg?branch=master)](https://travis-ci.org/FraunhoferIOSB/FROST-Manager)
+# FROST-Manager [![Build Status](https://api.travis-ci.com/FraunhoferIOSB/FROST-Manager.svg?branch=master)](https://travis-ci.com/FraunhoferIOSB/FROST-Manager)
 A manager for SensorThings API compatible servers.
 - Reading Entities
 - Updating Entities
