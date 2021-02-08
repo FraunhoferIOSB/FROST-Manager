@@ -1,6 +1,13 @@
 # Release Version 0.6
 
 **Updates**
+* Changed distribution from BinTray to Maven Central.
+* Updated dependencies.
+
+
+# Release Version 0.6
+
+**Updates**
 * Improved server-error output.
 * Fixed FeatureOfInterest/feature not being of type Any.
 
