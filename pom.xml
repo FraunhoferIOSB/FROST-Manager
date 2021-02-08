@@ -30,7 +30,7 @@
 
         <commons-io.version>2.8.0</commons-io.version>
         <commons-lang.version>3.11</commons-lang.version>
-        <configurable.version>0.29</configurable.version>
+        <configurable.version>0.30</configurable.version>
         <logback.version>1.2.3</logback.version>
         <openjfx.version>15.0.1</openjfx.version>
         <FROST-Client.version>0.34</FROST-Client.version>
@@ -135,19 +135,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>bintray-fraunhoferiosb-Maven</id>
-            <url>https://dl.bintray.com/fraunhoferiosb/Maven</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
