@@ -1,4 +1,4 @@
-# FROST-Manager
+# FROST-Manager  [![Build Status](https://github.com/FraunhoferIOSB/FROST-Manager/workflows/Maven%20Build/badge.svg)](https://github.com/FraunhoferIOSB/FROST-Manager/actions)
 A manager for SensorThings API compatible servers.
 - Reading Entities
 - Updating Entities
