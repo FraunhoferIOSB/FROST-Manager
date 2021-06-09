@@ -23,7 +23,6 @@ import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorNull;
 import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -69,13 +68,15 @@ public class AuthNone implements AnnotatedConfigurable<Void, Void>, AuthMethod {
     @Override
     public void setAuth(SensorThingsService service) {
         try {
-            URL url = service.getEndpoint();
-
             HttpClientBuilder clientBuilder = HttpClients.custom()
                     .useSystemProperties();
 
             if (ignoreSslErrors) {
-                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(new SSLContextBuilder().loadTrustMaterial((X509Certificate[] chain, String authType) -> true).build());
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                        new SSLContextBuilder()
+                                .loadTrustMaterial((X509Certificate[] chain, String authType) -> true)
+                                .build()
+                );
                 clientBuilder.setSSLSocketFactory(sslsf);
             }
 
