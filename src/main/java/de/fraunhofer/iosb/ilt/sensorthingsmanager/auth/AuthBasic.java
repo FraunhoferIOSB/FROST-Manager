@@ -70,7 +70,6 @@ public class AuthBasic implements AnnotatedConfigurable<Void, Void>, AuthMethod 
     @Override
     public void setAuth(SensorThingsService service) {
         try {
-
             CredentialsProvider credsProvider = new BasicCredentialsProvider();
             URL url = service.getEndpoint();
             credsProvider.setCredentials(
