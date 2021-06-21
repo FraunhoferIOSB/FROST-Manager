@@ -87,7 +87,7 @@ public class AuthBasic implements AnnotatedConfigurable<Void, Void>, AuthMethod 
 
             CloseableHttpClient httpclient = clientBuilder.build();
 
-            service.setClient(httpclient);
+            service.setHttpClient(httpclient);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
             LOGGER.error("Failed to initialise basic auth.", ex);
         }
