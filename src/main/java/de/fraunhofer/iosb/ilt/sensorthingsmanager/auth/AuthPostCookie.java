@@ -75,7 +75,7 @@ public class AuthPostCookie implements AnnotatedConfigurable<Void, Void>, AuthMe
     public void setAuth(SensorThingsService service) {
         String finalUrl = postUrl.replace("{username}", username);
         finalUrl = finalUrl.replace("{password}", password);
-        CloseableHttpClient client = service.getClient();
+        CloseableHttpClient client = service.getHttpClient();
         final HttpPost loginPost = new HttpPost(finalUrl);
         loginPost.setHeader(HTTPREQUEST_HEADER_ACCEPT, HTTPREQUEST_TYPE_JSON);
         try {
