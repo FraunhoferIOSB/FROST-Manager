@@ -35,7 +35,7 @@
         <configurable.version>0.30</configurable.version>
         <logback.version>1.2.6</logback.version>
         <openjfx.version>17.0.0.1</openjfx.version>
-        <FROST-Client.version>0.36</FROST-Client.version>
+        <FROST-Client.version>0.37</FROST-Client.version>
     </properties>
 
     <licenses>
