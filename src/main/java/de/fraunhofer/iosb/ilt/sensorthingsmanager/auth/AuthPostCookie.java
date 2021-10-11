@@ -64,13 +64,6 @@ public class AuthPostCookie implements AnnotatedConfigurable<Void, Void>, AuthMe
     @EditorPassword.EdOptsPassword()
     private String password;
 
-    @ConfigurableField(editor = EditorBoolean.class,
-            label = "IgnoreSslErrors",
-            description = "Ignore SSL certificate errors. This is a bad idea unless you know what you are doing.",
-            optional = true)
-    @EditorBoolean.EdOptsBool()
-    private boolean ignoreSslErrors;
-
     @Override
     public void setAuth(SensorThingsService service) {
         String finalUrl = postUrl.replace("{username}", username);
