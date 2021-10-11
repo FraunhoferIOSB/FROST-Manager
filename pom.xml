@@ -18,14 +18,11 @@
         <maven.compiler.target>11</maven.compiler.target>
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
 
-        <bintray.subject>fraunhoferiosb</bintray.subject>
-        <bintray.repo>Maven</bintray.repo>
-        <bintray.package>FROST-Manager</bintray.package>
-
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-gpg-plugin>3.0.1</maven-gpg-plugin>
         <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+        <maven-javafx-plugin>0.0.6</maven-javafx-plugin>
         <maven-nexus-staging-plugin>1.6.8</maven-nexus-staging-plugin>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
@@ -99,6 +96,17 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${maven-release-plugin.version}</version>
             </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>${maven-javafx-plugin}</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <jlinkImageName>FROST-Manager</jlinkImageName>
+                    <launcher>launcher</launcher>                    
+                    <mainClass>${mainClass}</mainClass>
+                </configuration>
+            </plugin>        
         </plugins>
     </build>
 

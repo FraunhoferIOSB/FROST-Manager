@@ -111,6 +111,7 @@ public class AggregationData {
                 nr++;
                 setProgress(progressBase + nr * pPart);
             }
+            LOGGER.info("Loaded {} Datastreams", nr);
         } catch (ServiceFailureException exc) {
             LOGGER.error("Service error loading Datastreams: ", exc);
         }
@@ -184,7 +185,7 @@ public class AggregationData {
                         .list()
                         .toList();
                 if (list.size() > 1) {
-                    LOGGER.warn("Multiple ({}) sources found for {}.", list.size(), target.baseName);
+                    LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
                 }
                 if (list.size() > 0) {
                     target.sourceMds = list.get(0);
@@ -196,13 +197,22 @@ public class AggregationData {
             {
                 List<Datastream> list = service.datastreams()
                         .query()
-                        .filter("startswith(name," + nameQuoted + ")")
+                        .filter("name eq " + nameQuoted)
                         .top(1000)
                         .orderBy("id asc")
                         .list()
                         .toList();
+                if (list.isEmpty()) {
+                    list = service.datastreams()
+                            .query()
+                            .filter("startswith(name," + nameQuoted + ")")
+                            .top(1000)
+                            .orderBy("id asc")
+                            .list()
+                            .toList();
+                }
                 if (list.size() > 1) {
-                    LOGGER.warn("Multiple ({}) sources found for {}.", list.size(), target.baseName);
+                    LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
                 }
                 for (Datastream source : list) {
                     String postfix = source.getName().substring(target.baseName.length());
@@ -216,7 +226,7 @@ public class AggregationData {
                     return;
                 }
             }
-            LOGGER.warn("No source found for {}.", target.baseName);
+            LOGGER.warn("No source found for '{}'.", target.baseName);
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to find source for {}." + target.baseName);
             LOGGER.debug("Exception:", ex);
