@@ -34,16 +34,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -787,6 +778,11 @@ public interface EntityGuiController<T extends Entity<T>> {
                 }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
+                Utils.showAlert(
+                        Alert.AlertType.ERROR,
+                        "Failed to update",
+                        "Failed to update the entity.",
+                        ex);
             }
         }
 
