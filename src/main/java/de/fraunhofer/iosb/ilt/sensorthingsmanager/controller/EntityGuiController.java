@@ -44,6 +44,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -787,6 +788,11 @@ public interface EntityGuiController<T extends Entity<T>> {
                 }
             } catch (IOException ex) {
                 LOGGER.error("Not valid json.", ex);
+                Utils.showAlert(
+                        Alert.AlertType.ERROR,
+                        "Failed to update",
+                        "Failed to update the entity.",
+                        ex);
             }
         }
 
