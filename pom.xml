@@ -31,7 +31,7 @@
         <commons-lang.version>3.12.0</commons-lang.version>
         <configurable.version>0.33</configurable.version>
         <logback.version>1.4.0</logback.version>
-        <openjfx.version>18.0.2</openjfx.version>
+        <openjfx.version>19</openjfx.version>
         <FROST-Client.version>0.43</FROST-Client.version>
     </properties>
 
