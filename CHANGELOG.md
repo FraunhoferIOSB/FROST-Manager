@@ -1,4 +1,13 @@
-# Release Version 0.6
+# Release Version 0.8
+
+**Updates**
+* Add AlertWindow to inform user when entered JSON is not valid.
+* Added option to ignore ssl certificate errors when not using authentication.
+* Improved aggregation searching.
+* Updated dependencies.
+
+
+# Release Version 0.7
 
 **Updates**
 * Changed distribution from BinTray to Maven Central.
