@@ -1,3 +1,9 @@
+# Release Version 0.9
+
+**Updates**
+* Add cross-platform jars for JavaFX.
+
+
 # Release Version 0.8
 
 **Updates**
