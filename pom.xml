@@ -27,7 +27,7 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 
-        <commons-io.version>2.11.0</commons-io.version>
+        <commons-io.version>2.13.0</commons-io.version>
         <commons-lang.version>3.12.0</commons-lang.version>
         <configurable.version>0.34</configurable.version>
         <logback.version>1.4.6</logback.version>
