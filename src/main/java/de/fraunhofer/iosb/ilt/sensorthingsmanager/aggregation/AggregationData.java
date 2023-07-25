@@ -358,9 +358,14 @@ public class AggregationData {
         String aggKey = null;
         Object aggId = null;
         if (sourceEqualsTarget) {
-            expectedAggFor = "/Datastreams(" + formatKeyValuesForUrl(sourceDs.getPrimaryKeyValues()) + ")";
+            final Object[] primaryKeyValues = sourceDs.getPrimaryKeyValues();
+            expectedAggFor = "/Datastreams(" + formatKeyValuesForUrl(primaryKeyValues) + ")";
             aggKey = KEY_AGGREGATE_SOURCE_D;
-            aggId = formatKeyValuesForUrl(sourceDs.getPrimaryKeyValues());
+            if (primaryKeyValues.length == 1) {
+                aggId = primaryKeyValues[0];
+            } else {
+                aggId = formatKeyValuesForUrl(primaryKeyValues);
+            }
         } else {
             expectedAggFor = sourceDs.getSelfLink();
         }
