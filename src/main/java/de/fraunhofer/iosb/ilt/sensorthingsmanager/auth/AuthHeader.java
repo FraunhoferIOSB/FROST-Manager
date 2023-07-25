@@ -19,14 +19,13 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 import de.fraunhofer.iosb.ilt.configurable.AnnotatedConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
-import de.fraunhofer.iosb.ilt.sta.service.TokenManager;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.utils.TokenManager;
 import org.apache.http.HttpRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 /**
- *
- * @author scf
+ * Authentication using custom Headers added to each request.
  */
 public class AuthHeader implements AnnotatedConfigurable<Void, Void>, AuthMethod {
 

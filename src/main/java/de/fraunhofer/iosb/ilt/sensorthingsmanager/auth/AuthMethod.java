@@ -17,11 +17,10 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
 import de.fraunhofer.iosb.ilt.configurable.Configurable;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 
 /**
- *
- * @author scf
+ * A method for authenticating users to a service.
  */
 public interface AuthMethod extends Configurable<Void, Void> {
 

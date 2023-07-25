@@ -16,8 +16,7 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
-import de.fraunhofer.iosb.ilt.sta.model.Datastream;
-import de.fraunhofer.iosb.ilt.sta.model.MultiDatastream;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,8 +36,8 @@ public class AggregationBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(AggregationBase.class);
 
     private final String baseName;
-    private Datastream baseDatastream;
-    private MultiDatastream baseMultiDatastream;
+    private Entity baseDatastream;
+    private Entity baseMultiDatastream;
 
     private final Set<AggregateCombo> combos = new TreeSet<>();
     private final Map<AggregationLevel, AggregateCombo> combosByLevel = new HashMap<>();
@@ -50,7 +49,7 @@ public class AggregationBase {
         this.baseName = baseName;
     }
 
-    public AggregationBase(String baseName, Datastream baseDatastream, MultiDatastream baseMultiDatastream) {
+    public AggregationBase(String baseName, Entity baseDatastream, Entity baseMultiDatastream) {
         this.baseName = baseName;
         this.baseDatastream = baseDatastream;
         this.baseMultiDatastream = baseMultiDatastream;
@@ -103,19 +102,19 @@ public class AggregationBase {
         return wantedLevels;
     }
 
-    public Datastream getBaseDatastream() {
+    public Entity getBaseDatastream() {
         return baseDatastream;
     }
 
-    public void setBaseDatastream(Datastream baseDatastream) {
+    public void setBaseDatastream(Entity baseDatastream) {
         this.baseDatastream = baseDatastream;
     }
 
-    public MultiDatastream getBaseMultiDatastream() {
+    public Entity getBaseMultiDatastream() {
         return baseMultiDatastream;
     }
 
-    public void setBaseMultiDatastream(MultiDatastream baseMultiDatastream) {
+    public void setBaseMultiDatastream(Entity baseMultiDatastream) {
         this.baseMultiDatastream = baseMultiDatastream;
     }
 

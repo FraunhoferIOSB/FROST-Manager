@@ -18,7 +18,7 @@
     <children>
         <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>
-                <SplitPane fx:id="mainSplit" dividerPositions="0.45" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <SplitPane fx:id="mainSplit" dividerPositions="0.60" prefHeight="160.0" prefWidth="300.0" BorderPane.alignment="CENTER">
                     <items>
                         <BorderPane fx:id="paneServers" prefHeight="200.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
                             <bottom>

@@ -21,7 +21,7 @@ import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorPassword;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -37,8 +37,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author scf
+ * Authentication using HTTP Basic Auth.
  */
 public class AuthBasic implements AnnotatedConfigurable<Void, Void>, AuthMethod {
 

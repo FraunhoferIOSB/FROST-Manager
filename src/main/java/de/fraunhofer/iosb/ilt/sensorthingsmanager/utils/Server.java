@@ -18,9 +18,12 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.utils;
 
 import de.fraunhofer.iosb.ilt.configurable.AbstractConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
+import de.fraunhofer.iosb.ilt.configurable.editor.EditorList;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorSubclass;
+import de.fraunhofer.iosb.ilt.frostclient.models.DataModel;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.auth.AuthMethod;
+import java.util.List;
 
 /**
  *
@@ -46,6 +49,12 @@ public class Server extends AbstractConfigurable<Void, Void> {
             optional = false)
     @EditorSubclass.EdOptsSubclass(iface = AuthMethod.class, nameField = "authClass")
     private AuthMethod authMethod;
+
+    @ConfigurableField(editor = EditorList.class,
+            label = "Data Models", description = "A list of data models, loaded in the given order.")
+    @EditorList.EdOptsList(editor = EditorSubclass.class)
+    @EditorSubclass.EdOptsSubclass(iface = DataModel.class)
+    private List<DataModel> dataModels;
 
     /**
      * @return the name
@@ -80,6 +89,14 @@ public class Server extends AbstractConfigurable<Void, Void> {
     public Server setUrl(String Url) {
         this.url = Url;
         return this;
+    }
+
+    public List<DataModel> getDataModels() {
+        return dataModels;
+    }
+
+    public void setDataModels(List<DataModel> dataModels) {
+        this.dataModels = dataModels;
     }
 
     public AuthMethod getAuthMethod() {

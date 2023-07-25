@@ -16,16 +16,20 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
-import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
-import de.fraunhofer.iosb.ilt.sta.Utils;
-import de.fraunhofer.iosb.ilt.sta.model.MultiDatastream;
-import de.fraunhofer.iosb.ilt.sta.model.ObservedProperty;
-import de.fraunhofer.iosb.ilt.sta.model.Sensor;
-import de.fraunhofer.iosb.ilt.sta.model.Thing;
-import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
-import de.fraunhofer.iosb.ilt.sta.model.ext.UnitOfMeasurement;
-import de.fraunhofer.iosb.ilt.sta.query.Query;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
+import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
+import de.fraunhofer.iosb.ilt.frostclient.model.ext.UnitOfMeasurement;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_DEFINITION;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_DESCRIPTION;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_NAME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_PROPERTIES;
+import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
+import de.fraunhofer.iosb.ilt.frostclient.query.Query;
+import de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,32 +48,31 @@ public class SensorThingsUtils {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorThingsUtils.class);
 
-    public final Map<ObservedProperty, List<ObservedProperty>> aggregateProperties = new HashMap<>();
+    public final Map<Entity, List<Entity>> aggregateProperties = new HashMap<>();
 
     public SensorThingsUtils() {
     }
 
-    public ObservedProperty findOrCreateOp(SensorThingsService service, String name, String def, String description, Map<String, Object> properties, String filter, boolean aggregates) throws ServiceFailureException {
-        Query<ObservedProperty> query = service.observedProperties().query();
-        if (Utils.isNullOrEmpty(filter)) {
-            query.filter("name eq '" + Utils.escapeForStringConstant(name) + "'");
+    public Entity findOrCreateOp(SensorThingsService service, String name, String def, String description, MapValue properties, String filter, boolean aggregates) throws ServiceFailureException {
+        SensorThingsSensingV11 sMdl = service.getModel(SensorThingsSensingV11.class);
+        SensorThingsMultiDatastreamV11 mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
+        Query query = service.query(sMdl.etObservedProperty);
+        if (StringHelper.isNullOrEmpty(filter)) {
+            query.filter("name eq " + StringHelper.quoteForUrl(name) + "");
         } else {
             query.filter(filter);
         }
-        EntityList<ObservedProperty> opList = query.list();
+        EntitySet opList = query.list();
         if (opList.size() > 1) {
             throw new IllegalStateException("More than one observedProperty with name " + name);
         }
-        ObservedProperty op;
+        Entity op;
         if (opList.size() == 1) {
             op = opList.iterator().next();
         } else {
             LOGGER.info("Creating ObservedProperty {}.", name);
-            op = new ObservedProperty();
-            op.setName(name);
-            op.setDefinition(def);
-            op.setDescription(description);
-            op.setProperties(properties);
+            op = sMdl.newObservedProperty(name, def, description)
+                    .setProperty(EP_PROPERTIES, properties);
             service.create(op);
         }
         if (aggregates) {
@@ -78,61 +81,57 @@ public class SensorThingsUtils {
         return op;
     }
 
-    public void findOrCreateAggregateOps(SensorThingsService service, ObservedProperty op) throws ServiceFailureException {
-        List<ObservedProperty> agList = aggregateProperties.get(op);
+    public void findOrCreateAggregateOps(SensorThingsService service, Entity op) throws ServiceFailureException {
+        List<Entity> agList = aggregateProperties.get(op);
         if (agList != null && agList.size() == 3) {
             return;
         }
         agList = new ArrayList<>();
         aggregateProperties.put(op, agList);
 
-        String opName = op.getName();
-        String opDef = op.getDefinition();
-        String opDesc = op.getDescription();
-        String def = op.getDefinition();
+        String opName = op.getProperty(EP_NAME);
+        String opDef = op.getProperty(EP_DEFINITION);
+        String opDesc = op.getProperty(EP_DESCRIPTION);
+        String def = op.getProperty(EP_DEFINITION);
         {
             String agOpName = opName + " Min";
             String agOpDesc = opDesc + " Minimum";
-            ObservedProperty agOp = findOrCreateOp(service, agOpName, def, agOpDesc, null, "", false);
+            Entity agOp = findOrCreateOp(service, agOpName, def, agOpDesc, null, "", false);
             agList.add(agOp);
         }
         {
             String agOpName = opName + " Max";
             String agOpDesc = opDesc + " Maximum";
-            ObservedProperty agOp = findOrCreateOp(service, agOpName, def, agOpDesc, null, "", false);
+            Entity agOp = findOrCreateOp(service, agOpName, def, agOpDesc, null, "", false);
             agList.add(agOp);
         }
         {
             String agOpName = opName + " Dev";
             String agOpDesc = opDesc + " Standard deviation";
-            ObservedProperty agOp = findOrCreateOp(service, agOpName, def, agOpDesc, null, "", false);
+            Entity agOp = findOrCreateOp(service, agOpName, def, agOpDesc, null, "", false);
             agList.add(agOp);
         }
     }
 
-    public MultiDatastream findOrCreateMultiDatastream(SensorThingsService service, String name, String desc, List<UnitOfMeasurement> uoms, Thing t, List<ObservedProperty> ops, Sensor s, Map<String, Object> props) throws ServiceFailureException {
-        EntityList<MultiDatastream> mdsList = service.multiDatastreams().query().filter("name eq '" + Utils.escapeForStringConstant(name) + "'").list();
+    public Entity findOrCreateMultiDatastream(SensorThingsService service, String name, String desc, List<UnitOfMeasurement> uoms, Entity thing, List<Entity> ops, Entity sensor, MapValue props) throws ServiceFailureException {
+        SensorThingsMultiDatastreamV11 mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
+
+        EntitySet mdsList = service.query(mMdl.etMultiDatastream)
+                .filter("name eq " + StringHelper.quoteForUrl(name) + "")
+                .list();
         if (mdsList.size() > 1) {
             throw new IllegalStateException("More than one multidatastream with name " + name);
         }
-        MultiDatastream mds;
+        Entity mds;
         if (mdsList.size() == 1) {
             mds = mdsList.iterator().next();
         } else {
             LOGGER.info("Creating multiDatastream {}.", name);
-            List<String> dataTypes = new ArrayList<>();
-            for (ObservedProperty op : ops) {
-                dataTypes.add("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
-            }
-            mds = new MultiDatastream(
-                    name,
-                    desc,
-                    dataTypes,
-                    uoms);
-            mds.setProperties(props);
-            mds.setThing(t);
-            mds.setSensor(s);
-            mds.getObservedProperties().addAll(ops);
+            mds = mMdl.newMultiDatastream(name, desc, uoms)
+                    .setProperty(EP_PROPERTIES, props)
+                    .setProperty(mMdl.npMultidatastreamThing, thing)
+                    .setProperty(mMdl.npMultidatastreamSensor, sensor)
+                    .addNavigationEntity(mMdl.npMultidatastreamObservedproperties, ops);
             service.create(mds);
         }
         return mds;

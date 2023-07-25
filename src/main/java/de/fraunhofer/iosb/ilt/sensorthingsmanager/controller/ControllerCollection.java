@@ -1,17 +1,24 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.frostclient.exception.StatusCodeException;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
+import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
+import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostclient.model.PrimaryKey;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_NAME;
+import de.fraunhofer.iosb.ilt.frostclient.query.Query;
+import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
+import de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
-import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
-import de.fraunhofer.iosb.ilt.sta.StatusCodeException;
-import de.fraunhofer.iosb.ilt.sta.model.Entity;
-import de.fraunhofer.iosb.ilt.sta.model.Id;
-import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
-import de.fraunhofer.iosb.ilt.sta.query.Query;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -37,14 +44,9 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author scf
- * @param <T> The entity type of the collection.
  */
-public class ControllerCollection<T extends Entity<T>> implements Initializable {
+public class ControllerCollection implements Initializable {
 
-    public static interface EntityFactory<T extends Entity<T>> {
-
-        public T createEntity();
-    }
     /**
      * The logger for this class.
      */
@@ -78,16 +80,19 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     private BorderPane paneSelected;
 
     @FXML
-    private TableView<EntityListEntry<T>> entityTable;
+    private TableView<EntityListEntry> entityTable;
 
     @FXML
-    private TableColumn<EntityListEntry<T>, String> columnName;
-    private TableColumn<EntityListEntry<T>, ?> columnId;
+    private TableColumn<EntityListEntry, String> columnName;
+    private TableColumn<EntityListEntry, ?> columnId;
 
-    private final ObservableList<EntityListEntry<T>> entities = FXCollections.observableArrayList();
-    private EntityList<T> currentQueryList;
+    private final ObservableList<EntityListEntry> entities = FXCollections.observableArrayList();
+    private EntitySet currentQueryList;
 
-    private Query<T> query;
+    private SensorThingsService service;
+    private Query query;
+    private EntityType entityType;
+
     /**
      * Can new entities be created.
      */
@@ -105,9 +110,9 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * The setter used to link newly selected items to the owner of the
      * collection.
      */
-    private EntityGuiController.ChildSetter<T> childSetter;
+    private EntityGuiController.ChildSetter childSetter;
     private boolean canMultiSelect = false;
-    private EntityFactory<T> entityFactory;
+
     /**
      * Should navigation properties of the selected Entity be shown, or just
      * entityProperties.
@@ -146,6 +151,13 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
                     Alert.AlertType.ERROR,
                     "Failed to fetch",
                     "Fetching the next set of entities failed for url: " + ex.getUrl(),
+                    ex);
+        } catch (ServiceFailureException ex) {
+            LOGGER.error("Failed to fetch entity list.", ex);
+            Utils.showAlert(
+                    Alert.AlertType.ERROR,
+                    "Failed to fetch",
+                    "Fetching the set of all entities failed.",
                     ex);
         }
         loadEntities();
@@ -227,26 +239,26 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (!canDelete) {
             return;
         }
-        ObservableList<EntityListEntry<T>> selectedItems = entityTable.getSelectionModel().getSelectedItems();
-        List<EntityListEntry<T>> toDelete = new ArrayList<>();
-        for (EntityListEntry<T> selectedItem : selectedItems) {
+        ObservableList<EntityListEntry> selectedItems = entityTable.getSelectionModel().getSelectedItems();
+        List<EntityListEntry> toDelete = new ArrayList<>();
+        for (EntityListEntry selectedItem : selectedItems) {
             toDelete.add(selectedItem);
         }
-        String what = selectedItems.size() == 1 ? "Item " + selectedItems.get(0).getEntity().getId().toString() : "all " + selectedItems.size() + " items";
+        String what = selectedItems.size() == 1 ? "Item " + ParserUtils.formatKeyValuesForUrl(selectedItems.get(0).getEntity()) : "all " + selectedItems.size() + " items";
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + what + " ?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait();
 
         if (alert.getResult() == ButtonType.YES) {
             try {
                 // ToDo: Add progress dialog.
-                for (EntityListEntry<T> selectedItem : toDelete) {
+                for (EntityListEntry selectedItem : toDelete) {
                     Entity entity = selectedItem.getEntity();
-                    if (entity.getId() == null) {
-                        // entity doesn't exist yet.
-                        entities.remove(selectedItem);
-                    } else {
+                    if (entity.primaryKeyFullySet()) {
                         LOGGER.info("Deleting " + entity);
                         entity.getService().delete(entity);
+                        entities.remove(selectedItem);
+                    } else {
+                        // entity doesn't exist yet.
                         entities.remove(selectedItem);
                     }
                 }
@@ -266,7 +278,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (!canCreate) {
             return;
         }
-        EntityListEntry newItem = new EntityListEntry().setEntity(entityFactory.createEntity());
+        EntityListEntry newItem = new EntityListEntry().setEntity(new Entity(entityType));
         entities.add(newItem);
         entityTable.getSelectionModel().select(newItem);
     }
@@ -277,11 +289,10 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
             new Alert(Alert.AlertType.ERROR, "No childSetter defined.", ButtonType.CLOSE).showAndWait();
             return;
         }
-        Class<T> entityClass = query.getEntityClass();
-        Query<T> allQuery = new Query<>(query.getService(), entityClass);
-        Optional<List<T>> result = EntityGuiController.entitySearchDialog(allQuery, true, orderby);
+        Query allQuery = service.query(entityType);
+        Optional<List<Entity>> result = EntityGuiController.entitySearchDialog(allQuery, true, orderby);
         if (result.isPresent() && !result.get().isEmpty()) {
-            List<T> newChildren = result.get();
+            List<Entity> newChildren = result.get();
             childSetter.setChildren(newChildren);
         }
     }
@@ -308,8 +319,8 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
 
     private void loadEntities() {
         entities.clear();
-        for (T entity : currentQueryList) {
-            entities.add(new EntityListEntry<T>().setEntity(entity));
+        for (Entity entity : currentQueryList.toList()) {
+            entities.add(new EntityListEntry().setEntity(entity));
         }
         createIdColumn();
         buttonNext.setDisable(!currentQueryList.hasNextLink());
@@ -320,9 +331,8 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     private void loadAllEntities() {
         int i = 0;
         entities.clear();
-        for (Iterator<T> it = currentQueryList.fullIterator(); it.hasNext();) {
-            T entity = it.next();
-            entities.add(new EntityListEntry<T>().setEntity(entity));
+        for (Entity entity : currentQueryList) {
+            entities.add(new EntityListEntry().setEntity(entity));
             i++;
             if (i >= 500) {
                 LOGGER.warn("Warning after {}. Total: {}.", i, entities.size());
@@ -339,14 +349,14 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         entityTable.sort();
     }
 
-    private void entitySelected(EntityListEntry<T> newValue) {
+    private void entitySelected(EntityListEntry newValue) {
         if (newValue == null) {
             buttonDelete.setDisable(true);
             return;
         }
         try {
-            T entity = newValue.getEntity();
-            Node pane = FactoryEntityPanel.getPane(query.getService(), entity.getType(), entity, showNavigationProperties);
+            Entity entity = newValue.getEntity();
+            Node pane = FactoryEntityPanel.getPane(service, entityType, entity, showNavigationProperties);
             paneSelected.setCenter(pane);
             buttonDelete.setDisable(false);
         } catch (IOException ex) {
@@ -356,20 +366,26 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        columnName.setCellValueFactory(
-                (TableColumn.CellDataFeatures<EntityListEntry<T>, String> param) -> {
-                    T entity = param.getValue().getEntity();
-                    Id id = entity.getId();
-                    String entityString = entity.toString();
-                    if (id != null && entityString.startsWith(id.toString())) {
-                        entityString = entityString.substring(id.toString().length()).trim();
-                    }
-                    return new ReadOnlyObjectWrapper<>(entityString);
-                });
+        columnName.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, String> param) -> {
+            Entity entity = param.getValue().getEntity();
+            if (entityType.hasProperty(EP_NAME)) {
+                String name = entity.getProperty(EP_NAME);
+                if (!StringHelper.isNullOrEmpty(name)) {
+                    return new ReadOnlyObjectWrapper<>(name);
+                }
+            }
+            for (EntityPropertyMain prop : entity.getEntityType().getEntityProperties()) {
+                if (prop.getType() == TypePrimitive.EDM_STRING) {
+                    Object propValue = entity.getProperty(prop);
+                    return new ReadOnlyObjectWrapper<>(Objects.toString(propValue));
+                }
+            }
+            return new ReadOnlyObjectWrapper<>(entity.getEntityType().entityName);
+        });
         entityTable.setItems(entities);
         entityTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         entityTable.getSelectionModel().selectedItemProperty().addListener(
-                (ObservableValue<? extends EntityListEntry<T>> observable, EntityListEntry<T> oldValue, EntityListEntry<T> newValue) -> {
+                (ObservableValue<? extends EntityListEntry> observable, EntityListEntry oldValue, EntityListEntry newValue) -> {
                     entitySelected(newValue);
                 });
     }
@@ -378,28 +394,45 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         if (entities.isEmpty() || columnId != null) {
             return;
         }
-        Id id = entities.get(0).getEntity().getId();
-        if (id == null) {
+        final Entity entity = entities.get(0).getEntity();
+        if (!entity.primaryKeyFullySet()) {
             return;
         }
-        if (id.getValue() instanceof Number) {
-            TableColumn<EntityListEntry<T>, Number> column = new TableColumn<>("ID");
-            column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry<T>, Number> param) -> {
-                if (param.getValue().getEntity().getId() == null) {
+        final PrimaryKey pk = entity.getPrimaryKey();
+        final List<EntityPropertyMain> keyProps = pk.getKeyProperties();
+        final EntityPropertyMain keyProp0 = keyProps.get(0);
+        boolean pkIsNumeric = false;
+
+        if (keyProps.size() == 1 && keyProp0.getType().getName().equals(TypePrimitive.EDM_UNTYPED_NAME)) {
+            final Object pkVal = entity.getPrimaryKeyValues()[0];
+            if (pkVal instanceof Number n) {
+                pkIsNumeric = true;
+            }
+        } else if (keyProps.size() == 1 && keyProp0.getType().getName().startsWith("EDM.Int")) {
+            pkIsNumeric = true;
+        }
+        if (pkIsNumeric) {
+            TableColumn<EntityListEntry, Number> column = new TableColumn<>("ID");
+            columnId = column;
+            column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, Number> param) -> {
+                final Object pkValue = param.getValue().getEntity().getPrimaryKeyValues()[0];
+                if (pkValue == null) {
                     return new ReadOnlyObjectWrapper<>(-1);
                 }
-                return new ReadOnlyObjectWrapper<>((Number) param.getValue().getEntity().getId().getValue());
+                return new ReadOnlyObjectWrapper<>((Number) pkValue);
             });
-            columnId = column;
+
         } else {
-            TableColumn<EntityListEntry<T>, String> column = new TableColumn<>("ID");
-            column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry<T>, String> param) -> {
-                if (param.getValue().getEntity().getId() == null) {
+            TableColumn<EntityListEntry, String> column = new TableColumn<>("ID");
+            column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, String> param) -> {
+                final Entity cellEntity = param.getValue().getEntity();
+                if (!cellEntity.primaryKeyFullySet()) {
                     return new ReadOnlyObjectWrapper<>("");
                 }
-                return new ReadOnlyObjectWrapper<>(param.getValue().getEntity().getId().toString());
+                String keyValue = ParserUtils.formatKeyValuesForUrl(cellEntity);
+                return new ReadOnlyObjectWrapper<>(keyValue);
             });
-            columnId = column;
+
         }
         entityTable.getColumns().add(0, columnId);
     }
@@ -412,17 +445,18 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
     }
 
     /**
-     * @param query the query to set.
-     * @param entityFactory The factory to use to generate new entities.
+     * @param query the query to use to fetch entities. This includes the
+     * service and the EntityType.
      * @param orderBy The ordering to use.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, EntityFactory<T> entityFactory, String orderBy) {
+    public ControllerCollection setQuery(Query query, String orderBy) {
         this.query = query;
+        this.service = query.getService();
+        this.entityType = query.getEntityType();
         this.canCreate = true;
         this.canDelete = true;
         this.orderby = orderBy;
-        this.entityFactory = entityFactory;
         buttonDelete.setVisible(canDelete);
         buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);
@@ -441,6 +475,8 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      */
     public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect, String orderBy) {
         this.query = query;
+        this.service = query.getService();
+        this.entityType = query.getEntityType();
         this.canCreate = false;
         this.canLinkNew = canLinkNew;
         this.canDelete = canDelete;
@@ -454,7 +490,7 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
         return this;
     }
 
-    public void setChildSetter(EntityGuiController.ChildSetter<T> childSetter) {
+    public void setChildSetter(EntityGuiController.ChildSetter childSetter) {
         this.childSetter = childSetter;
     }
 
@@ -462,8 +498,8 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * @return the currently selected entity for single-select mode, or the last
      * selected entity for multi select mode.
      */
-    public T getSelectedEntity() {
-        EntityListEntry<T> item = entityTable.getSelectionModel().getSelectedItem();
+    public Entity getSelectedEntity() {
+        EntityListEntry item = entityTable.getSelectionModel().getSelectedItem();
         if (item == null) {
             return null;
         }
@@ -474,15 +510,13 @@ public class ControllerCollection<T extends Entity<T>> implements Initializable 
      * @return the currently selected entity for single-select mode, or the last
      * selected entity for multi select mode.
      */
-    public List<T> getSelectedEntities() {
-        ObservableList<EntityListEntry<T>> items = entityTable.getSelectionModel().getSelectedItems();
+    public List<Entity> getSelectedEntities() {
+        ObservableList<EntityListEntry> items = entityTable.getSelectionModel().getSelectedItems();
         if (items == null) {
             return null;
         }
-        List<T> values = new ArrayList<>();
-        for (EntityListEntry<T> item : items) {
-            values.add(item.getEntity());
-        }
+        List<Entity> values = new ArrayList<>();
+        items.stream().forEach(i -> values.add(i.getEntity()));
         return values;
     }
 }

@@ -18,18 +18,16 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.auth;
 
 import de.fraunhofer.iosb.ilt.configurable.AnnotatedConfigurable;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
-import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorPassword;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import java.io.IOException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author scf
+ * Authentication using Cookies.
  */
 public class AuthPostCookie implements AnnotatedConfigurable<Void, Void>, AuthMethod {
 

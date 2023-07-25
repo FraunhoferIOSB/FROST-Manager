@@ -26,6 +26,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
+import net.time4j.Moment;
 
 /**
  *
@@ -42,6 +43,10 @@ public class DateTimePicker extends GridPane {
 
     public DateTimePicker() {
         this(ZonedDateTime.now());
+    }
+
+    public DateTimePicker(Moment initialValue) {
+        this(initialValue.toTemporalAccessor());
     }
 
     public DateTimePicker(Instant initialValue) {

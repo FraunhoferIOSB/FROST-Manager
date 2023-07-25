@@ -22,7 +22,7 @@ import de.fraunhofer.iosb.ilt.configurable.ConfigEditor;
 import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorBoolean;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorNull;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -39,8 +39,6 @@ import org.slf4j.LoggerFactory;
  * Authentication type for no authentication. Does add the option to ignore SSL
  * certificate errors, for when using self-signed certificates for testing
  * purposes.
- *
- * @author scf
  */
 public class AuthNone implements AnnotatedConfigurable<Void, Void>, AuthMethod {
 
@@ -68,8 +66,7 @@ public class AuthNone implements AnnotatedConfigurable<Void, Void>, AuthMethod {
     @Override
     public void setAuth(SensorThingsService service) {
         try {
-            HttpClientBuilder clientBuilder = HttpClients.custom()
-                    .useSystemProperties();
+            HttpClientBuilder clientBuilder = service.getClientBuilder();
 
             if (ignoreSslErrors) {
                 SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
@@ -80,9 +77,7 @@ public class AuthNone implements AnnotatedConfigurable<Void, Void>, AuthMethod {
                 clientBuilder.setSSLSocketFactory(sslsf);
             }
 
-            CloseableHttpClient httpclient = clientBuilder.build();
-
-            service.setHttpClient(httpclient);
+            service.rebuildHttpClient();
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
             LOGGER.error("Failed to initialise basic auth.", ex);
         }

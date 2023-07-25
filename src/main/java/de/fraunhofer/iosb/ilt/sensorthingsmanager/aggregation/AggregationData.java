@@ -16,25 +16,30 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
+import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11.EP_MULTIOBSERVATIONDATATYPES;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11.EP_UNITOFMEASUREMENTS;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_NAME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_PROPERTIES;
+import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
+import de.fraunhofer.iosb.ilt.frostclient.query.Query;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils.formatKeyValuesForUrl;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_SOURCE_D;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_SOURCE_MD;
-import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
-import de.fraunhofer.iosb.ilt.sta.model.Datastream;
-import de.fraunhofer.iosb.ilt.sta.model.MultiDatastream;
-import de.fraunhofer.iosb.ilt.sta.model.Thing;
-import de.fraunhofer.iosb.ilt.sta.model.ext.EntityList;
-import de.fraunhofer.iosb.ilt.sta.query.Query;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
+import net.time4j.tz.TZID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,18 +62,22 @@ public class AggregationData {
     private final List<AggregationBase> aggregationBases = new ArrayList<>();
     private final Map<String, AggregationBase> aggregationBasesByName = new HashMap<>();
     private Map<String, List<AggregateCombo>> combosBySource;
-    private ZoneId zoneId;
+    private TZID zoneId;
     private final boolean fixReferences;
     private final boolean addEmptyBases;
     private final boolean sourceEqualsTarget = true;
     private double progressBase = 0;
     private double progressTarget = 1;
     private final List<ProgressListener> progressListeners = new CopyOnWriteArrayList<>();
+    private final SensorThingsSensingV11 sMdl;
+    private final SensorThingsMultiDatastreamV11 mMdl;
 
     public AggregationData(SensorThingsService service, boolean fixReferences, boolean addEmptyBases) {
         this.service = service;
         this.fixReferences = fixReferences;
         this.addEmptyBases = addEmptyBases;
+        sMdl = service.getModel(SensorThingsSensingV11.class);
+        mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
     }
 
     public AggregationData(SensorThingsService service, boolean fixReferences) {
@@ -89,22 +98,19 @@ public class AggregationData {
 
     private void findAllBases() {
         try {
-            Query<Datastream> query = service.datastreams()
-                    .query()
+            Query query = service.query(sMdl.etDatastream)
                     .select("id", "name", "description", "properties", "unitOfMeasurement")
                     .top(1000)
                     .orderBy("id asc");
             if (hasListeners()) {
                 query.count();
             }
-            EntityList<Datastream> dsList = query.list();
+            EntitySet dsList = query.list();
             long count = dsList.getCount();
             double pPart = (progressTarget - progressBase) / count;
             int nr = 0;
-            Iterator<Datastream> datastreams = dsList.fullIterator();
-            while (datastreams.hasNext()) {
-                Datastream datastream = datastreams.next();
-                String name = datastream.getName();
+            for (Entity datastream : dsList) {
+                String name = datastream.getProperty(EP_NAME);
                 String base = baseNameFromName(name);
                 AggregationBase aggregationBase = getAggregationBase(base);
                 aggregationBase.setBaseDatastream(datastream);
@@ -119,8 +125,7 @@ public class AggregationData {
 
     private void findTargetMultiDatastreams() {
         try {
-            Query<Thing> query = service.things()
-                    .query()
+            Query query = service.query(sMdl.etThing)
                     .top(1000)
                     .select("id,name,properties")
                     .orderBy("id asc")
@@ -128,23 +133,20 @@ public class AggregationData {
             if (hasListeners()) {
                 query.count();
             }
-            EntityList<Thing> thingList = query.list();
+            EntitySet thingList = query.list();
             long count = thingList.getCount();
             double pPart = (progressTarget - progressBase) / count;
             int nr = 0;
-            Iterator<Thing> thingIt = thingList.fullIterator();
-            while (thingIt.hasNext()) {
-                Thing thing = thingIt.next();
-                EntityList<MultiDatastream> dsList = thing.getMultiDatastreams();
-                for (Iterator<MultiDatastream> it = dsList.fullIterator(); it.hasNext();) {
-                    MultiDatastream mds = it.next();
-                    String name = mds.getName();
+            for (Entity thing : thingList) {
+                EntitySet dsList = thing.getProperty(mMdl.npThingMultidatastreams);
+                for (Entity mds : dsList) {
+                    String name = mds.getProperty(EP_NAME);
                     Matcher matcher = Utils.POSTFIX_PATTERN.matcher(name);
                     if (!matcher.matches()) {
                         LOGGER.debug("MultiDatastream {} is not an aggregate.");
                         continue;
                     }
-                    AggregateCombo combo = new AggregateCombo(thing, mds);
+                    AggregateCombo combo = new AggregateCombo(service, thing, mds);
                     combo.baseName = matcher.group(1).trim();
                     String postfix = matcher.group(2);
                     combo.level = AggregationLevel.of(postfix);
@@ -153,7 +155,7 @@ public class AggregationData {
                         continue;
                     }
                     combo.resolveZoneId(zoneId);
-                    LOGGER.debug("Found: {} from {}, timeZone {}", combo.level, combo.target.getName(), combo.getZoneId());
+                    LOGGER.debug("Found: {} from {}, timeZone {}", combo.level, combo.targetMds.getProperty(EP_NAME), combo.getZoneId());
                     AggregationBase aggBase = getAggregationBase(combo.baseName);
                     aggBase.addCombo(combo);
                 }
@@ -171,14 +173,13 @@ public class AggregationData {
             if (base != null && base.getBaseDatastream() != null) {
                 target.sourceDs = base.getBaseDatastream();
                 target.sourceIsAggregate = false;
-                checkReference(target.sourceDs, target.target, target.level);
+                checkReferenceFromDs(target.sourceDs, target.targetMds, target.level);
                 return;
             }
 
             String nameQuoted = "'" + target.baseName.replaceAll("'", "''") + "'";
             {
-                List<MultiDatastream> list = service.multiDatastreams()
-                        .query()
+                List<Entity> list = service.query(mMdl.etMultiDatastream)
                         .filter("name eq " + nameQuoted)
                         .top(1000)
                         .orderBy("id asc")
@@ -187,24 +188,22 @@ public class AggregationData {
                 if (list.size() > 1) {
                     LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
                 }
-                if (list.size() > 0) {
+                if (!list.isEmpty()) {
                     target.sourceMds = list.get(0);
                     target.sourceIsAggregate = false;
-                    checkReference(target.sourceMds, target.target, target.level);
+                    checkReferenceFromDs(target.sourceMds, target.targetMds, target.level);
                     return;
                 }
             }
             {
-                List<Datastream> list = service.datastreams()
-                        .query()
+                List<Entity> list = service.query(sMdl.etDatastream)
                         .filter("name eq " + nameQuoted)
                         .top(1000)
                         .orderBy("id asc")
                         .list()
                         .toList();
                 if (list.isEmpty()) {
-                    list = service.datastreams()
-                            .query()
+                    list = service.query(sMdl.etDatastream)
                             .filter("startswith(name," + nameQuoted + ")")
                             .top(1000)
                             .orderBy("id asc")
@@ -214,15 +213,15 @@ public class AggregationData {
                 if (list.size() > 1) {
                     LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
                 }
-                for (Datastream source : list) {
-                    String postfix = source.getName().substring(target.baseName.length());
+                for (Entity sourceDs : list) {
+                    String postfix = sourceDs.getProperty(EP_NAME).substring(target.baseName.length());
                     if (!AggregationLevel.isPostfix(postfix)) {
                         continue;
                     }
-                    target.sourceDs = source;
+                    target.sourceDs = sourceDs;
                     target.sourceIsAggregate = false;
                     target.sourceIsCollection = true;
-                    checkReference(target.sourceDs, target.target, target.level);
+                    checkReferenceFromDs(target.sourceDs, target.targetMds, target.level);
                     return;
                 }
             }
@@ -248,10 +247,10 @@ public class AggregationData {
                 long larger = target.level.duration.getSeconds();
                 if (larger % smaller == 0) {
                     LOGGER.debug("{}: {} ~ {} ({})", target.baseName, target.level, test.level, (larger / smaller));
-                    target.sourceMds = test.target;
+                    target.sourceMds = test.targetMds;
                     target.sourceIsAggregate = true;
                     found = true;
-                    checkReference(target.sourceMds, target.target, target.level);
+                    checkReferenceFromDs(target.sourceMds, target.targetMds, target.level);
                 }
             }
             if (!found) {
@@ -354,35 +353,35 @@ public class AggregationData {
         return combosBySource;
     }
 
-    private void checkReference(Datastream source, MultiDatastream aggregate, AggregationLevel level) {
+    private void checkReferenceFromDs(Entity sourceDs, Entity aggregateMds, AggregationLevel level) {
         String expectedAggFor;
         String aggKey = null;
         Object aggId = null;
         if (sourceEqualsTarget) {
-            expectedAggFor = "/Datastreams(" + source.getId().getUrl() + ")";
+            expectedAggFor = "/Datastreams(" + formatKeyValuesForUrl(sourceDs.getPrimaryKeyValues()) + ")";
             aggKey = KEY_AGGREGATE_SOURCE_D;
-            aggId = source.getId().getValue();
+            aggId = formatKeyValuesForUrl(sourceDs.getPrimaryKeyValues());
         } else {
-            expectedAggFor = source.getSelfLink().toString();
+            expectedAggFor = sourceDs.getSelfLink();
         }
-        checkReference(aggregate, expectedAggFor, level, aggKey, aggId);
+        checkReference(aggregateMds, expectedAggFor, level, aggKey, aggId);
     }
 
-    private void checkReference(MultiDatastream source, MultiDatastream aggregate, AggregationLevel level) {
+    private void checkReferenceFromMds(Entity sourceMds, Entity aggregateMds, AggregationLevel level) {
         String expectedAggFor;
         String aggKey = null;
         Object aggId = null;
         if (sourceEqualsTarget) {
-            expectedAggFor = "/MultiDatastreams(" + source.getId().getUrl() + ")";
+            expectedAggFor = "/MultiDatastreams(" + formatKeyValuesForUrl(sourceMds.getPrimaryKeyValues()) + ")";
             aggKey = KEY_AGGREGATE_SOURCE_MD;
-            aggId = source.getId().getValue();
+            aggId = formatKeyValuesForUrl(sourceMds.getPrimaryKeyValues());
         } else {
-            expectedAggFor = source.getSelfLink().toString();
+            expectedAggFor = sourceMds.getSelfLink();
         }
-        checkReference(aggregate, expectedAggFor, level, aggKey, aggId);
+        checkReference(aggregateMds, expectedAggFor, level, aggKey, aggId);
     }
 
-    private boolean checkProperty(Map<String, Object> properties, String property, Object value) {
+    private boolean checkProperty(MapValue properties, String property, Object value) {
         Object checkValue = value;
         boolean changed = false;
         Object oldValue = properties.get(property);
@@ -401,11 +400,11 @@ public class AggregationData {
         return changed;
     }
 
-    private void checkReference(MultiDatastream aggregate, String expectedAggFor, AggregationLevel level, String aggSourceKey, Object aggSourceId) {
-        Map<String, Object> properties = aggregate.getProperties();
+    private void checkReference(Entity aggregateMds, String expectedAggFor, AggregationLevel level, String aggSourceKey, Object aggSourceId) {
+        MapValue properties = aggregateMds.getProperty(EP_PROPERTIES);
         if (properties == null) {
-            properties = new HashMap<>();
-            aggregate.setProperties(properties);
+            properties = new MapValue();
+            aggregateMds.setProperty(EP_PROPERTIES, properties);
         }
         boolean changed = false;
         changed = changed | checkProperty(properties, Utils.KEY_AGGREGATE_AMOUNT, level.amount);
@@ -417,27 +416,27 @@ public class AggregationData {
         String aggFor = Objects.toString(properties.get(Utils.KEY_AGGREGATE_FOR));
         if (!expectedAggFor.equals(aggFor)) {
             if (fixReferences) {
-                LOGGER.info("Setting source reference for {} to {}.", aggregate.getName(), expectedAggFor);
+                LOGGER.info("Setting source reference for {} to {}.", aggregateMds.getProperty(EP_NAME), expectedAggFor);
                 properties.put(Utils.KEY_AGGREGATE_FOR, expectedAggFor);
                 changed = true;
             } else {
-                LOGGER.info("Source reference for {} not correct. Should be {}.", aggregate.getName(), expectedAggFor);
+                LOGGER.info("Source reference for {} not correct. Should be {}.", aggregateMds.getProperty(EP_NAME), expectedAggFor);
             }
         }
         if (changed && fixReferences) {
             try {
-                MultiDatastream copy = aggregate.withOnlyId();
-                copy.setProperties(aggregate.getProperties());
-                copy.setMultiObservationDataTypes(null);
-                copy.setUnitOfMeasurements(null);
-                service.update(copy);
+                Entity copyMds = aggregateMds.withOnlyPk();
+                copyMds.setProperty(EP_PROPERTIES, aggregateMds.getProperty(EP_PROPERTIES));
+                copyMds.setProperty(EP_MULTIOBSERVATIONDATATYPES, null);
+                copyMds.setProperty(EP_UNITOFMEASUREMENTS, null);
+                service.update(copyMds);
             } catch (ServiceFailureException ex) {
                 LOGGER.error("Failed to update reference.", ex);
             }
         }
     }
 
-    public void setZoneId(ZoneId zoneId) {
+    public void setZoneId(TZID zoneId) {
         this.zoneId = zoneId;
     }
 

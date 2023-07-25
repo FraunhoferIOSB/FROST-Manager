@@ -1,9 +1,9 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
-import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
-import de.fraunhofer.iosb.ilt.sta.model.Entity;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -19,11 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author scf
- * @param <T> The entity type this controller controls.
+ * Controller for showing one entity.
  */
-public class ControllerEntity<T extends Entity<T>> implements Initializable {
+public class ControllerEntity implements Initializable {
 
     /**
      * The logger for this class.
@@ -41,15 +39,15 @@ public class ControllerEntity<T extends Entity<T>> implements Initializable {
     private SplitPane splitPaneMain;
     @FXML
     private Button buttonSave;
-    private T entity;
-    private EntityGuiController<T> controller;
+    private Entity entity;
+    private EntityGuiController controller;
     private SensorThingsService service;
 
     @FXML
     private void actionSave(ActionEvent event) {
         controller.saveFields();
         try {
-            if (entity.getId() == null) {
+            if (!entity.primaryKeyFullySet()) {
                 service.create(entity);
                 controller.loadFields();
             } else {
@@ -73,7 +71,7 @@ public class ControllerEntity<T extends Entity<T>> implements Initializable {
     /**
      * @return the entity
      */
-    public T getEntity() {
+    public Entity getEntity() {
         return entity;
     }
 
@@ -85,11 +83,11 @@ public class ControllerEntity<T extends Entity<T>> implements Initializable {
      * selected Entity be shown, or just entityProperties.
      * @return this Controller.
      */
-    public ControllerEntity setEntity(SensorThingsService service, T entity, EntityGuiController<T> controller, boolean showNavigationProperties) {
+    public ControllerEntity setEntity(SensorThingsService service, Entity entity, EntityGuiController controller, boolean showNavigationProperties) {
         this.service = service;
         this.entity = entity;
         this.controller = controller;
-        labelType.setText(controller.getType().getName());
+        labelType.setText(entity.getEntityType().getEntityName());
         if (entity != null && showNavigationProperties) {
             controller.init(service, entity, gridProperties, accordionLinks, labelId, true);
         } else {
@@ -101,7 +99,7 @@ public class ControllerEntity<T extends Entity<T>> implements Initializable {
         return this;
     }
 
-    public EntityGuiController<T> getController() {
+    public EntityGuiController getController() {
         return controller;
     }
 

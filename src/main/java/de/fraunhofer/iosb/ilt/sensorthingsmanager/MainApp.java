@@ -17,7 +17,7 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
-import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

@@ -18,17 +18,22 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
 import de.fraunhofer.iosb.ilt.configurable.ConfigurationException;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
+import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
+import de.fraunhofer.iosb.ilt.frostclient.model.ext.TimeValue;
+import de.fraunhofer.iosb.ilt.frostclient.model.ext.UnitOfMeasurement;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_DESCRIPTION;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_PHENOMENONTIME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_UNITOFMEASUREMENT;
+import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
+import de.fraunhofer.iosb.ilt.frostclient.utils.CollectionsHelper;
+import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ButtonTableCell;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.DateTimePicker;
-import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
-import de.fraunhofer.iosb.ilt.sta.model.Datastream;
-import de.fraunhofer.iosb.ilt.sta.model.Observation;
-import de.fraunhofer.iosb.ilt.sta.model.ObservedProperty;
-import de.fraunhofer.iosb.ilt.sta.model.TimeObject;
-import de.fraunhofer.iosb.ilt.sta.model.ext.UnitOfMeasurement;
-import de.fraunhofer.iosb.ilt.sta.service.SensorThingsService;
 import java.net.URL;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,9 +69,9 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
+import net.time4j.Moment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.extra.Interval;
 
 /**
  *
@@ -105,6 +110,8 @@ public class ControllerAggManager implements Initializable {
     private ProgressBar progressBar;
 
     private SensorThingsService service;
+    private SensorThingsSensingV11 sMdl;
+    private SensorThingsMultiDatastreamV11 mMdl;
 
     private AggregationData data;
 
@@ -113,8 +120,8 @@ public class ControllerAggManager implements Initializable {
     private Map<AggregationLevel, TableColumn<AggregationBase, Boolean>> columnsByLevel = new HashMap<>();
     private EditorMap<?> levelEditor;
     private SensorThingsUtils utils = new SensorThingsUtils();
-    private Instant lastPickedStart;
-    private Instant lastPickedEnd;
+    private Moment lastPickedStart;
+    private Moment lastPickedEnd;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -129,6 +136,8 @@ public class ControllerAggManager implements Initializable {
     public void setService(SensorThingsService service) {
         this.service = service;
         buttonReload.setDisable(false);
+        sMdl = service.getModel(SensorThingsSensingV11.class);
+        mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
     }
 
     private void addMenuToColumn(final TableColumn<AggregationBase, Boolean> column, final AggregationLevel level) {
@@ -183,17 +192,17 @@ public class ControllerAggManager implements Initializable {
         return column;
     }
 
-    private void reCalculateBase(AggregationBase base, Instant start, Instant end) {
+    private void reCalculateBase(AggregationBase base, Moment start, Moment end) {
         try {
-            Datastream baseDs = base.getBaseDatastream();
+            Entity baseDs = base.getBaseDatastream();
             if (baseDs == null) {
                 LOGGER.error("No base Datastream for {}", base.getBaseName());
             }
-            Observation dummy = new Observation("Dummy", baseDs);
-            dummy.setPhenomenonTime(new TimeObject(Interval.of(start, end)));
+            Entity dummyObs = sMdl.newObservation("Dummy", baseDs);
+            dummyObs.setProperty(EP_PHENOMENONTIME, TimeValue.create(start, end));
 
-            service.create(dummy);
-            service.delete(dummy);
+            service.create(dummyObs);
+            service.delete(dummyObs);
         } catch (ServiceFailureException ex) {
             LOGGER.error("Failed to create or delete dummy observation!", ex);
         }
@@ -221,9 +230,9 @@ public class ControllerAggManager implements Initializable {
         dialog.getDialogPane().setExpandableContent(new Text("This will create a new Observation in the given Datastream, and directly delete it again."));
         Optional<ButtonType> confirmation = dialog.showAndWait();
 
-        Instant startDateTime = startTime.getValue().toInstant();
+        Moment startDateTime = Moment.from(startTime.getValue().toInstant());
         lastPickedStart = startDateTime;
-        Instant endDateTime = endTime.getValue().toInstant();
+        Moment endDateTime = Moment.from(endTime.getValue().toInstant());
         lastPickedEnd = endDateTime;
 
         if (confirmation.isPresent() && confirmation.get() == ButtonType.APPLY) {
@@ -362,27 +371,31 @@ public class ControllerAggManager implements Initializable {
 
     private void createAggregate(AggregationBase base, AggregationLevel level) throws ServiceFailureException {
         LOGGER.info("Creating {} for {}.", level, base.getBaseName());
-        Datastream baseDs = base.getBaseDatastream();
-        ObservedProperty op = baseDs.getObservedProperty();
-        UnitOfMeasurement uom = baseDs.getUnitOfMeasurement();
+        Entity baseDs = base.getBaseDatastream();
+        Entity op = baseDs.getProperty(sMdl.npDatastreamObservedproperty);
+        UnitOfMeasurement uom = baseDs.getProperty(EP_UNITOFMEASUREMENT);
         utils.findOrCreateAggregateOps(service, op);
 
-        List<ObservedProperty> ops = new ArrayList<>();
+        List<Entity> ops = new ArrayList<>();
         ops.add(op);
         ops.addAll(utils.aggregateProperties.get(op));
         List<UnitOfMeasurement> uoms = new ArrayList<>();
-        for (ObservedProperty op1 : ops) {
+        for (Entity op1 : ops) {
             uoms.add(uom);
         }
 
-        Map<String, Object> aggProps = new HashMap<>();
-        aggProps.put(Utils.KEY_AGGREGATE_SOURCE_D, baseDs.getId().getValue());
-        aggProps.put(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + baseDs.getId().getUrl() + ")");
-        aggProps.put(Utils.KEY_AGGREGATE_AMOUNT, level.amount);
-        aggProps.put(Utils.KEY_AGGREGATE_UNIT, level.unit.toString());
+        MapValue aggProps = CollectionsHelper.propertiesBuilder()
+                .addItem(Utils.KEY_AGGREGATE_SOURCE_D, ParserUtils.formatKeyValuesForUrl(baseDs.getPrimaryKeyValues()))
+                .addItem(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + ParserUtils.formatKeyValuesForUrl(baseDs.getPrimaryKeyValues()) + ")")
+                .addItem(Utils.KEY_AGGREGATE_AMOUNT, level.amount)
+                .addItem(Utils.KEY_AGGREGATE_UNIT, level.unit.toString())
+                .build();
         String mdsName = base.getBaseName() + " " + level.toPostFix();
-        String mdsDesc = baseDs.getDescription() + " aggregated per " + level.amount + " " + level.unit;
-        utils.findOrCreateMultiDatastream(service, mdsName, mdsDesc, uoms, baseDs.getThing(), ops, baseDs.getSensor(), aggProps);
+        String mdsDesc = baseDs.getProperty(EP_DESCRIPTION) + " aggregated per " + level.amount + " " + level.unit;
+        utils.findOrCreateMultiDatastream(
+                service, mdsName, mdsDesc, uoms,
+                baseDs.getProperty(sMdl.npDatastreamThing), ops,
+                baseDs.getProperty(sMdl.npDatastreamSensor), aggProps);
     }
 
     private void deleteAggregate(AggregationBase base, AggregationLevel level) {
@@ -393,9 +406,9 @@ public class ControllerAggManager implements Initializable {
         }
         LOGGER.error("Deleting {} for {}", level, base.getBaseName());
         try {
-            service.delete(combo.target);
+            service.delete(combo.targetMds);
         } catch (ServiceFailureException ex) {
-            LOGGER.error("Failed to delete {}", combo.target);
+            LOGGER.error("Failed to delete {}", combo.targetMds);
             LOGGER.error("Failed to delete:", ex);
         }
     }

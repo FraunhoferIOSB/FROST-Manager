@@ -16,12 +16,13 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
-import de.fraunhofer.iosb.ilt.sta.model.Observation;
-import de.fraunhofer.iosb.ilt.sta.model.TimeObject;
-import de.fraunhofer.iosb.ilt.sta.model.ext.UnitOfMeasurement;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
+import de.fraunhofer.iosb.ilt.frostclient.model.ext.TimeValue;
+import de.fraunhofer.iosb.ilt.frostclient.model.ext.UnitOfMeasurement;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
 import java.nio.charset.Charset;
-import java.time.Instant;
 import java.util.regex.Pattern;
+import net.time4j.Moment;
 
 /**
  *
@@ -59,27 +60,27 @@ public class Utils {
         // Not to be instantiated.
     }
 
-    public static Instant getPhenTimeStart(Observation obs) {
-        TimeObject phenTime = obs.getPhenomenonTime();
+    public static Moment getPhenTimeStart(Entity obs) {
+        TimeValue phenTime = obs.getProperty(SensorThingsSensingV11.EP_PHENOMENONTIME);
         return getPhenTimeStart(phenTime);
     }
 
-    public static Instant getPhenTimeStart(TimeObject phenTime) {
+    public static Moment getPhenTimeStart(TimeValue phenTime) {
         if (phenTime.isInterval()) {
-            return phenTime.getAsInterval().getStart();
+            return phenTime.getInterval().getStart();
         }
-        return phenTime.getAsDateTime().toInstant();
+        return phenTime.getInstant().getDateTime();
     }
 
-    public static Instant getPhenTimeEnd(Observation obs) {
-        TimeObject phenTime = obs.getPhenomenonTime();
+    public static Moment getPhenTimeEnd(Entity obs) {
+        TimeValue phenTime = obs.getProperty(SensorThingsSensingV11.EP_PHENOMENONTIME);
         return getPhenTimeEnd(phenTime);
     }
 
-    public static Instant getPhenTimeEnd(TimeObject phenTime) {
+    public static Moment getPhenTimeEnd(TimeValue phenTime) {
         if (phenTime.isInterval()) {
-            return phenTime.getAsInterval().getEnd();
+            return phenTime.getInterval().getEnd();
         }
-        return phenTime.getAsDateTime().toInstant();
+        return phenTime.getInstant().getDateTime();
     }
 }
