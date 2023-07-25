@@ -18,10 +18,11 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
-import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Server;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.ControllerAggManager;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Server;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,11 +30,13 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +59,10 @@ public class ControllerServer implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        collectionTabs.setTabMinWidth(20);
+        collectionTabs.setTabMaxWidth(20);
+        collectionTabs.setTabMinHeight(150);
+        collectionTabs.setTabMaxHeight(150);
     }
 
     public void setServerEntry(Server entry) {
@@ -77,7 +83,9 @@ public class ControllerServer implements Initializable {
                 addTabFor(et.plural, orderBy, service.query(et));
             }
 
-            addAggregationTab();
+            if (service.hasModel(SensorThingsMultiDatastreamV11.class)) {
+                addAggregationTab();
+            }
         } catch (MalformedURLException ex) {
             LOGGER.error("Failed to create service url.", ex);
         }
@@ -90,7 +98,8 @@ public class ControllerServer implements Initializable {
             ControllerCollection controller = loader.<ControllerCollection>getController();
             controller.setQuery(query, orderBy);
 
-            Tab tab = new Tab(title);
+            Tab tab = new Tab();
+            tab.setGraphic(new StackPane(new Group(new Label(title))));
             tab.setContent(content);
             collectionTabs.getTabs().add(tab);
         } catch (IOException ex) {
@@ -119,7 +128,8 @@ public class ControllerServer implements Initializable {
             ControllerAggManager controller = loader.<ControllerAggManager>getController();
             controller.setService(service);
 
-            Tab tab = new Tab("Aggregations");
+            Tab tab = new Tab();
+            tab.setGraphic(new StackPane(new Group(new Label("Aggregations"))));
             tab.setContent(content);
             collectionTabs.getTabs().add(tab);
         } catch (IOException ex) {
