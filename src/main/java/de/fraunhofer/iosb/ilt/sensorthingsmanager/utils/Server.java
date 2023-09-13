@@ -47,13 +47,13 @@ public class Server extends AbstractConfigurable<Void, Void> {
             label = "Auth",
             description = "The method to use for authentication",
             optional = false)
-    @EditorSubclass.EdOptsSubclass(iface = AuthMethod.class, nameField = "authClass")
+    @EditorSubclass.EdOptsSubclass(iface = AuthMethod.class, nameField = "authClass", shortenClassNames = true)
     private AuthMethod authMethod;
 
     @ConfigurableField(editor = EditorList.class,
             label = "Data Models", description = "A list of data models, loaded in the given order.")
     @EditorList.EdOptsList(editor = EditorSubclass.class)
-    @EditorSubclass.EdOptsSubclass(iface = DataModel.class)
+    @EditorSubclass.EdOptsSubclass(iface = DataModel.class, shortenClassNames = true)
     private List<DataModel> dataModels;
 
     /**
