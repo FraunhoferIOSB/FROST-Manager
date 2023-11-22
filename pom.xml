@@ -28,7 +28,7 @@
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 
         <commons-io.version>2.13.0</commons-io.version>
-        <commons-lang.version>3.13.0</commons-lang.version>
+        <commons-lang.version>3.14.0</commons-lang.version>
         <configurable.version>0.34</configurable.version>
         <logback.version>1.4.11</logback.version>
         <openjfx.version>20.0.2</openjfx.version>
