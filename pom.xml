@@ -21,17 +21,17 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-gpg-plugin>3.1.0</maven-gpg-plugin>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.6.2</maven-javadoc-plugin.version>
         <maven-javafx-plugin>0.0.8</maven-javafx-plugin>
         <maven-nexus-staging-plugin>1.6.13</maven-nexus-staging-plugin>
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 
-        <commons-io.version>2.13.0</commons-io.version>
-        <commons-lang.version>3.13.0</commons-lang.version>
+        <commons-io.version>2.15.0</commons-io.version>
+        <commons-lang.version>3.14.0</commons-lang.version>
         <configurable.version>0.34</configurable.version>
-        <logback.version>1.4.11</logback.version>
-        <openjfx.version>20.0.2</openjfx.version>
+        <logback.version>1.4.13</logback.version>
+        <openjfx.version>21.0.1</openjfx.version>
         <FROST-Client.version>0.44</FROST-Client.version>
     </properties>
 
