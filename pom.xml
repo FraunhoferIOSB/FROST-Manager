@@ -18,7 +18,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
 
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-gpg-plugin>3.1.0</maven-gpg-plugin>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
