@@ -3,14 +3,15 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostclient.model.Property;
 import de.fraunhofer.iosb.ilt.frostclient.model.PropertyType;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationPropertyEntitySet;
-import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
-import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
 import static de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive.EDM_STRING_NAME;
@@ -217,9 +218,11 @@ public interface EntityGuiController {
                     value = ptc.instantiate();
                     entity.setProperty(property, value);
                 }
-                for (EntityProperty subProperty : ptc.getProperties()) {
-                    PropertyGuiGlue subItem = PropertyGuiGlue.createGuiElement(value, subProperty, editable, gridProperties, itemCount);
-                    subProperties.put(subProperty.getJsonName(), subItem);
+                for (Property subProperty : ptc.getProperties()) {
+                    if (subProperty instanceof EntityProperty ep) {
+                        PropertyGuiGlue subItem = PropertyGuiGlue.createGuiElement(value, ep, editable, gridProperties, itemCount);
+                        subProperties.put(subProperty.getJsonName(), subItem);
+                    }
                 }
             }
             return this;

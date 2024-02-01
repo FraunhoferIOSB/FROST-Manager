@@ -17,9 +17,9 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
-import de.fraunhofer.iosb.ilt.frostclient.model.ext.TimeValue;
-import de.fraunhofer.iosb.ilt.frostclient.model.ext.UnitOfMeasurement;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import de.fraunhofer.iosb.ilt.frostclient.models.ext.TimeValue;
+import de.fraunhofer.iosb.ilt.frostclient.models.ext.UnitOfMeasurement;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 import net.time4j.Moment;

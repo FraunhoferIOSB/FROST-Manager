@@ -80,7 +80,7 @@ public class ControllerServer implements Initializable {
                 if (et.getProperty(SensorThingsSensingV11.NAME_NAME) != null) {
                     orderBy = "name asc";
                 }
-                addTabFor(et.plural, orderBy, service.query(et));
+                addTabFor(et.mainContainer, orderBy, service.query(et));
             }
 
             if (service.hasModel(SensorThingsMultiDatastreamV11.class)) {
