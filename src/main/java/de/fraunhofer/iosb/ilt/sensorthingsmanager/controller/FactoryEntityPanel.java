@@ -1,5 +1,6 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.GuiControllerDefault;
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
@@ -28,7 +29,7 @@ public class FactoryEntityPanel {
         FXMLLoader loader = new FXMLLoader(FactoryEntityPanel.class.getResource(ENTITY_PANE_FXML));
         Node content = (Pane) loader.load();
         ControllerEntity controller = loader.<ControllerEntity>getController();
-        controller.setEntity(service, entity, new EntityGuiController.GuiControllerDefault(type), showNavProps);
+        controller.setEntity(service, entity, new GuiControllerDefault(type), showNavProps);
         return content;
     }
 

@@ -230,9 +230,9 @@ public class ControllerAggManager implements Initializable {
         dialog.getDialogPane().setExpandableContent(new Text("This will create a new Observation in the given Datastream, and directly delete it again."));
         Optional<ButtonType> confirmation = dialog.showAndWait();
 
-        Moment startDateTime = Moment.from(startTime.getValue().toInstant());
+        Moment startDateTime = startTime.getValue();
         lastPickedStart = startDateTime;
-        Moment endDateTime = Moment.from(endTime.getValue().toInstant());
+        Moment endDateTime = endTime.getValue();
         lastPickedEnd = endDateTime;
 
         if (confirmation.isPresent() && confirmation.get() == ButtonType.APPLY) {

@@ -88,7 +88,7 @@ public class ControllerEntity implements Initializable {
         this.entity = entity;
         this.controller = controller;
         labelType.setText(entity.getEntityType().getEntityName());
-        if (entity != null && showNavigationProperties) {
+        if (showNavigationProperties) {
             controller.init(service, entity, gridProperties, accordionLinks, labelId, true);
         } else {
             splitPaneMain.getItems().remove(accordionLinks);

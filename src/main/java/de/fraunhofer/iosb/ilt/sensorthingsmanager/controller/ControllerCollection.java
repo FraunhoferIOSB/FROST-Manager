@@ -13,6 +13,8 @@ import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.E
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
 import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
 import de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.helper.ChildSetter;
+import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.helper.entitySearchDialog;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import java.io.IOException;
 import java.net.URL;
@@ -110,7 +112,7 @@ public class ControllerCollection implements Initializable {
      * The setter used to link newly selected items to the owner of the
      * collection.
      */
-    private EntityGuiController.ChildSetter childSetter;
+    private ChildSetter childSetter;
     private boolean canMultiSelect = false;
 
     /**
@@ -290,7 +292,7 @@ public class ControllerCollection implements Initializable {
             return;
         }
         Query allQuery = service.query(entityType);
-        Optional<List<Entity>> result = EntityGuiController.entitySearchDialog(allQuery, true, orderby);
+        Optional<List<Entity>> result = entitySearchDialog(allQuery, true, orderby);
         if (result.isPresent() && !result.get().isEmpty()) {
             List<Entity> newChildren = result.get();
             childSetter.setChildren(newChildren);
@@ -403,16 +405,26 @@ public class ControllerCollection implements Initializable {
         final EntityPropertyMain keyProp0 = keyProps.get(0);
         boolean pkIsNumeric = false;
 
+        String idColumnName = null;
+        for (var prop : keyProps) {
+            if (idColumnName == null) {
+                idColumnName = "";
+            } else {
+                idColumnName += ",";
+            }
+            idColumnName += prop.getJsonName();
+        }
+
         if (keyProps.size() == 1 && keyProp0.getType().getName().equals(TypePrimitive.EDM_UNTYPED_NAME)) {
             final Object pkVal = entity.getPrimaryKeyValues()[0];
             if (pkVal instanceof Number n) {
                 pkIsNumeric = true;
             }
-        } else if (keyProps.size() == 1 && keyProp0.getType().getName().startsWith("EDM.Int")) {
+        } else if (keyProps.size() == 1 && keyProp0.getType().getName().startsWith("Edm.Int")) {
             pkIsNumeric = true;
         }
         if (pkIsNumeric) {
-            TableColumn<EntityListEntry, Number> column = new TableColumn<>("ID");
+            TableColumn<EntityListEntry, Number> column = new TableColumn<>(idColumnName);
             columnId = column;
             column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, Number> param) -> {
                 final Object pkValue = param.getValue().getEntity().getPrimaryKeyValues()[0];
@@ -423,7 +435,8 @@ public class ControllerCollection implements Initializable {
             });
 
         } else {
-            TableColumn<EntityListEntry, String> column = new TableColumn<>("ID");
+            TableColumn<EntityListEntry, String> column = new TableColumn<>(idColumnName);
+            columnId = column;
             column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, String> param) -> {
                 final Entity cellEntity = param.getValue().getEntity();
                 if (!cellEntity.primaryKeyFullySet()) {
@@ -490,7 +503,7 @@ public class ControllerCollection implements Initializable {
         return this;
     }
 
-    public void setChildSetter(EntityGuiController.ChildSetter childSetter) {
+    public void setChildSetter(ChildSetter childSetter) {
         this.childSetter = childSetter;
     }
 

@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -99,7 +100,10 @@ public class ControllerServer implements Initializable {
             controller.setQuery(query, orderBy);
 
             Tab tab = new Tab();
-            tab.setGraphic(new StackPane(new Group(new Label(title))));
+            final StackPane stackPane = new StackPane(new Group(new Label(title)));
+            stackPane.setMinWidth(140);
+            stackPane.setAlignment(Pos.CENTER_LEFT);
+            tab.setGraphic(stackPane);
             tab.setContent(content);
             collectionTabs.getTabs().add(tab);
         } catch (IOException ex) {
