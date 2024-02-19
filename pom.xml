@@ -14,25 +14,24 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
+        <maven.compiler.release>17</maven.compiler.release>
 
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
-        <maven-gpg-plugin>3.1.0</maven-gpg-plugin>
-        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
-        <maven-javafx-plugin>0.0.8</maven-javafx-plugin>
-        <maven-nexus-staging-plugin>1.6.13</maven-nexus-staging-plugin>
-        <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <version.maven-plugin-compiler>3.12.1</version.maven-plugin-compiler>
+        <version.maven-plugin-dependency>3.1.1</version.maven-plugin-dependency>
+        <version.maven-plugin-gpg>3.1.0</version.maven-plugin-gpg>
+        <version.maven-plugin-javadoc>3.6.3</version.maven-plugin-javadoc>
+        <version.maven-plugin-javafx>0.0.8</version.maven-plugin-javafx>
+        <version.maven-plugin-nexus-staging>1.6.13</version.maven-plugin-nexus-staging>
+        <version.maven-plugin-release>3.0.1</version.maven-plugin-release>
+        <version.maven-plugin-source>3.3.0</version.maven-plugin-source>
 
-        <commons-io.version>2.15.1</commons-io.version>
-        <commons-lang.version>3.14.0</commons-lang.version>
-        <configurable.version>0.34</configurable.version>
-        <logback.version>1.4.14</logback.version>
-        <openjfx.version>21.0.1</openjfx.version>
-        <FROST-Client.version>2.6-SNAPSHOT</FROST-Client.version>
+        <version.commons-io>2.15.1</version.commons-io>
+        <version.commons-lang>3.14.0</version.commons-lang>
+        <version.configurable>0.34</version.configurable>
+        <version.logback>1.4.14</version.logback>
+        <version.openjfx>21.0.1</version.openjfx>
+        <version.FROST-Client>2.6</version.FROST-Client>
     </properties>
 
     <licenses>
@@ -85,7 +84,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <version>${version.maven-plugin-compiler}</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -94,12 +93,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
+                <version>${version.maven-plugin-release}</version>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>${maven-javafx-plugin}</version>
+                <version>${version.maven-plugin-javafx}</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
                     <jlinkImageName>FROST-Manager</jlinkImageName>
@@ -140,7 +139,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>${maven-source-plugin.version}</version>
+                        <version>${version.maven-plugin-source}</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -154,7 +153,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven-javadoc-plugin.version}</version>
+                        <version>${version.maven-plugin-javadoc}</version>
                         <configuration>
                             <source>8</source>
                         </configuration>
@@ -170,7 +169,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin}</version>
+                        <version>${version.maven-plugin-gpg}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -184,7 +183,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${maven-nexus-staging-plugin}</version>
+                        <version>${version.maven-plugin-nexus-staging}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -201,54 +200,54 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>FROST-Client-Dynamic</artifactId>
-            <version>${FROST-Client.version}</version>
+            <version>${version.FROST-Client}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <version>${version.logback}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>Configurable</artifactId>
-            <version>${configurable.version}</version>
+            <version>${version.configurable}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
+            <version>${version.commons-io}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang.version}</version>
+            <version>${version.commons-lang}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${openjfx.version}</version>
+            <version>${version.openjfx}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${openjfx.version}</version>
+            <version>${version.openjfx}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${openjfx.version}</version>
+            <version>${version.openjfx}</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${openjfx.version}</version>
+            <version>${version.openjfx}</version>
             <classifier>linux</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${openjfx.version}</version>
+            <version>${version.openjfx}</version>
             <classifier>mac</classifier>
         </dependency>    
     </dependencies>
