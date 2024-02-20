@@ -85,9 +85,9 @@ public class GuiGlueSimpleDateTime implements PropertyGuiGlue<GuiGlueSimpleDateT
                 entity.setProperty(property, TimeInstant.create(result));
                 field.setText(FORMATTER.print(result));
                 field.setBorder(origBorder);
-            } catch (ParseException ex) {
+            } catch (ParseException | IndexOutOfBoundsException ex) {
                 field.setBorder(Border.stroke(Color.RED));
-                Utils.showAlert(Alert.AlertType.ERROR, "Invalid DateTime", "Failed to parse DateTime: " + textData, ex);
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid DateTime", "Failed to parse DateTime. Expected yyyy-MM-dd HH:mm:ss.SSSXXX: " + textData, ex);
             }
         }
     }
