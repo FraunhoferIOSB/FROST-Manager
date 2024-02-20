@@ -28,9 +28,9 @@
 
         <version.commons-io>2.15.1</version.commons-io>
         <version.commons-lang>3.14.0</version.commons-lang>
-        <version.configurable>0.34</version.configurable>
+        <version.configurable>0.35</version.configurable>
         <version.logback>1.5.0</version.logback>
-        <version.openjfx>21.0.1</version.openjfx>
+        <version.openjfx>21.0.2</version.openjfx>
         <version.FROST-Client>2.8</version.FROST-Client>
     </properties>
 
