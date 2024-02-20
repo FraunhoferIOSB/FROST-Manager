@@ -4,7 +4,7 @@
 
     <groupId>de.fraunhofer.iosb.ilt</groupId>
     <artifactId>FROST-Manager</artifactId>
-    <version>0.10</version>
+    <version>0.11-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>FROST-Manager</name>
@@ -60,7 +60,7 @@
         <url>https://github.com/FraunhoferIOSB/FROST-Manager</url>
         <connection>scm:git:git@github.com:FraunhoferIOSB/FROST-Manager.git</connection>
         <developerConnection>scm:git:git@github.com:FraunhoferIOSB/FROST-Manager.git</developerConnection>
-        <tag>v0.10</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
