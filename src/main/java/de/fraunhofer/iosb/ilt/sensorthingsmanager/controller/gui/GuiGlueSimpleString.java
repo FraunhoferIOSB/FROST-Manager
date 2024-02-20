@@ -53,8 +53,9 @@ public class GuiGlueSimpleString implements PropertyGuiGlue<GuiGlueSimpleString>
         final Object value = entity.getProperty(property);
         if (value == null) {
             field.setText("");
+        } else {
+            field.setText(Objects.toString(value));
         }
-        field.setText(Objects.toString(value));
     }
 
     @Override

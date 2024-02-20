@@ -61,7 +61,9 @@ public class GuiGlueGeometry implements PropertyGuiGlue<GuiGlueGeometry> {
         final ObjectMapper mapper = ObjectMapperFactory.get();
         try {
             final Object value = entity.getProperty(property);
-            if (value != null) {
+            if (value == null) {
+                field.setText("");
+            } else {
                 String textValue = mapper.writeValueAsString(value);
                 field.setText(textValue);
             }

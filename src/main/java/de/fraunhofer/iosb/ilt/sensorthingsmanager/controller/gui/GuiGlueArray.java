@@ -60,7 +60,9 @@ public class GuiGlueArray implements PropertyGuiGlue<GuiGlueArray> {
         final ObjectMapper mapper = ObjectMapperFactory.get();
         try {
             List value = entity.getProperty(property);
-            if (value != null) {
+            if (value == null) {
+                field.setText("");
+            } else {
                 String textValue = mapper.writeValueAsString(value);
                 field.setText(textValue);
             }

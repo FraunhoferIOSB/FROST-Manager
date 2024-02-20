@@ -58,8 +58,9 @@ public class GuiGlueSimpleNumber implements PropertyGuiGlue<GuiGlueSimpleNumber>
         final Number value = entity.getProperty(property);
         if (value == null) {
             field.setText("");
+        } else {
+            field.setText(Objects.toString(value));
         }
-        field.setText(Objects.toString(value));
     }
 
     @Override

@@ -60,7 +60,9 @@ public class GuiGlueOpenType implements PropertyGuiGlue<GuiGlueOpenType> {
         final ObjectMapper mapper = ObjectMapperFactory.get();
         try {
             final ComplexValue<? extends ComplexValue> value = entity.getProperty(property);
-            if (value != null) {
+            if (value == null) {
+                field.setText("");
+            } else {
                 String textValue = mapper.writeValueAsString(value);
                 field.setText(textValue);
             }
