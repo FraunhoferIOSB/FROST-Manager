@@ -20,6 +20,7 @@ import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationProperty;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
+import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.EntityGuiController;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.FactoryEntityPanel;
@@ -78,10 +79,11 @@ public class helper {
 
         EntityType type = childQuery.getEntityType();
         String paneTitle;
+        final String childTypeName = npe.getEntityType().getShortName();
         if (childEntity == null) {
-            paneTitle = npe.getName() + ": No " + npe.getEntityType().getShortName() + " selected";
+            paneTitle = npe.getName() + ": No " + childTypeName + " selected";
         } else {
-            paneTitle = npe.getName() + ": " + childEntity.toString();
+            paneTitle = npe.getName() + ": " + childTypeName + '(' + ParserUtils.formatKeyValuesForUrl(childEntity) + ')';
         }
         Node pane = FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, false);
         TitledPane tp = new TitledPane(paneTitle, pane);

@@ -55,11 +55,11 @@ public class ControllerEntity implements Initializable {
                 controller.loadFields();
             }
         } catch (ServiceFailureException ex) {
-            LOGGER.error("Failed to update entity.", ex);
+            LOGGER.error("Failed to update or create entity.", ex);
             Utils.showAlert(
                     Alert.AlertType.ERROR,
-                    "Failed to update",
-                    "Failed to update the entity.",
+                    "Failed to update or create",
+                    "Failed to update or create the entity.",
                     ex);
         }
     }
