@@ -21,6 +21,7 @@ import de.fraunhofer.iosb.ilt.frostclient.model.PropertyType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
+import static de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive.EDM_BOOLEAN_NAME;
 import static de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive.EDM_DATETIMEOFFSET_NAME;
 import static de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive.EDM_GEOMETRY_NAME;
 import static de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive.EDM_INT16_NAME;
@@ -73,6 +74,10 @@ public interface PropertyGuiGlue<T extends PropertyGuiGlue<T>> {
         }
         if (pt instanceof TypePrimitive ptsp) {
             switch (ptsp.getName()) {
+                case EDM_BOOLEAN_NAME:
+                    return new GuiGlueSimpleBoolean(entity, property)
+                            .init(namePrfx, gridProperties, itemCount, editable);
+
                 case EDM_GEOMETRY_NAME:
                     return new GuiGlueGeometry(entity, property)
                             .init(namePrfx, gridProperties, itemCount, editable);
