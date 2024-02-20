@@ -1,3 +1,9 @@
+# Development Version 0.10
+
+**Updates**
+* Added dynamic data model support.
+
+
 # Release Version 0.9
 
 **Updates**
