@@ -103,12 +103,15 @@ public class GuiControllerDefault implements EntityGuiController {
                     if (npe.getEntityType().hasProperty("name")) {
                         order = "name asc";
                     }
-                    TitledPane tp = createEditableEntityPane(entity, npe, entity.getProperty(npe), service.query(npe.getEntityType()), order, child -> entity.setProperty(npe, child));
+                    final Entity linkedEntity = entity.getProperty(npe);
+                    TitledPane tp = createEditableEntityPane(entity, npe, linkedEntity, service.query(npe.getEntityType()), order, child -> entity.setProperty(npe, child));
                     accordionLinks.getPanes().add(tp);
                 }
-                for (NavigationPropertyEntitySet nps : entityType.getNavigationSets()) {
-                    Pane pane = createCollectionPaneFor(entity.query(nps), "");
-                    accordionLinks.getPanes().add(new TitledPane(nps.getName(), pane));
+                if (entity.hasService()) {
+                    for (NavigationPropertyEntitySet nps : entityType.getNavigationSets()) {
+                        Pane pane = createCollectionPaneFor(entity.query(nps), "");
+                        accordionLinks.getPanes().add(new TitledPane(nps.getName(), pane));
+                    }
                 }
             } catch (IOException ex) {
                 LOGGER.error("Failed to create panel.", ex);
