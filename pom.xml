@@ -17,21 +17,21 @@
         <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
         <maven.compiler.release>17</maven.compiler.release>
 
-        <version.maven-plugin-compiler>3.12.1</version.maven-plugin-compiler>
+        <version.maven-plugin-compiler>3.13.0</version.maven-plugin-compiler>
         <version.maven-plugin-dependency>3.1.1</version.maven-plugin-dependency>
-        <version.maven-plugin-gpg>3.1.0</version.maven-plugin-gpg>
+        <version.maven-plugin-gpg>3.2.3</version.maven-plugin-gpg>
         <version.maven-plugin-javadoc>3.6.3</version.maven-plugin-javadoc>
         <version.maven-plugin-javafx>0.0.8</version.maven-plugin-javafx>
         <version.maven-plugin-nexus-staging>1.6.13</version.maven-plugin-nexus-staging>
         <version.maven-plugin-release>3.0.1</version.maven-plugin-release>
-        <version.maven-plugin-source>3.3.0</version.maven-plugin-source>
+        <version.maven-plugin-source>3.3.1</version.maven-plugin-source>
 
-        <version.commons-io>2.15.1</version.commons-io>
+        <version.commons-io>2.16.1</version.commons-io>
         <version.commons-lang>3.14.0</version.commons-lang>
         <version.configurable>0.35</version.configurable>
-        <version.logback>1.5.0</version.logback>
-        <version.openjfx>21.0.2</version.openjfx>
-        <version.FROST-Client>2.8</version.FROST-Client>
+        <version.logback>1.5.4</version.logback>
+        <version.openjfx>22</version.openjfx>
+        <version.FROST-Client>2.10</version.FROST-Client>
     </properties>
 
     <licenses>
