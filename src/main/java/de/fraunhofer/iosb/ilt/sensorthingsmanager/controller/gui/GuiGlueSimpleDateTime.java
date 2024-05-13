@@ -62,12 +62,19 @@ public class GuiGlueSimpleDateTime implements PropertyGuiGlue<GuiGlueSimpleDateT
 
     @Override
     public void entityToGui() {
-        TimeInstant value = entity.getProperty(property);
+        Object value = entity.getProperty(property);
         if (value == null) {
             field.setText("");
         } else {
-            final Moment moment = value.getDateTime();
-            field.setText(FORMATTER.print(moment));
+            Moment moment = null;
+            if (value instanceof TimeInstant ti) {
+                moment = ti.getDateTime();
+            } else if (value instanceof Moment m) {
+                moment = m;
+            }
+            if (moment != null) {
+                field.setText(FORMATTER.print(moment));
+            }
         }
     }
 
