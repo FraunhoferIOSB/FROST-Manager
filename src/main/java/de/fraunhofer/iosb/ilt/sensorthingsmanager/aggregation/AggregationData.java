@@ -176,7 +176,26 @@ public class AggregationData {
                 checkReferenceFromDs(target.sourceDs, target.targetMds, target.level);
                 return;
             }
-
+            {
+                MapValue properties = target.targetMds.getProperty(EP_PROPERTIES);
+                Object sourceDsId = properties.get(KEY_AGGREGATE_SOURCE_D);
+                Object sourceMdsId = properties.get(KEY_AGGREGATE_SOURCE_MD);
+                if (sourceDsId != null) {
+                    Entity sourceDs = service.dao(sMdl.etDatastream).find(sourceDsId);
+                    if (sourceDs != null) {
+                        target.sourceDs = sourceDs;
+                        target.baseName = target.sourceDs.getProperty(EP_NAME);
+                        String expectedName = target.baseName + " " + target.level.toPostFix();
+                        if (!expectedName.equals(target.targetMds.getProperty(EP_NAME))) {
+                            LOGGER.info("Updating name of MultiDatastreams({}) to {}", formatKeyValuesForUrl(target.targetMds), expectedName);
+                            target.targetMds.setProperty(EP_NAME, expectedName);
+                            service.update(target.targetMds);
+                            target.sourceIsAggregate = false;
+                        }
+                        return;
+                    }
+                }
+            }
             String nameQuoted = "'" + target.baseName.replaceAll("'", "''") + "'";
             {
                 List<Entity> list = service.query(mMdl.etMultiDatastream)
@@ -227,14 +246,14 @@ public class AggregationData {
             }
             LOGGER.warn("No source found for '{}'.", target.baseName);
         } catch (ServiceFailureException ex) {
-            LOGGER.error("Failed to find source for {}." + target.baseName);
+            LOGGER.error("Failed to find source for {} MultiDatastreams({}).", target.baseName, formatKeyValuesForUrl(target.targetMds));
             LOGGER.debug("Exception:", ex);
         }
     }
 
     private void findSourceDatastreams(AggregationBase base) {
         Set<AggregateCombo> comboSet = base.getCombos();
-        AggregateCombo[] targets = comboSet.toArray(new AggregateCombo[comboSet.size()]);
+        AggregateCombo[] targets = comboSet.toArray(AggregateCombo[]::new);
         int i = 0;
         for (AggregateCombo target : targets) {
             int idx = i;
