@@ -37,7 +37,8 @@ import org.slf4j.LoggerFactory;
 public class GuiGlueArray implements PropertyGuiGlue<GuiGlueArray> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuiGlueArray.class);
-    private final ComplexValue<? extends ComplexValue> entity;
+
+    private ComplexValue<? extends ComplexValue> entity;
     private final EntityProperty<List> property;
     private TextArea field;
 
@@ -51,7 +52,7 @@ public class GuiGlueArray implements PropertyGuiGlue<GuiGlueArray> {
     }
 
     public GuiGlueArray init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        field = helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property.getName(), new TextArea(), true, editable);
+        field = Helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property.getName(), new TextArea(), true, editable);
         return this;
     }
 
@@ -94,6 +95,16 @@ public class GuiGlueArray implements PropertyGuiGlue<GuiGlueArray> {
     public GuiGlueArray setEnabled(boolean enabled) {
         field.setEditable(enabled);
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue entity) {
+        this.entity = entity;
     }
 
 }

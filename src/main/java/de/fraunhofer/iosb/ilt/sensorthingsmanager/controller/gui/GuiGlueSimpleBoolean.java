@@ -34,7 +34,7 @@ public class GuiGlueSimpleBoolean implements PropertyGuiGlue<GuiGlueSimpleBoolea
         TRUE,
         FALSE,
     }
-    private final ComplexValue<?> entity;
+    private ComplexValue<?> entity;
     private final EntityProperty<Boolean> property;
     private ToggleButton fieldToggle;
     private ComboBox<Values> fieldCombo;
@@ -50,13 +50,13 @@ public class GuiGlueSimpleBoolean implements PropertyGuiGlue<GuiGlueSimpleBoolea
 
     public GuiGlueSimpleBoolean init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
         if (property.isNullable()) {
-            fieldToggle = helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new ToggleButton(), false, editable);
+            fieldToggle = Helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new ToggleButton(), false, editable);
         } else {
             fieldCombo = new ComboBox<>();
             fieldCombo.getItems().setAll(Values.values());
             fieldCombo.setValue(Values.NULL);
             fieldCombo.setDisable(!editable);
-            helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, fieldCombo, false, editable);
+            Helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, fieldCombo, false, editable);
         }
         return this;
     }
@@ -116,6 +116,16 @@ public class GuiGlueSimpleBoolean implements PropertyGuiGlue<GuiGlueSimpleBoolea
             fieldCombo.setDisable(!enabled);
         }
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue<?> entity) {
+        this.entity = entity;
     }
 
 }

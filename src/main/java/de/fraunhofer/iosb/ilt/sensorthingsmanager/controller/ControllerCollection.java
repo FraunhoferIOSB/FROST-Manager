@@ -13,8 +13,8 @@ import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.E
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
 import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
 import de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper;
-import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.helper.ChildSetter;
-import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.helper.entitySearchDialog;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.ChildSetter;
+import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.entitySearchDialog;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import java.io.IOException;
 import java.net.URL;

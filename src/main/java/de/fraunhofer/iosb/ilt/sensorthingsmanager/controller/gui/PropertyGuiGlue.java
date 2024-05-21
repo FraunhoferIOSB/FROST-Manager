@@ -19,6 +19,7 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
 import de.fraunhofer.iosb.ilt.frostclient.model.PropertyType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeCollection;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
 import static de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive.EDM_BOOLEAN_NAME;
@@ -53,6 +54,18 @@ public interface PropertyGuiGlue<T extends PropertyGuiGlue<T>> {
     public boolean isGuiNullOrEmpty();
 
     public T setEnabled(boolean enabled);
+
+    /**
+     * @return the parent "entity" that the value of this editor will be set on.
+     */
+    public ComplexValue getEntity();
+
+    /**
+     *
+     * @param entity the parent "entity" that the value of this editor should be
+     * loaded from and set on.
+     */
+    public void setEntity(ComplexValue<? extends ComplexValue> entity);
 
     static PropertyGuiGlue createGuiElement(ComplexValue entity, EntityProperty property, boolean editable, GridPane gridProperties, AtomicInteger itemCount) {
         return createGuiElement("", entity, property, editable, gridProperties, itemCount);
@@ -101,6 +114,10 @@ public interface PropertyGuiGlue<T extends PropertyGuiGlue<T>> {
                     return new GuiGlueSimpleString(entity, property)
                             .init(namePrfx, gridProperties, itemCount, editable);
             }
+        }
+        if (pt instanceof TypeCollection tc) {
+            return new GuiGlueCollection(entity, property, tc.getContaintedType())
+                    .init(namePrfx, gridProperties, itemCount, editable);
         }
         return new GuiGlueSimpleString(entity, property)
                 .init(namePrfx, gridProperties, itemCount, editable);

@@ -39,7 +39,7 @@ import net.time4j.tz.Timezone;
  */
 public class GuiGlueSimpleDateTime implements PropertyGuiGlue<GuiGlueSimpleDateTime> {
 
-    private final ComplexValue<?> entity;
+    private ComplexValue<?> entity;
     private final EntityProperty<TimeInstant> property;
     private TextField field;
     private Border origBorder;
@@ -55,7 +55,7 @@ public class GuiGlueSimpleDateTime implements PropertyGuiGlue<GuiGlueSimpleDateT
     }
 
     public GuiGlueSimpleDateTime init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        field = helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new TextField(), false, editable);
+        field = Helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new TextField(), false, editable);
         origBorder = field.getBorder();
         return this;
     }
@@ -108,6 +108,16 @@ public class GuiGlueSimpleDateTime implements PropertyGuiGlue<GuiGlueSimpleDateT
     public GuiGlueSimpleDateTime setEnabled(boolean enabled) {
         field.setEditable(enabled);
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue entity) {
+        this.entity = entity;
     }
 
 }

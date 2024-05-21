@@ -30,7 +30,7 @@ import javafx.scene.layout.GridPane;
  */
 public class GuiGlueSimpleString implements PropertyGuiGlue<GuiGlueSimpleString> {
 
-    private final ComplexValue<?> entity;
+    private ComplexValue<?> entity;
     private final EntityProperty<String> property;
     private TextField field;
 
@@ -44,7 +44,7 @@ public class GuiGlueSimpleString implements PropertyGuiGlue<GuiGlueSimpleString>
     }
 
     public GuiGlueSimpleString init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        field = helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new TextField(), false, editable);
+        field = Helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new TextField(), false, editable);
         return this;
     }
 
@@ -80,6 +80,16 @@ public class GuiGlueSimpleString implements PropertyGuiGlue<GuiGlueSimpleString>
     public GuiGlueSimpleString setEnabled(boolean enabled) {
         field.setEditable(enabled);
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue<?> entity) {
+        this.entity = entity;
     }
 
 }

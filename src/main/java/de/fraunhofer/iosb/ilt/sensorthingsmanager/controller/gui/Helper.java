@@ -54,9 +54,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author hylke
  */
-public class helper {
+public class Helper {
 
-    private helper() {
+    private Helper() {
         // Utility class, not for instantiation.
     }
 

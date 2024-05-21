@@ -33,7 +33,7 @@ import javafx.scene.paint.Color;
  */
 public class GuiGlueSimpleNumber implements PropertyGuiGlue<GuiGlueSimpleNumber> {
 
-    private final ComplexValue<?> entity;
+    private ComplexValue<?> entity;
     private final EntityProperty<Number> property;
     private TextField field;
     private Border origBorder;
@@ -48,7 +48,7 @@ public class GuiGlueSimpleNumber implements PropertyGuiGlue<GuiGlueSimpleNumber>
     }
 
     public GuiGlueSimpleNumber init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        field = helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new TextField(), false, editable);
+        field = Helper.addFieldTo(gridProperties, itemCount.getAndIncrement(), namePrefix + property, new TextField(), false, editable);
         origBorder = field.getBorder();
         return this;
     }
@@ -90,6 +90,16 @@ public class GuiGlueSimpleNumber implements PropertyGuiGlue<GuiGlueSimpleNumber>
     public GuiGlueSimpleNumber setEnabled(boolean enabled) {
         field.setEditable(enabled);
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue<?> entity) {
+        this.entity = entity;
     }
 
 }

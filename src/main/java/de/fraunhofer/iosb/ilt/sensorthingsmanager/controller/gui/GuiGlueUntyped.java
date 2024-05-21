@@ -18,7 +18,7 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 
 import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
-import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.helper.SUPPRESS;
+import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.SUPPRESS;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javafx.scene.control.ComboBox;
@@ -48,7 +48,7 @@ public class GuiGlueUntyped implements PropertyGuiGlue<GuiGlueUntyped> {
         }
     }
 
-    private final ComplexValue<?> entity;
+    private ComplexValue<?> entity;
     private final EntityProperty property;
     private ComboBox<Type> comboBoxType;
     private PropertyGuiGlue subBox;
@@ -72,8 +72,8 @@ public class GuiGlueUntyped implements PropertyGuiGlue<GuiGlueUntyped> {
         comboBoxType.setValue(Type.NUMBER);
         comboBoxType.setDisable(!editable);
         comboBoxType.setOnAction(evt -> boxChanged());
-        helper.addFieldTo(parentPane, itemCount.getAndIncrement(), namePrefix + property, comboBoxType, false, editable);
-        helper.addFieldTo(parentPane, itemCount.getAndIncrement(), " ", gridPane, false, editable);
+        Helper.addFieldTo(parentPane, itemCount.getAndIncrement(), namePrefix + property, comboBoxType, false, editable);
+        Helper.addFieldTo(parentPane, itemCount.getAndIncrement(), " ", gridPane, false, editable);
         subBox = new GuiGlueSimpleNumber(entity, property)
                 .init(SUPPRESS, gridPane, itemCount, editable);
         return this;
@@ -156,6 +156,16 @@ public class GuiGlueUntyped implements PropertyGuiGlue<GuiGlueUntyped> {
         comboBoxType.setEditable(enabled);
         subBox.setEnabled(enabled);
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue<?> entity) {
+        this.entity = entity;
     }
 
 }

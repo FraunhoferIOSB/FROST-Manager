@@ -32,8 +32,9 @@ import javafx.scene.layout.GridPane;
  */
 public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
 
-    private final ComplexValue<? extends ComplexValue> entity;
+    private ComplexValue<? extends ComplexValue> entity;
     private final EntityProperty<ComplexValue> property;
+    private TypeComplex propertyType;
     private final Map<String, PropertyGuiGlue> subProperties = new HashMap<>();
     private ComplexValue value;
 
@@ -47,9 +48,10 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
     }
 
     public GuiGlueComplex init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        helper.addLabelTo(gridProperties, itemCount.getAndIncrement(), property.getName());
+        Helper.addLabelTo(gridProperties, itemCount.getAndIncrement(), property.getName());
         PropertyType pt = property.getType();
         if (pt instanceof TypeComplex ptc) {
+            propertyType = ptc;
             value = entity.getProperty(property);
             if (value == null) {
                 value = ptc.instantiate();
@@ -61,13 +63,19 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
                 }
             }
         }
-        helper.addSeparatorTo(gridProperties, itemCount.getAndIncrement());
+        Helper.addSeparatorTo(gridProperties, itemCount.getAndIncrement());
         return this;
     }
 
     @Override
     public void entityToGui() {
+        value = entity.getProperty(property);
+        if (value == null) {
+            value = propertyType.instantiate();
+        }
+
         for (PropertyGuiGlue subProp : subProperties.values()) {
+            subProp.setEntity(value);
             subProp.entityToGui();
         }
     }
@@ -103,6 +111,20 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
             subProp.setEnabled(enabled);
         }
         return this;
+    }
+
+    @Override
+    public ComplexValue<? extends ComplexValue> getEntity() {
+        return entity;
+    }
+
+    @Override
+    public void setEntity(ComplexValue<? extends ComplexValue> entity) {
+        this.entity = entity;
+        value = this.entity.getProperty(property);
+        for (PropertyGuiGlue subProp : subProperties.values()) {
+            subProp.setEntity(value);
+        }
     }
 
 }
