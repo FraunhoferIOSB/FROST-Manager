@@ -1,6 +1,9 @@
-# Development Version 0.11
+# Release Version 0.11
 
 **Updates**
+* Fixed editing of complex values.
+* Improved aggregation handling.
+* Updated dependencies.
 
 
 # Release Version 0.10
