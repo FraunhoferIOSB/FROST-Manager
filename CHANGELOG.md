@@ -1,6 +1,8 @@
-# Development Version 0.12
+# Release Version 0.12
 
 **Updates**
+* Improved dynamic model support and automatic data-model detection.
+* Updated dependencies.
 
 
 # Release Version 0.11
