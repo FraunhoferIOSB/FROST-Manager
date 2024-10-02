@@ -22,16 +22,16 @@ import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostclient.model.PkValue;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationPropertyEntitySet;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_PROPERTIES;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.TimeInterval;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.TimeValue;
-import static de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils.formatKeyValuesForUrl;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import net.time4j.Moment;
@@ -88,7 +88,7 @@ public class AggregateCombo implements Comparable<AggregateCombo> {
         return null;
     }
 
-    public Object[] getSourceId() {
+    public PkValue getSourceId() {
         if (sourceDs != null) {
             return sourceDs.getPrimaryKeyValues();
         }
@@ -166,7 +166,7 @@ public class AggregateCombo implements Comparable<AggregateCombo> {
 
     public void resolveZoneId(TZID dflt) {
         if (zoneId == null) {
-            MapValue properties = targetThing.getProperty(SensorThingsSensingV11.EP_PROPERTIES);
+            MapValue properties = targetThing.getProperty(EP_PROPERTIES);
             Object zoneName = properties.get("timeZone");
             if (zoneName == null || zoneName.toString().isEmpty()) {
                 zoneId = dflt;
@@ -277,7 +277,7 @@ public class AggregateCombo implements Comparable<AggregateCombo> {
         if (!baseName.equals(otherCombo.baseName)) {
             return false;
         }
-        return Arrays.equals(targetMds.getPrimaryKeyValues(), otherCombo.targetMds.getPrimaryKeyValues());
+        return Objects.equals(targetMds.getPrimaryKeyValues(), otherCombo.targetMds.getPrimaryKeyValues());
     }
 
     @Override
@@ -296,12 +296,12 @@ public class AggregateCombo implements Comparable<AggregateCombo> {
     @Override
     public String toString() {
         if (sourceDs != null) {
-            return baseName + " " + level + ". (d " + Arrays.toString(sourceDs.getPrimaryKeyValues()) + " -> md " + Arrays.toString(targetMds.getPrimaryKeyValues()) + ")";
+            return baseName + " " + level + ". (d " + sourceDs.getPrimaryKeyValues() + " -> md " + targetMds.getPrimaryKeyValues() + ")";
         }
         if (sourceMds != null) {
-            return baseName + " " + level + ". (md " + Arrays.toString(sourceMds.getPrimaryKeyValues()) + " -> md " + Arrays.toString(targetMds.getPrimaryKeyValues()) + ")";
+            return baseName + " " + level + ". (md " + sourceMds.getPrimaryKeyValues() + " -> md " + targetMds.getPrimaryKeyValues() + ")";
         }
-        return baseName + " " + level + ". (? -> md " + Arrays.toString(targetMds.getPrimaryKeyValues()) + ")";
+        return baseName + " " + level + ". (? -> md " + targetMds.getPrimaryKeyValues() + ")";
     }
 
     public String getBaseName() {

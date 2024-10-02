@@ -22,7 +22,7 @@ import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationPropertyEntitySet;
-import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.EntityGuiController;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.createCollectionPaneFor;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.createEditableEntityPane;
@@ -40,8 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author hylke
+ * Default GUI controller for entities.
  */
 public class GuiControllerDefault implements EntityGuiController {
 
@@ -65,7 +64,7 @@ public class GuiControllerDefault implements EntityGuiController {
             return;
         }
         if (entity.primaryKeyFullySet()) {
-            labelId.setText(ParserUtils.formatKeyValuesForUrl(entity));
+            labelId.setText(formatKeyValuesForUrl(entity));
         }
         for (PropertyGuiGlue control : controls) {
             control.entityToGui();

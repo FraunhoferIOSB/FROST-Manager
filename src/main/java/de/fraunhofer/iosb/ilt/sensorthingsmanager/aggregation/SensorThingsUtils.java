@@ -20,12 +20,12 @@ import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_DEFINITION;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_DESCRIPTION;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_NAME;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_PROPERTIES;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_DEFINITION;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_DESCRIPTION;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_NAME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_PROPERTIES;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.UnitOfMeasurement;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
@@ -54,8 +54,8 @@ public class SensorThingsUtils {
     }
 
     public Entity findOrCreateOp(SensorThingsService service, String name, String def, String description, MapValue properties, String filter, boolean aggregates) throws ServiceFailureException {
-        SensorThingsSensingV11 sMdl = service.getModel(SensorThingsSensingV11.class);
-        SensorThingsMultiDatastreamV11 mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
+        SensorThingsV11Sensing sMdl = service.getModel(SensorThingsV11Sensing.class);
+        SensorThingsV11MultiDatastream mMdl = service.getModel(SensorThingsV11MultiDatastream.class);
         Query query = service.query(sMdl.etObservedProperty);
         if (StringHelper.isNullOrEmpty(filter)) {
             query.filter("name eq " + StringHelper.quoteForUrl(name) + "");
@@ -114,7 +114,7 @@ public class SensorThingsUtils {
     }
 
     public Entity findOrCreateMultiDatastream(SensorThingsService service, String name, String desc, List<UnitOfMeasurement> uoms, Entity thing, List<Entity> ops, Entity sensor, MapValue props) throws ServiceFailureException {
-        SensorThingsMultiDatastreamV11 mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
+        SensorThingsV11MultiDatastream mMdl = service.getModel(SensorThingsV11MultiDatastream.class);
 
         EntitySet mdsList = service.query(mMdl.etMultiDatastream)
                 .filter("name eq " + StringHelper.quoteForUrl(name) + "")

@@ -17,7 +17,7 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
 
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.TimeValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.UnitOfMeasurement;
 import java.nio.charset.Charset;
@@ -61,7 +61,7 @@ public class Utils {
     }
 
     public static Moment getPhenTimeStart(Entity obs) {
-        TimeValue phenTime = obs.getProperty(SensorThingsSensingV11.EP_PHENOMENONTIME);
+        TimeValue phenTime = obs.getProperty(SensorThingsV11Sensing.EP_PHENOMENONTIME);
         return getPhenTimeStart(phenTime);
     }
 
@@ -73,7 +73,7 @@ public class Utils {
     }
 
     public static Moment getPhenTimeEnd(Entity obs) {
-        TimeValue phenTime = obs.getProperty(SensorThingsSensingV11.EP_PHENOMENONTIME);
+        TimeValue phenTime = obs.getProperty(SensorThingsV11Sensing.EP_PHENOMENONTIME);
         return getPhenTimeEnd(phenTime);
     }
 

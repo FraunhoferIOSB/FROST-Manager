@@ -9,10 +9,10 @@ import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.PrimaryKey;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_NAME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_NAME;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
-import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
 import de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.ChildSetter;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.entitySearchDialog;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
@@ -246,7 +246,7 @@ public class ControllerCollection implements Initializable {
         for (EntityListEntry selectedItem : selectedItems) {
             toDelete.add(selectedItem);
         }
-        String what = selectedItems.size() == 1 ? "Item " + ParserUtils.formatKeyValuesForUrl(selectedItems.get(0).getEntity()) : "all " + selectedItems.size() + " items";
+        String what = selectedItems.size() == 1 ? "Item " + formatKeyValuesForUrl(selectedItems.get(0).getEntity()) : "all " + selectedItems.size() + " items";
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + what + " ?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait();
 
@@ -416,7 +416,7 @@ public class ControllerCollection implements Initializable {
         }
 
         if (keyProps.size() == 1 && keyProp0.getType().getName().equals(TypePrimitive.EDM_UNTYPED_NAME)) {
-            final Object pkVal = entity.getPrimaryKeyValues()[0];
+            final Object pkVal = entity.getPrimaryKeyValues().get(0);
             if (pkVal instanceof Number n) {
                 pkIsNumeric = true;
             }
@@ -427,7 +427,7 @@ public class ControllerCollection implements Initializable {
             TableColumn<EntityListEntry, Number> column = new TableColumn<>(idColumnName);
             columnId = column;
             column.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, Number> param) -> {
-                final Object pkValue = param.getValue().getEntity().getPrimaryKeyValues()[0];
+                final Object pkValue = param.getValue().getEntity().getPrimaryKeyValues().get(0);
                 if (pkValue == null) {
                     return new ReadOnlyObjectWrapper<>(-1);
                 }
@@ -442,7 +442,7 @@ public class ControllerCollection implements Initializable {
                 if (!cellEntity.primaryKeyFullySet()) {
                     return new ReadOnlyObjectWrapper<>("");
                 }
-                String keyValue = ParserUtils.formatKeyValuesForUrl(cellEntity);
+                String keyValue = formatKeyValuesForUrl(cellEntity);
                 return new ReadOnlyObjectWrapper<>(keyValue);
             });
 

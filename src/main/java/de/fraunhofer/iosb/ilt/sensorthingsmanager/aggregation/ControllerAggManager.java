@@ -21,16 +21,16 @@ import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_DESCRIPTION;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_PHENOMENONTIME;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_UNITOFMEASUREMENT;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_DESCRIPTION;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing.EP_PHENOMENONTIME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing.EP_UNITOFMEASUREMENT;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.TimeValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.UnitOfMeasurement;
 import de.fraunhofer.iosb.ilt.frostclient.utils.CollectionsHelper;
-import de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ButtonTableCell;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.DateTimePicker;
 import java.net.URL;
@@ -110,8 +110,8 @@ public class ControllerAggManager implements Initializable {
     private ProgressBar progressBar;
 
     private SensorThingsService service;
-    private SensorThingsSensingV11 sMdl;
-    private SensorThingsMultiDatastreamV11 mMdl;
+    private SensorThingsV11Sensing sMdl;
+    private SensorThingsV11MultiDatastream mMdl;
 
     private AggregationData data;
 
@@ -136,8 +136,8 @@ public class ControllerAggManager implements Initializable {
     public void setService(SensorThingsService service) {
         this.service = service;
         buttonReload.setDisable(false);
-        sMdl = service.getModel(SensorThingsSensingV11.class);
-        mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
+        sMdl = service.getModel(SensorThingsV11Sensing.class);
+        mMdl = service.getModel(SensorThingsV11MultiDatastream.class);
     }
 
     private void addMenuToColumn(final TableColumn<AggregationBase, Boolean> column, final AggregationLevel level) {
@@ -385,8 +385,8 @@ public class ControllerAggManager implements Initializable {
         }
 
         MapValue aggProps = CollectionsHelper.propertiesBuilder()
-                .addItem(Utils.KEY_AGGREGATE_SOURCE_D, ParserUtils.formatKeyValuesForUrl(baseDs.getPrimaryKeyValues()))
-                .addItem(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + ParserUtils.formatKeyValuesForUrl(baseDs.getPrimaryKeyValues()) + ")")
+                .addItem(Utils.KEY_AGGREGATE_SOURCE_D, formatKeyValuesForUrl(baseDs))
+                .addItem(Utils.KEY_AGGREGATE_FOR, "/Datastreams(" + formatKeyValuesForUrl(baseDs) + ")")
                 .addItem(Utils.KEY_AGGREGATE_AMOUNT, level.amount)
                 .addItem(Utils.KEY_AGGREGATE_UNIT, level.unit.toString())
                 .build();

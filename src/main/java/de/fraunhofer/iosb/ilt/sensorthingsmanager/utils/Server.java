@@ -21,8 +21,8 @@ import de.fraunhofer.iosb.ilt.configurable.annotations.ConfigurableField;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorList;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorString;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorSubclass;
+import de.fraunhofer.iosb.ilt.frostclient.auth.AuthMethod;
 import de.fraunhofer.iosb.ilt.frostclient.models.DataModel;
-import de.fraunhofer.iosb.ilt.sensorthingsmanager.auth.AuthMethod;
 import java.util.List;
 
 /**

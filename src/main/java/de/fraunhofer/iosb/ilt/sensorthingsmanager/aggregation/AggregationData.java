@@ -20,15 +20,16 @@ import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11.EP_MULTIOBSERVATIONDATATYPES;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11.EP_UNITOFMEASUREMENTS;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_NAME;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11.EP_PROPERTIES;
+import de.fraunhofer.iosb.ilt.frostclient.model.PkValue;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_NAME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_PROPERTIES;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream.EP_MULTIOBSERVATIONDATATYPES;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream.EP_UNITOFMEASUREMENTS;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
-import static de.fraunhofer.iosb.ilt.frostclient.utils.ParserUtils.formatKeyValuesForUrl;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_SOURCE_D;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.Utils.KEY_AGGREGATE_SOURCE_MD;
 import java.util.ArrayList;
@@ -69,15 +70,15 @@ public class AggregationData {
     private double progressBase = 0;
     private double progressTarget = 1;
     private final List<ProgressListener> progressListeners = new CopyOnWriteArrayList<>();
-    private final SensorThingsSensingV11 sMdl;
-    private final SensorThingsMultiDatastreamV11 mMdl;
+    private final SensorThingsV11Sensing sMdl;
+    private final SensorThingsV11MultiDatastream mMdl;
 
     public AggregationData(SensorThingsService service, boolean fixReferences, boolean addEmptyBases) {
         this.service = service;
         this.fixReferences = fixReferences;
         this.addEmptyBases = addEmptyBases;
-        sMdl = service.getModel(SensorThingsSensingV11.class);
-        mMdl = service.getModel(SensorThingsMultiDatastreamV11.class);
+        sMdl = service.getModel(SensorThingsV11Sensing.class);
+        mMdl = service.getModel(SensorThingsV11MultiDatastream.class);
     }
 
     public AggregationData(SensorThingsService service, boolean fixReferences) {
@@ -178,10 +179,15 @@ public class AggregationData {
             }
             {
                 MapValue properties = target.targetMds.getProperty(EP_PROPERTIES);
-                Object sourceDsId = properties.get(KEY_AGGREGATE_SOURCE_D);
-                Object sourceMdsId = properties.get(KEY_AGGREGATE_SOURCE_MD);
+                PkValue sourceDsId = PkValue.of(properties.get(KEY_AGGREGATE_SOURCE_D));
+                PkValue sourceMdsId = PkValue.of(properties.get(KEY_AGGREGATE_SOURCE_MD));
                 if (sourceDsId != null) {
-                    Entity sourceDs = service.dao(sMdl.etDatastream).find(sourceDsId);
+                    Entity sourceDs = null;
+                    try {
+                        sourceDs = service.dao(sMdl.etDatastream).find(sourceDsId);
+                    } catch (ServiceFailureException ex) {
+                        LOGGER.info("Invalid reference to Datastreams {} from {}", sourceDsId, target.targetMds);
+                    }
                     if (sourceDs != null) {
                         target.sourceDs = sourceDs;
                         target.baseName = target.sourceDs.getProperty(EP_NAME);
@@ -189,7 +195,11 @@ public class AggregationData {
                         if (!expectedName.equals(target.targetMds.getProperty(EP_NAME))) {
                             LOGGER.info("Updating name of MultiDatastreams({}) to {}", formatKeyValuesForUrl(target.targetMds), expectedName);
                             target.targetMds.setProperty(EP_NAME, expectedName);
-                            service.update(target.targetMds);
+                            try {
+                                service.update(target.targetMds);
+                            } catch (ServiceFailureException ex) {
+                                LOGGER.error("Failed to update {}", target.targetMds, ex);
+                            }
                             target.sourceIsAggregate = false;
                         }
                         return;
@@ -198,54 +208,68 @@ public class AggregationData {
             }
             String nameQuoted = "'" + target.baseName.replaceAll("'", "''") + "'";
             {
-                List<Entity> list = service.query(mMdl.etMultiDatastream)
-                        .filter("name eq " + nameQuoted)
-                        .top(1000)
-                        .orderBy("id asc")
-                        .list()
-                        .toList();
-                if (list.size() > 1) {
-                    LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
-                }
-                if (!list.isEmpty()) {
-                    target.sourceMds = list.get(0);
-                    target.sourceIsAggregate = false;
-                    checkReferenceFromDs(target.sourceMds, target.targetMds, target.level);
-                    return;
-                }
-            }
-            {
-                List<Entity> list = service.query(sMdl.etDatastream)
-                        .filter("name eq " + nameQuoted)
-                        .top(1000)
-                        .orderBy("id asc")
-                        .list()
-                        .toList();
-                if (list.isEmpty()) {
-                    list = service.query(sMdl.etDatastream)
-                            .filter("startswith(name," + nameQuoted + ")")
+                List<Entity> list = null;
+                try {
+                    list = service.query(mMdl.etMultiDatastream)
+                            .filter("name eq " + nameQuoted)
                             .top(1000)
                             .orderBy("id asc")
                             .list()
                             .toList();
+                } catch (ServiceFailureException ex) {
+                    LOGGER.error("Failed to fetch MultiDatastreams", ex);
                 }
-                if (list.size() > 1) {
-                    LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
-                }
-                for (Entity sourceDs : list) {
-                    String postfix = sourceDs.getProperty(EP_NAME).substring(target.baseName.length());
-                    if (!AggregationLevel.isPostfix(postfix)) {
-                        continue;
+                if (list != null) {
+                    if (list.size() > 1) {
+                        LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
                     }
-                    target.sourceDs = sourceDs;
-                    target.sourceIsAggregate = false;
-                    target.sourceIsCollection = true;
-                    checkReferenceFromDs(target.sourceDs, target.targetMds, target.level);
-                    return;
+                    if (!list.isEmpty()) {
+                        target.sourceMds = list.get(0);
+                        target.sourceIsAggregate = false;
+                        checkReferenceFromDs(target.sourceMds, target.targetMds, target.level);
+                        return;
+                    }
                 }
             }
-            LOGGER.warn("No source found for '{}'.", target.baseName);
-        } catch (ServiceFailureException ex) {
+            {
+                List<Entity> list = null;
+                try {
+                    list = service.query(sMdl.etDatastream)
+                            .filter("name eq " + nameQuoted)
+                            .top(1000)
+                            .orderBy("id asc")
+                            .list()
+                            .toList();
+                    if (list.isEmpty()) {
+                        list = service.query(sMdl.etDatastream)
+                                .filter("startswith(name," + nameQuoted + ")")
+                                .top(1000)
+                                .orderBy("id asc")
+                                .list()
+                                .toList();
+                    }
+                } catch (ServiceFailureException ex) {
+                    LOGGER.error("Failed to fetch Datastreams", ex);
+                }
+                if (list != null) {
+                    if (list.size() > 1) {
+                        LOGGER.warn("Multiple ({}) sources found for '{}'.", list.size(), target.baseName);
+                    }
+                    for (Entity sourceDs : list) {
+                        String postfix = sourceDs.getProperty(EP_NAME).substring(target.baseName.length());
+                        if (!AggregationLevel.isPostfix(postfix)) {
+                            continue;
+                        }
+                        target.sourceDs = sourceDs;
+                        target.sourceIsAggregate = false;
+                        target.sourceIsCollection = true;
+                        checkReferenceFromDs(target.sourceDs, target.targetMds, target.level);
+                        return;
+                    }
+                }
+            }
+            LOGGER.warn("No source found for '{}', {}.", target.baseName, target.targetMds);
+        } catch (RuntimeException ex) {
             LOGGER.error("Failed to find source for {} MultiDatastreams({}).", target.baseName, formatKeyValuesForUrl(target.targetMds));
             LOGGER.debug("Exception:", ex);
         }
@@ -377,13 +401,13 @@ public class AggregationData {
         String aggKey = null;
         Object aggId = null;
         if (sourceEqualsTarget) {
-            final Object[] primaryKeyValues = sourceDs.getPrimaryKeyValues();
-            expectedAggFor = "/Datastreams(" + formatKeyValuesForUrl(primaryKeyValues) + ")";
+            final PkValue primaryKeyValues = sourceDs.getPrimaryKeyValues();
+            expectedAggFor = "/Datastreams(" + formatKeyValuesForUrl(sourceDs) + ")";
             aggKey = KEY_AGGREGATE_SOURCE_D;
-            if (primaryKeyValues.length == 1) {
-                aggId = primaryKeyValues[0];
+            if (primaryKeyValues.size() == 1) {
+                aggId = primaryKeyValues.get(0);
             } else {
-                aggId = formatKeyValuesForUrl(primaryKeyValues);
+                aggId = formatKeyValuesForUrl(sourceDs);
             }
         } else {
             expectedAggFor = sourceDs.getSelfLink();
@@ -396,9 +420,9 @@ public class AggregationData {
         String aggKey = null;
         Object aggId = null;
         if (sourceEqualsTarget) {
-            expectedAggFor = "/MultiDatastreams(" + formatKeyValuesForUrl(sourceMds.getPrimaryKeyValues()) + ")";
+            expectedAggFor = "/MultiDatastreams(" + formatKeyValuesForUrl(sourceMds) + ")";
             aggKey = KEY_AGGREGATE_SOURCE_MD;
-            aggId = formatKeyValuesForUrl(sourceMds.getPrimaryKeyValues());
+            aggId = formatKeyValuesForUrl(sourceMds);
         } else {
             expectedAggFor = sourceMds.getSelfLink();
         }

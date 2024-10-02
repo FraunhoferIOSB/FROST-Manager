@@ -18,8 +18,8 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsMultiDatastreamV11;
-import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsSensingV11;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
+import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.ControllerAggManager;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Server;
@@ -71,20 +71,22 @@ public class ControllerServer implements Initializable {
         serverTitle.setText(entry.getName() + " @ " + entry.getUrl());
 
         try {
-            service = new SensorThingsService(new URL(entry.getUrl()), entry.getDataModels());
+            service = new SensorThingsService(entry.getDataModels())
+                    .setBaseUrl(new URL(entry.getUrl()))
+                    .init();
             if (entry.getAuthMethod() != null) {
                 entry.getAuthMethod().setAuth(service);
             }
 
             for (EntityType et : service.getModelRegistry().getEntityTypes()) {
                 String orderBy = "";
-                if (et.getProperty(SensorThingsSensingV11.NAME_NAME) != null) {
+                if (et.getProperty(SensorThingsV11Sensing.NAME_NAME) != null) {
                     orderBy = "name asc";
                 }
-                addTabFor(et.mainContainer, orderBy, service.query(et));
+                addTabFor(et.mainSet, orderBy, service.query(et));
             }
 
-            if (service.hasModel(SensorThingsMultiDatastreamV11.class)) {
+            if (service.hasModel(SensorThingsV11MultiDatastream.class)) {
                 addAggregationTab();
             }
         } catch (MalformedURLException ex) {
