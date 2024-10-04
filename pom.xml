@@ -30,7 +30,7 @@
         <version.commons-lang>3.17.0</version.commons-lang>
         <version.configurable>0.36</version.configurable>
         <version.logback>1.5.8</version.logback>
-        <version.openjfx>23</version.openjfx>
+        <version.openjfx>24-ea+5</version.openjfx>
         <version.FROST-Client-Dynamic>2.18</version.FROST-Client-Dynamic>
     </properties>
 
