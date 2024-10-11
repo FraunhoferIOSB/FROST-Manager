@@ -14,13 +14,13 @@ A manager for SensorThings API compatible servers.
 
 ## Download
 
-The compiled jar is hosted on Maven Central: [FROST-Manager-0.12-jar-with-dependencies.jar](https://repo1.maven.org/maven2/de/fraunhofer/iosb/ilt/FROST-Manager/0.12/FROST-Manager-0.12-jar-with-dependencies.jar)
+The compiled jar is hosted on Maven Central: [FROST-Manager-0.13-jar-with-dependencies.jar](https://repo1.maven.org/maven2/de/fraunhofer/iosb/ilt/FROST-Manager/0.12/FROST-Manager-0.13-jar-with-dependencies.jar)
 
 
 ## Running
 
 Start it with the command
-```java -jar FROST-Manager-0.12-jar-with-dependencies.jar```
+```java -jar FROST-Manager-0.13-jar-with-dependencies.jar```
 Or double-click the jar on operating systems where this is supported
 
 
