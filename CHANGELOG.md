@@ -1,6 +1,8 @@
 # Development Version 0.13
 
 **Updates**
+* Fixed setting of authentication.
+* Improved toString conversion of entities in lists.
 
 
 # Release Version 0.12

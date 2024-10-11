@@ -9,9 +9,7 @@ import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.PrimaryKey;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
-import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_NAME;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
-import de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper;
 import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.ChildSetter;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.entitySearchDialog;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -370,19 +367,11 @@ public class ControllerCollection implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         columnName.setCellValueFactory((TableColumn.CellDataFeatures<EntityListEntry, String> param) -> {
             Entity entity = param.getValue().getEntity();
-            if (entityType.hasProperty(EP_NAME)) {
-                String name = entity.getProperty(EP_NAME);
-                if (!StringHelper.isNullOrEmpty(name)) {
-                    return new ReadOnlyObjectWrapper<>(name);
-                }
+            String display = entity.display();
+            if (Utils.isNullOrEmpty(display)) {
+                display = entity.getEntityType().entityName;
             }
-            for (EntityPropertyMain prop : entity.getEntityType().getEntityProperties()) {
-                if (prop.getType() == TypePrimitive.EDM_STRING) {
-                    Object propValue = entity.getProperty(prop);
-                    return new ReadOnlyObjectWrapper<>(Objects.toString(propValue));
-                }
-            }
-            return new ReadOnlyObjectWrapper<>(entity.getEntityType().entityName);
+            return new ReadOnlyObjectWrapper<>(display);
         });
         entityTable.setItems(entities);
         entityTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
