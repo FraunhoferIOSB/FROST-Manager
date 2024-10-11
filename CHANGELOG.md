@@ -1,4 +1,4 @@
-# Development Version 0.13
+# Release Version 0.13
 
 **Updates**
 * Fixed setting of authentication.
