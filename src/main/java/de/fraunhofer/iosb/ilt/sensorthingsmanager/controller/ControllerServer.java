@@ -25,6 +25,8 @@ import de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation.ControllerAggManag
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Server;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -72,11 +74,9 @@ public class ControllerServer implements Initializable {
 
         try {
             service = new SensorThingsService(entry.getDataModels())
-                    .setBaseUrl(new URL(entry.getUrl()))
+                    .setBaseUrl(new URI(entry.getUrl()).toURL())
+                    .setAuthMethod(entry.getAuthMethod())
                     .init();
-            if (entry.getAuthMethod() != null) {
-                entry.getAuthMethod().setAuth(service);
-            }
 
             for (EntityType et : service.getModelRegistry().getEntityTypes()) {
                 String orderBy = "";
@@ -89,7 +89,7 @@ public class ControllerServer implements Initializable {
             if (service.hasModel(SensorThingsV11MultiDatastream.class)) {
                 addAggregationTab();
             }
-        } catch (MalformedURLException ex) {
+        } catch (URISyntaxException | MalformedURLException ex) {
             LOGGER.error("Failed to create service url.", ex);
         }
     }
