@@ -1,6 +1,6 @@
 # FROST-Manager  [![Build Status](https://github.com/FraunhoferIOSB/FROST-Manager/workflows/Maven%20Build/badge.svg)](https://github.com/FraunhoferIOSB/FROST-Manager/actions)
 
-A manager for SensorThings API compatible servers.
+A manager for SensorThings API or other OData 4.01 compatible servers.
 - Reading Entities
 - Updating Entities
 - Updating single relations (Datastream(x)/Thing)
