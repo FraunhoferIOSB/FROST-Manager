@@ -14,7 +14,7 @@ A manager for SensorThings API or other OData 4.01 compatible servers.
 
 ## Download
 
-The compiled jar is hosted on Maven Central: [FROST-Manager-0.13-jar-with-dependencies.jar](https://repo1.maven.org/maven2/de/fraunhofer/iosb/ilt/FROST-Manager/0.12/FROST-Manager-0.13-jar-with-dependencies.jar)
+The compiled jar is hosted on Maven Central: [FROST-Manager-0.13-jar-with-dependencies.jar](https://repo1.maven.org/maven2/de/fraunhofer/iosb/ilt/FROST-Manager/0.13/FROST-Manager-0.13-jar-with-dependencies.jar)
 
 
 ## Running
