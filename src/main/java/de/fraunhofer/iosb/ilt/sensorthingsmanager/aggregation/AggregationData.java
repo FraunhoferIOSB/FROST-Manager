@@ -24,8 +24,6 @@ import de.fraunhofer.iosb.ilt.frostclient.model.PkValue;
 import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_NAME;
 import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_PROPERTIES;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream.EP_MULTIOBSERVATIONDATATYPES;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream.EP_UNITOFMEASUREMENTS;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
@@ -293,7 +291,7 @@ public class AggregationData {
                     target.sourceMds = test.targetMds;
                     target.sourceIsAggregate = true;
                     found = true;
-                    checkReferenceFromDs(target.sourceMds, target.targetMds, target.level);
+                    checkReferenceFromMds(target.sourceMds, target.targetMds, target.level);
                 }
             }
             if (!found) {
@@ -436,12 +434,16 @@ public class AggregationData {
         if (!(value instanceof Number) && !(value instanceof Boolean) && !(value instanceof String) && value != null) {
             checkValue = value.toString();
         }
-        if (value instanceof Number && oldValue instanceof Number) {
+        if (value instanceof Number && oldValue != null) {
             checkValue = value.toString();
             oldValue = oldValue.toString();
         }
         if (!checkValue.equals(oldValue)) {
-            LOGGER.info("Fixing property {}. Is {}, should be {}.", property, oldValue, value);
+            if (oldValue == null) {
+                LOGGER.info("Fixing property {}. Is {}, should be ({}) {}.", property, oldValue, checkValue.getClass(), checkValue);
+            } else {
+                LOGGER.info("Fixing property {}. Is ({}) {}, should be ({}) {}.", property, oldValue.getClass(), oldValue, checkValue.getClass(), checkValue);
+            }
             properties.put(property, value);
             changed = true;
         }
@@ -475,8 +477,6 @@ public class AggregationData {
             try {
                 Entity copyMds = aggregateMds.withOnlyPk();
                 copyMds.setProperty(EP_PROPERTIES, aggregateMds.getProperty(EP_PROPERTIES));
-                copyMds.setProperty(EP_MULTIOBSERVATIONDATATYPES, null);
-                copyMds.setProperty(EP_UNITOFMEASUREMENTS, null);
                 service.update(copyMds);
             } catch (ServiceFailureException ex) {
                 LOGGER.error("Failed to update reference.", ex);
