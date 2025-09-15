@@ -142,23 +142,7 @@ public class ControllerCollection implements Initializable {
         if (currentQueryList == null || !currentQueryList.hasNextLink()) {
             return;
         }
-        try {
-            currentQueryList.fetchNext();
-        } catch (StatusCodeException ex) {
-            LOGGER.error("Failed to fetch next set of entities.", ex);
-            Utils.showAlert(
-                    Alert.AlertType.ERROR,
-                    "Failed to fetch",
-                    "Fetching the next set of entities failed for url: " + ex.getUrl(),
-                    ex);
-        } catch (ServiceFailureException ex) {
-            LOGGER.error("Failed to fetch entity list.", ex);
-            Utils.showAlert(
-                    Alert.AlertType.ERROR,
-                    "Failed to fetch",
-                    "Fetching the set of all entities failed.",
-                    ex);
-        }
+        currentQueryList.fetchNext();
         loadEntities();
     }
 

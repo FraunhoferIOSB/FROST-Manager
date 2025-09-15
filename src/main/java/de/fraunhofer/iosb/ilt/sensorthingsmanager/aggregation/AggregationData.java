@@ -102,7 +102,7 @@ public class AggregationData {
                     .top(1000)
                     .orderBy("id asc");
             if (hasListeners()) {
-                query.count();
+                query.count(true);
             }
             EntitySet dsList = query.list();
             long count = dsList.getCount();
@@ -130,7 +130,7 @@ public class AggregationData {
                     .orderBy("id asc")
                     .expand("MultiDatastreams($top=1000;$orderby=id asc;$select=id,name,properties)");
             if (hasListeners()) {
-                query.count();
+                query.count(true);
             }
             EntitySet thingList = query.list();
             long count = thingList.getCount();
