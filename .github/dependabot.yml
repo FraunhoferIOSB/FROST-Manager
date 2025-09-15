@@ -9,6 +9,10 @@ updates:
       dependencies:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "org.openjfx:*"
+        versions: ["[23,)"]
+
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
