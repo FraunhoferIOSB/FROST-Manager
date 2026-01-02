@@ -12,27 +12,10 @@
     <url>https://github.com/FraunhoferIOSB/FROST-Manager</url>
     <inceptionYear>2017</inceptionYear>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
-        <maven.compiler.release>21</maven.compiler.release>
-
-        <version.maven-plugin-compiler>3.14.1</version.maven-plugin-compiler>
-        <version.maven-plugin-dependency>3.1.1</version.maven-plugin-dependency>
-        <version.maven-plugin-gpg>3.2.8</version.maven-plugin-gpg>
-        <version.maven-plugin-javadoc>3.12.0</version.maven-plugin-javadoc>
-        <version.maven-plugin-javafx>0.0.8</version.maven-plugin-javafx>
-        <version.maven-plugin-nexus-staging>1.7.0</version.maven-plugin-nexus-staging>
-        <version.maven-plugin-release>3.3.1</version.maven-plugin-release>
-        <version.maven-plugin-source>3.4.0</version.maven-plugin-source>
-
-        <version.commons-io>2.21.0</version.commons-io>
-        <version.commons-lang>3.20.0</version.commons-lang>
-        <version.configurable>0.37</version.configurable>
-        <version.logback>1.5.23</version.logback>
-        <version.openjfx>23</version.openjfx>
-        <version.FROST-Client-Dynamic>2.33</version.FROST-Client-Dynamic>
-    </properties>
+    <organization>
+        <name>Fraunhofer IOSB</name>
+        <url>http://iosb.fraunhofer.de</url>
+    </organization>
 
     <licenses>
         <license>
@@ -51,16 +34,11 @@
         </developer>
     </developers>
 
-    <organization>
-        <name>Fraunhofer IOSB</name>
-        <url>http://iosb.fraunhofer.de</url>
-    </organization>
-
     <scm>
-        <url>https://github.com/FraunhoferIOSB/FROST-Manager</url>
         <connection>scm:git:git@github.com:FraunhoferIOSB/FROST-Manager.git</connection>
         <developerConnection>scm:git:git@github.com:FraunhoferIOSB/FROST-Manager.git</developerConnection>
         <tag>HEAD</tag>
+        <url>https://github.com/FraunhoferIOSB/FROST-Manager</url>
     </scm>
 
     <issueManagement>
@@ -68,44 +46,169 @@
         <url>https://github.com/FraunhoferIOSB/FROST-Manager/issues</url>
     </issueManagement>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+    <properties>
+        <mainClass>de.fraunhofer.iosb.ilt.sensorthingsmanager.MainApp</mainClass>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <root.basedir>${project.basedir}</root.basedir>
+        <version.FROST-Client-Dynamic>2.33</version.FROST-Client-Dynamic>
+
+        <version.commons-io>2.21.0</version.commons-io>
+        <version.commons-lang>3.20.0</version.commons-lang>
+        <version.configurable>0.37</version.configurable>
+        <version.logback>1.5.23</version.logback>
+
+        <version.maven.plugin.central-publishing>0.9.0</version.maven.plugin.central-publishing>
+        <version.maven.plugin.compiler>3.14.1</version.maven.plugin.compiler>
+        <version.maven.plugin.dependency>3.1.1</version.maven.plugin.dependency>
+        <version.maven.plugin.gpg>3.2.8</version.maven.plugin.gpg>
+        <version.maven.plugin.javadoc>3.12.0</version.maven.plugin.javadoc>
+        <version.maven.plugin.javafx>0.0.8</version.maven.plugin.javafx>
+        <version.maven.plugin.nexus-staging>1.7.0</version.maven.plugin.nexus-staging>
+        <version.maven.plugin.release>3.3.1</version.maven.plugin.release>
+        <version.maven.plugin.source>3.4.0</version.maven.plugin.source>
+        <version.maven.plugin.spotless>3.1.0</version.maven.plugin.spotless>
+        <version.openjfx>23</version.openjfx>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Configurable</artifactId>
+            <version>${version.configurable}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>FROST-Client-Dynamic</artifactId>
+            <version>${version.FROST-Client-Dynamic}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version.logback}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${version.commons-io}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${version.commons-lang}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${version.openjfx}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${version.openjfx}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${version.openjfx}</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${version.openjfx}</version>
+            <classifier>linux</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${version.openjfx}</version>
+            <classifier>mac</classifier>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${version.maven-plugin-compiler}</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
+                <version>${version.maven.plugin.compiler}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>${version.maven-plugin-release}</version>
+                <version>${version.maven.plugin.release}</version>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>${version.maven-plugin-javafx}</version>
+                <version>${version.maven.plugin.javafx}</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
                     <jlinkImageName>FROST-Manager</jlinkImageName>
-                    <launcher>launcher</launcher>                    
+                    <launcher>launcher</launcher>
                     <mainClass>${mainClass}</mainClass>
                 </configuration>
-            </plugin>        
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${version.maven.plugin.spotless}</version>
+                <configuration>
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>scripts/codestyle/*.xml</include>
+                            </includes>
+                            <eclipseWtp>
+                                <type>XML</type>
+                                <files>
+                                    <file>${root.basedir}/scripts/codestyle/xml.prefs</file>
+                                </files>
+                            </eclipseWtp>
+                        </format>
+                        <format>
+                            <includes>
+                                <include>.gitignore</include>
+                            </includes>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                        </format>
+                    </formats>
+                    <pom>
+                        <includes>
+                            <include>**/pom.xml</include>
+                        </includes>
+                        <sortPom>
+                            <keepBlankLines>true</keepBlankLines>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <sortDependencies>groupId,artifactId</sortDependencies>
+                            <sortProperties>true</sortProperties>
+                            <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                            <expandEmptyElements>false</expandEmptyElements>
+                        </sortPom>
+                    </pom>
+                    <java>
+                        <eclipse>
+                            <version>4.21</version>
+                            <file>${root.basedir}/scripts/codestyle/formatter.xml</file>
+                        </eclipse>
+                        <importOrder/>
+                        <removeUnusedImports/>
+                        <licenseHeader>
+                            <file>${root.basedir}/scripts/license-header</file>
+                        </licenseHeader>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -128,35 +231,33 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                                <phase>package</phase>
+                                <id>make-assembly</id>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <!-- this is used for inheritance merges -->
+                                <phase>package</phase>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>${version.maven-plugin-source}</version>
+                        <version>${version.maven.plugin.source}</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
-                                <phase>verify</phase>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${version.maven-plugin-javadoc}</version>
-                        <configuration>
-                            <source>8</source>
-                        </configuration>
+                        <version>${version.maven.plugin.javadoc}</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -169,86 +270,28 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${version.maven-plugin-gpg}</version>
+                        <version>${version.maven.plugin.gpg}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
-                                <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${version.maven-plugin-nexus-staging}</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${version.maven.plugin.central-publishing}</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                            <publishingServerId>central</publishingServerId>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>FROST-Client-Dynamic</artifactId>
-            <version>${version.FROST-Client-Dynamic}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${version.logback}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>Configurable</artifactId>
-            <version>${version.configurable}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${version.commons-io}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${version.commons-lang}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${version.openjfx}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${version.openjfx}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${version.openjfx}</version>
-            <classifier>win</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${version.openjfx}</version>
-            <classifier>linux</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${version.openjfx}</version>
-            <classifier>mac</classifier>
-        </dependency>    
-    </dependencies>
 </project>
