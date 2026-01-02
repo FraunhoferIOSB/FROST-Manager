@@ -1,26 +1,28 @@
 /*
- * Copyright (C) 2024 Fraunhofer IOSB
+ * Copyright (C) 2024 Fraunhofer Institut IOSB, Fraunhoferstr. 1, D 76131
+ * Karlsruhe, Germany.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
+
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationProperty;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
-import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.EntityGuiController;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.FactoryEntityPanel;
@@ -117,6 +119,7 @@ public class Helper {
         separator.setPrefWidth(200);
         gp.add(separator, 0, row, 2, 1);
     }
+
     public static final String SUPPRESS = "_SUPPRESS_";
 
     public static <T extends Node> T addFieldTo(GridPane gp, int row, String title, T node, boolean fillHeight, boolean editable) {
@@ -150,7 +153,7 @@ public class Helper {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            ControllerCollection controller = loader.<ControllerCollection>getController();
+            ControllerCollection controller = loader.<ControllerCollection> getController();
             controller.setQuery(query, true, true, canLinkNew, true, orderBy);
             if (childSetter != null) {
                 controller.setChildSetter(childSetter);
@@ -166,7 +169,7 @@ public class Helper {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            final ControllerCollection controller = loader.<ControllerCollection>getController();
+            final ControllerCollection controller = loader.<ControllerCollection> getController();
             controller.setQuery(query, false, false, false, multiSelect, orderBy);
 
             Dialog<List<Entity>> dialog = new Dialog<>();

@@ -1,17 +1,18 @@
 /*
- * Copyright (C) 2019 Fraunhofer IOSB
+ * Copyright (C) 2024 Fraunhofer Institut IOSB, Fraunhoferstr. 1, D 76131
+ * Karlsruhe, Germany.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
@@ -98,7 +99,7 @@ public class ControllerServer implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            ControllerCollection controller = loader.<ControllerCollection>getController();
+            ControllerCollection controller = loader.<ControllerCollection> getController();
             controller.setQuery(query, orderBy);
 
             Tab tab = new Tab();
@@ -113,25 +114,25 @@ public class ControllerServer implements Initializable {
         }
     }
 
-//    private void addCleanerTab() {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Cleaner.fxml"));
-//            BorderPane content = (BorderPane) loader.load();
-//            ControllerCleaner controller = loader.<ControllerCleaner>getController();
-//            controller.setService(service);
-//
-//            Tab tab = new Tab("Cleaner");
-//            tab.setContent(content);
-//            collectionTabs.getTabs().add(tab);
-//        } catch (IOException ex) {
-//            LOGGER.error("Failed to load Tab.", ex);
-//        }
-//    }
+    //    private void addCleanerTab() {
+    //        try {
+    //            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Cleaner.fxml"));
+    //            BorderPane content = (BorderPane) loader.load();
+    //            ControllerCleaner controller = loader.<ControllerCleaner>getController();
+    //            controller.setService(service);
+    //
+    //            Tab tab = new Tab("Cleaner");
+    //            tab.setContent(content);
+    //            collectionTabs.getTabs().add(tab);
+    //        } catch (IOException ex) {
+    //            LOGGER.error("Failed to load Tab.", ex);
+    //        }
+    //    }
     private void addAggregationTab() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AggregationManager.fxml"));
             BorderPane content = (BorderPane) loader.load();
-            ControllerAggManager controller = loader.<ControllerAggManager>getController();
+            ControllerAggManager controller = loader.<ControllerAggManager> getController();
             controller.setService(service);
 
             Tab tab = new Tab();

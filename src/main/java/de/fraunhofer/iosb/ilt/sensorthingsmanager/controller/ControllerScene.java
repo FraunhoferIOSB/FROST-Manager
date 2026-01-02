@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2024 Fraunhofer Institut IOSB, Fraunhoferstr. 1, D 76131
+ * Karlsruhe, Germany.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
-import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,6 +25,7 @@ import de.fraunhofer.iosb.ilt.configurable.ConfigurationException;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Server;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ServerListEntry;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -175,7 +192,7 @@ public class ControllerScene implements Initializable {
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Server.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            ControllerServer controller = loader.<ControllerServer>getController();
+            ControllerServer controller = loader.<ControllerServer> getController();
             controller.setServerEntry(server);
 
             Tab tab = new Tab(name);
@@ -217,8 +234,7 @@ public class ControllerScene implements Initializable {
             File serversFile = new File("servers.json");
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            List<ServerListEntry> serversFromFile = gson.fromJson(new FileReader(serversFile), new TypeReference<List<ServerListEntry>>() {
-            }.getType());
+            List<ServerListEntry> serversFromFile = gson.fromJson(new FileReader(serversFile), new TypeReference<List<ServerListEntry>>() {}.getType());
             servers.addAll(serversFromFile);
             sortServers();
         } catch (IOException ex) {

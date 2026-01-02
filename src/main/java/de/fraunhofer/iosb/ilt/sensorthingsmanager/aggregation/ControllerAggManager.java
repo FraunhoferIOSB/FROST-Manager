@@ -1,36 +1,38 @@
 /*
- * Copyright (C) 2019 Fraunhofer IOSB
+ * Copyright (C) 2024 Fraunhofer Institut IOSB, Fraunhoferstr. 1, D 76131
+ * Karlsruhe, Germany.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.aggregation;
+
+import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_DESCRIPTION;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing.EP_PHENOMENONTIME;
+import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing.EP_UNITOFMEASUREMENT;
+import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 
 import de.fraunhofer.iosb.ilt.configurable.ConfigurationException;
 import de.fraunhofer.iosb.ilt.configurable.editor.EditorMap;
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
-import static de.fraunhofer.iosb.ilt.frostclient.models.CommonProperties.EP_DESCRIPTION;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing.EP_PHENOMENONTIME;
-import static de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing.EP_UNITOFMEASUREMENT;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.TimeValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.UnitOfMeasurement;
 import de.fraunhofer.iosb.ilt.frostclient.utils.CollectionsHelper;
-import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ButtonTableCell;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.DateTimePicker;
 import java.net.URL;
