@@ -56,7 +56,7 @@
         <version.commons-io>2.21.0</version.commons-io>
         <version.commons-lang>3.20.0</version.commons-lang>
         <version.configurable>0.37</version.configurable>
-        <version.logback>1.5.23</version.logback>
+        <version.logback>1.5.24</version.logback>
 
         <version.maven.plugin.central-publishing>0.9.0</version.maven.plugin.central-publishing>
         <version.maven.plugin.compiler>3.14.1</version.maven.plugin.compiler>
