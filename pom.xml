@@ -56,7 +56,7 @@
         <version.commons-io>2.21.0</version.commons-io>
         <version.commons-lang>3.20.0</version.commons-lang>
         <version.configurable>0.37</version.configurable>
-        <version.logback>1.5.24</version.logback>
+        <version.logback>1.5.25</version.logback>
 
         <version.maven.plugin.central-publishing>0.10.0</version.maven.plugin.central-publishing>
         <version.maven.plugin.compiler>3.14.1</version.maven.plugin.compiler>
@@ -67,7 +67,7 @@
         <version.maven.plugin.nexus-staging>1.7.0</version.maven.plugin.nexus-staging>
         <version.maven.plugin.release>3.3.1</version.maven.plugin.release>
         <version.maven.plugin.source>3.4.0</version.maven.plugin.source>
-        <version.maven.plugin.spotless>3.1.0</version.maven.plugin.spotless>
+        <version.maven.plugin.spotless>3.2.0</version.maven.plugin.spotless>
         <version.openjfx>23</version.openjfx>
     </properties>
 
