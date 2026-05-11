@@ -20,13 +20,14 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 
 /**
- *
- * @author scf
+ * The GUI element that represents an Entity in a GUI List.
  */
 public class EntityListEntry {
 
     private Entity entity;
     private boolean changed = false;
+    private boolean toLink = false;
+    private boolean toUnlink = false;
 
     @Override
     public String toString() {
@@ -50,18 +51,36 @@ public class EntityListEntry {
     }
 
     /**
-     * @return the changed
+     * @return the changed flag.
      */
     public boolean isChanged() {
         return changed;
     }
 
     /**
-     * @param changed the changed to set.
+     * @param changed the value to set the changed flag to.
      * @return this EntityListEntry.
      */
     public EntityListEntry setChanged(boolean changed) {
         this.changed = changed;
+        return this;
+    }
+
+    public boolean isToLink() {
+        return toLink;
+    }
+
+    public EntityListEntry setToLink(boolean toLink) {
+        this.toLink = toLink;
+        return this;
+    }
+
+    public boolean isToUnlink() {
+        return toUnlink;
+    }
+
+    public EntityListEntry setToUnlink(boolean toUnlink) {
+        this.toUnlink = toUnlink;
         return this;
     }
 

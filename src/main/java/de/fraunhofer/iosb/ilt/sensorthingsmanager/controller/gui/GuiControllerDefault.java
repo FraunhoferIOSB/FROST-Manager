@@ -18,7 +18,6 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 
 import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
-import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.createCollectionPaneFor;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.createEditableEntityPane;
 
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
@@ -82,15 +81,15 @@ public class GuiControllerDefault implements EntityGuiController {
 
     @Override
     public EntityType getType() {
-        return entity.getEntityType();
+        return entity.getType();
     }
 
     @Override
     public void init(SensorThingsService service, Entity entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
         this.labelId = labelId;
         this.entity = entity;
-        if (entityType != entity.getEntityType()) {
-            LOGGER.error("Entity types do not match. {} != {}", entityType, entity.getEntityType());
+        if (entityType != entity.getType()) {
+            LOGGER.error("Entity types do not match. {} != {}", entityType, entity.getType());
         }
         Set<EntityPropertyMain> entityProperties = entityType.getEntityProperties();
         for (EntityPropertyMain ep : entityProperties) {
@@ -110,7 +109,7 @@ public class GuiControllerDefault implements EntityGuiController {
                 }
                 if (entity.hasService()) {
                     for (NavigationPropertyEntitySet nps : entityType.getNavigationSets()) {
-                        Pane pane = createCollectionPaneFor(entity.query(nps), "");
+                        Pane pane = Helper.createCollectionPaneFor(entity.query(nps), "", true, null);
                         accordionLinks.getPanes().add(new TitledPane(nps.getName(), pane));
                     }
                 }

@@ -51,7 +51,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <root.basedir>${project.basedir}</root.basedir>
-        <version.FROST-Client-Dynamic>2.33</version.FROST-Client-Dynamic>
+        <version.FROST-Client-Dynamic>2.35</version.FROST-Client-Dynamic>
 
         <version.commons-io>2.21.0</version.commons-io>
         <version.commons-lang>3.20.0</version.commons-lang>

@@ -104,7 +104,7 @@ public class ControllerEntity implements Initializable {
         this.service = service;
         this.entity = entity;
         this.controller = controller;
-        labelType.setText(entity.getEntityType().getEntityName());
+        labelType.setText(entity.getType().getEntityName());
         if (showNavigationProperties) {
             controller.init(service, entity, gridProperties, accordionLinks, labelId, true);
         } else {

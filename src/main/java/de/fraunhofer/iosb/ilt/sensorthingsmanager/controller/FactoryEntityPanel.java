@@ -36,7 +36,7 @@ public class FactoryEntityPanel {
     private static final String ENTITY_PANE_FXML = "/fxml/PaneEntity.fxml";
 
     public static Node getPane(SensorThingsService service, EntityType type, Entity entity, boolean showNavProps) throws IOException {
-        if (entity != null && entity.getEntityType() != type) {
+        if (entity != null && entity.getType() != type) {
             throw new IllegalArgumentException("Entity must have given type or be null.");
         }
         if (entity == null) {

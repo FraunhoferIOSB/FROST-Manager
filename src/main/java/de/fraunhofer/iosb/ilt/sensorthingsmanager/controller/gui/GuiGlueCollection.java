@@ -18,11 +18,13 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 
 import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
+import de.fraunhofer.iosb.ilt.frostclient.model.ContainerType;
 import de.fraunhofer.iosb.ilt.frostclient.model.Property;
 import de.fraunhofer.iosb.ilt.frostclient.model.PropertyType;
 import de.fraunhofer.iosb.ilt.frostclient.model.csdl.annotation.Annotation;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeCollection;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -148,6 +150,11 @@ public class GuiGlueCollection implements PropertyGuiGlue<GuiGlueCollection> {
     private static class ComplexValuePlaceholder implements ComplexValue<ComplexValuePlaceholder> {
 
         private Object value;
+
+        @Override
+        public ContainerType<?> getType() {
+            return TypeComplex.STA_MAP;
+        }
 
         @Override
         public <P> P getProperty(Property<P> property) {

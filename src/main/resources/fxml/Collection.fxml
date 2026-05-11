@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="395.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection">
+<AnchorPane prefHeight="395.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection">
     <children>
         <SplitPane dividerPositions="0.3" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <items>
@@ -39,12 +39,12 @@
                                         <Tooltip text="Set the filter." />
                                     </tooltip>
                                 </ToggleButton>
-                                <ToggleButton fx:id="buttonSelect" mnemonicParsing="false" onAction="#actionButtonSelect" text="S" >
+                                <ToggleButton fx:id="buttonSelect" mnemonicParsing="false" onAction="#actionButtonSelect" text="S">
                                     <tooltip>
                                         <Tooltip text="Set the Select." />
                                     </tooltip>
                                 </ToggleButton>
-                                <ToggleButton fx:id="buttonOrder" mnemonicParsing="false" onAction="#actionButtonOrder" text="O" >
+                                <ToggleButton fx:id="buttonOrder" mnemonicParsing="false" onAction="#actionButtonOrder" text="O">
                                     <tooltip>
                                         <Tooltip text="Set the OrderBy." />
                                     </tooltip>
@@ -56,8 +56,10 @@
                         <FlowPane BorderPane.alignment="CENTER">
                             <children>
                                 <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionDelete" text="Delete" />
-                                <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="New" />
-                                <Button fx:id="buttonAdd" mnemonicParsing="false" onAction="#actionAdd" text="Add" />
+                                <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="Create New" />
+                                <Button fx:id="buttonAdd" mnemonicParsing="false" onAction="#actionAdd" text="Link" />
+                        <Button fx:id="buttonRemove" mnemonicParsing="false" onAction="#actionRemove" text="Unlink" />
+                        <Button fx:id="buttonSave" mnemonicParsing="false" onAction="#actionSave" text="Save" />
                             </children>
                         </FlowPane>
                     </bottom>

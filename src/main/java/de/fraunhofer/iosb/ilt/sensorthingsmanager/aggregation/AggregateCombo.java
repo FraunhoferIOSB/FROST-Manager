@@ -82,10 +82,10 @@ public class AggregateCombo implements Comparable<AggregateCombo> {
 
     public EntityType getSourceType() {
         if (sourceDs != null) {
-            return sourceDs.getEntityType();
+            return sourceDs.getType();
         }
         if (sourceMds != null) {
-            return sourceMds.getEntityType();
+            return sourceMds.getType();
         }
         return null;
     }
@@ -117,7 +117,7 @@ public class AggregateCombo implements Comparable<AggregateCombo> {
 
     public Entity getLastForTarget() {
         try {
-            NavigationPropertyEntitySet npObs = targetMds.getEntityType().getNavigationPropertySet("Observations");
+            NavigationPropertyEntitySet npObs = targetMds.getType().getNavigationPropertySet("Observations");
             return targetMds.query(npObs).select("id", "phenomenonTime").orderBy("phenomenonTime desc").first();
         } catch (ServiceFailureException ex) {
             LOGGER.error("Error fetching last observation.", ex);

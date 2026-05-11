@@ -21,6 +21,7 @@ import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyVal
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.entitySearchDialog;
 
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.dao.Dao;
 import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.exception.StatusCodeException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
@@ -28,6 +29,7 @@ import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.PrimaryKey;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationPropertyEntitySet;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypePrimitive;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.ChildSetter;
@@ -35,6 +37,7 @@ import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -50,6 +53,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
@@ -80,6 +84,10 @@ public class ControllerCollection implements Initializable {
     private Button buttonNew;
     @FXML
     private Button buttonAdd;
+    @FXML
+    private Button buttonRemove;
+    @FXML
+    private Button buttonSave;
 
     @FXML
     private ToggleButton buttonFilter;
@@ -114,15 +122,18 @@ public class ControllerCollection implements Initializable {
      * Can new entities be created.
      */
     private boolean canCreate = false;
+
     /**
      * Can entities be deleted.
      */
     private boolean canDelete = false;
+
     /**
      * Can existing entities not in this collection be linked into this
      * collection.
      */
     private boolean canLinkNew = false;
+
     /**
      * The setter used to link newly selected items to the owner of the
      * collection.
@@ -286,16 +297,65 @@ public class ControllerCollection implements Initializable {
 
     @FXML
     private void actionAdd(ActionEvent event) {
-        if (childSetter == null) {
-            new Alert(Alert.AlertType.ERROR, "No childSetter defined.", ButtonType.CLOSE).showAndWait();
+        if (!canLinkNew) {
             return;
         }
         Query allQuery = service.query(entityType);
         Optional<List<Entity>> result = entitySearchDialog(allQuery, true, orderby);
         if (result.isPresent() && !result.get().isEmpty()) {
             List<Entity> newChildren = result.get();
-            childSetter.setChildren(newChildren);
+            for (var child : newChildren) {
+                entities.add(new EntityListEntry()
+                        .setEntity(child)
+                        .setToLink(true));
+            }
         }
+    }
+
+    @FXML
+    private void actionRemove(ActionEvent event) {
+        List<EntityListEntry> toNotLink = new ArrayList<>();
+        ObservableList<EntityListEntry> selectedItems = entityTable.getSelectionModel().getSelectedItems();
+        for (EntityListEntry selectedItem : selectedItems) {
+            if (selectedItem.isToLink()) {
+                toNotLink.add(selectedItem);
+            } else {
+                selectedItem.setToUnlink(true);
+            }
+        }
+        for (EntityListEntry selectedItem : toNotLink) {
+            entities.remove(selectedItem);
+        }
+        entityTable.refresh();
+    }
+
+    @FXML
+    private void actionSave(ActionEvent event) {
+        Entity parent = query.getParent();
+        NavigationPropertyEntitySet npes = query.getNavigationLink();
+        Dao dao = parent.dao(npes);
+        for (Iterator<EntityListEntry> it = entities.iterator(); it.hasNext();) {
+            EntityListEntry ele = it.next();
+            if (ele.isToLink()) {
+                LOGGER.info("Linking {}", ele.getEntity());
+                try {
+                    dao.linkEntities(ele.getEntity().asReference());
+                    ele.setToLink(false);
+                } catch (ServiceFailureException ex) {
+                    LOGGER.error("Failed to link {}", ele.getEntity());
+                }
+            }
+            if (ele.isToUnlink()) {
+                LOGGER.info("UnLinking {}", ele.getEntity());
+                try {
+                    dao.unlinkEntity(ele.getEntity().asReference());
+                    it.remove();
+                } catch (ServiceFailureException ex) {
+                    LOGGER.error("Failed to unlink {}", ele.getEntity());
+                }
+            }
+        }
+        entityTable.refresh();
     }
 
     private void addOptionsToQuery() {
@@ -371,7 +431,7 @@ public class ControllerCollection implements Initializable {
             Entity entity = param.getValue().getEntity();
             String display = entity.display();
             if (Utils.isNullOrEmpty(display)) {
-                display = entity.getEntityType().entityName;
+                display = entity.getType().entityName;
             }
             return new ReadOnlyObjectWrapper<>(display);
         });
@@ -408,7 +468,7 @@ public class ControllerCollection implements Initializable {
 
         if (keyProps.size() == 1 && keyProp0.getType().getName().equals(TypePrimitive.EDM_UNTYPED_NAME)) {
             final Object pkVal = entity.getPrimaryKeyValues().get(0);
-            if (pkVal instanceof Number n) {
+            if (pkVal instanceof Number) {
                 pkIsNumeric = true;
             }
         } else if (keyProps.size() == 1 && keyProp0.getType().getName().startsWith("Edm.Int")) {
@@ -424,7 +484,30 @@ public class ControllerCollection implements Initializable {
                 }
                 return new ReadOnlyObjectWrapper<>((Number) pkValue);
             });
+            column.setCellFactory(param -> new TableCell<>() {
+                @Override
+                protected void updateItem(Number item, boolean empty) {
+                    super.updateItem(item, empty);
 
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        setStyle("-fx-background-color: transparent;");
+                        return;
+                    }
+
+                    setText(item.toString());
+
+                    EntityListEntry ele = getTableRow().getItem();
+                    if (ele.isToLink()) {
+                        this.setStyle("-fx-background-color: lime;");
+                    } else if (ele.isToUnlink()) {
+                        this.setStyle("-fx-background-color: tomato;");
+                    } else {
+                        this.setStyle("-fx-background-color: transparent;");
+                    }
+                }
+            });
         } else {
             TableColumn<EntityListEntry, String> column = new TableColumn<>(idColumnName);
             columnId = column;
@@ -436,7 +519,28 @@ public class ControllerCollection implements Initializable {
                 String keyValue = formatKeyValuesForUrl(cellEntity);
                 return new ReadOnlyObjectWrapper<>(keyValue);
             });
+            column.setCellFactory(param -> new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
 
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        setStyle("-fx-background-color: transparent;");
+                    } else {
+                        setText(item);
+                    }
+                    EntityListEntry ele = getTableRow().getItem();
+                    if (ele.isToLink()) {
+                        setStyle("-fx-background-color: lime;");
+                    } else if (ele.isToUnlink()) {
+                        setStyle("-fx-background-color: tomato;");
+                    } else {
+                        setStyle("-fx-background-color: transparent;");
+                    }
+                }
+            });
         }
         entityTable.getColumns().add(0, columnId);
     }
@@ -459,11 +563,13 @@ public class ControllerCollection implements Initializable {
         this.service = query.getService();
         this.entityType = query.getEntityType();
         this.canCreate = true;
+        this.canLinkNew = false;
         this.canDelete = true;
         this.orderby = orderBy;
         buttonDelete.setVisible(canDelete);
         buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);
+        buttonRemove.setVisible(canLinkNew);
         return this;
     }
 
@@ -490,6 +596,8 @@ public class ControllerCollection implements Initializable {
         buttonDelete.setVisible(canDelete);
         buttonNew.setVisible(canCreate);
         buttonAdd.setVisible(canLinkNew);
+        buttonRemove.setVisible(canLinkNew);
+        buttonSave.setVisible(canLinkNew || canCreate || canDelete);
         entityTable.getSelectionModel().setSelectionMode(canMultiSelect ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
         return this;
     }

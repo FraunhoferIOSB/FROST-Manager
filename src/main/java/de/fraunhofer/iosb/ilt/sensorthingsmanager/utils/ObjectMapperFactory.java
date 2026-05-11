@@ -18,9 +18,9 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import de.fraunhofer.iosb.ilt.frostclient.json.SimpleJsonMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 
 /**
  * Factory for ObjectMapper instances. Keeps track of configuration.
@@ -43,9 +43,11 @@ public final class ObjectMapperFactory {
      */
     public static ObjectMapper get() {
         if (mapper == null) {
-            mapper = SimpleJsonMapper.getSimpleObjectMapper().copy();
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper = SimpleJsonMapper.getSimpleObjectMapper().rebuild()
+                    .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+                    .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_EMPTY))
+                    .enable(SerializationFeature.INDENT_OUTPUT)
+                    .build();
         }
 
         return mapper;

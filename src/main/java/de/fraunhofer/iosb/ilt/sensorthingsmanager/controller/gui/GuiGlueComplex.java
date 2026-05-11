@@ -57,7 +57,7 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
             if (value == null) {
                 value = ptc.instantiate();
             }
-            for (Property subProperty : ptc.getProperties()) {
+            for (Property subProperty : ptc.getEntityProperties()) {
                 if (subProperty instanceof EntityProperty ep) {
                     PropertyGuiGlue subItem = PropertyGuiGlue.createGuiElement("-", value, ep, editable, gridProperties, itemCount);
                     subProperties.put(subProperty.getJsonName(), subItem);

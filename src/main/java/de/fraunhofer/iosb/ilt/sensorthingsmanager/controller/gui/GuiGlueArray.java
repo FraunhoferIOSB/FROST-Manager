@@ -17,19 +17,18 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ObjectMapperFactory;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -68,7 +67,7 @@ public class GuiGlueArray implements PropertyGuiGlue<GuiGlueArray> {
                 String textValue = mapper.writeValueAsString(value);
                 field.setText(textValue);
             }
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Properties can not be converted to JSON.", ex);
         }
     }
@@ -82,7 +81,7 @@ public class GuiGlueArray implements PropertyGuiGlue<GuiGlueArray> {
                 List value = mapper.readValue(textInput, List.class);
                 entity.setProperty(property, value);
             }
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Not valid json.", ex);
         }
     }

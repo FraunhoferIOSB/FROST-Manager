@@ -28,6 +28,7 @@ import de.fraunhofer.iosb.ilt.frostclient.exception.ServiceFailureException;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntitySet;
 import de.fraunhofer.iosb.ilt.frostclient.model.PkValue;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
@@ -455,7 +456,7 @@ public class AggregationData {
     private void checkReference(Entity aggregateMds, String expectedAggFor, AggregationLevel level, String aggSourceKey, Object aggSourceId) {
         MapValue properties = aggregateMds.getProperty(EP_PROPERTIES);
         if (properties == null) {
-            properties = new MapValue();
+            properties = new MapValue(TypeComplex.STA_MAP);
             aggregateMds.setProperty(EP_PROPERTIES, properties);
         }
         boolean changed = false;

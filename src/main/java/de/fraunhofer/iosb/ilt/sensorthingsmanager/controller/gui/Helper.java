@@ -101,7 +101,7 @@ public class Helper {
                 } catch (IOException ex) {
                     LoggerFactory.getLogger(EntityGuiController.class).error("Failed to load Collection Pane.", ex);
                 }
-                tp.setText(newChild.getEntityType().getEntityName() + ": " + newChild.toString());
+                tp.setText(newChild.getType().getEntityName() + ": " + newChild.toString());
             }
         });
 
@@ -153,7 +153,7 @@ public class Helper {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            ControllerCollection controller = loader.<ControllerCollection> getController();
+            ControllerCollection controller = loader.getController();
             controller.setQuery(query, true, true, canLinkNew, true, orderBy);
             if (childSetter != null) {
                 controller.setChildSetter(childSetter);
@@ -169,7 +169,7 @@ public class Helper {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            final ControllerCollection controller = loader.<ControllerCollection> getController();
+            final ControllerCollection controller = loader.getController();
             controller.setQuery(query, false, false, false, multiSelect, orderBy);
 
             Dialog<List<Entity>> dialog = new Dialog<>();
