@@ -25,11 +25,16 @@ import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import javafx.geometry.VPos;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 
 /**
  *
- * @author hylke
  */
 public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
 
@@ -49,7 +54,18 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
     }
 
     public GuiGlueComplex init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        Helper.addLabelTo(gridProperties, itemCount.getAndIncrement(), property.getName());
+        gridProperties.getRowConstraints().add(new RowConstraints(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE, Priority.NEVER, VPos.BASELINE, false));
+        GridPane subGrid = new GridPane();
+        ColumnConstraints col1 = new ColumnConstraints();
+        ColumnConstraints col2 = new ColumnConstraints();
+        col1.setFillWidth(false);
+        col1.setHgrow(Priority.NEVER);
+        col1.setMinWidth(Double.NEGATIVE_INFINITY);
+        col2.setHgrow(Priority.SOMETIMES);
+        col2.setMinWidth(40);
+        subGrid.getColumnConstraints().addAll(col1, col2);
+        gridProperties.add(new TitledPane(property.getName(), subGrid), 0, itemCount.getAndIncrement(), 2, 1);
+        AtomicInteger subItemCount = new AtomicInteger();
         PropertyType pt = property.getType();
         if (pt instanceof TypeComplex ptc) {
             propertyType = ptc;
@@ -59,12 +75,12 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
             }
             for (Property subProperty : ptc.getEntityProperties()) {
                 if (subProperty instanceof EntityProperty ep) {
-                    PropertyGuiGlue subItem = PropertyGuiGlue.createGuiElement("-", value, ep, editable, gridProperties, itemCount);
+                    PropertyGuiGlue subItem = PropertyGuiGlue.createGuiElement(value, ep, editable, subGrid, subItemCount);
                     subProperties.put(subProperty.getJsonName(), subItem);
                 }
             }
         }
-        Helper.addSeparatorTo(gridProperties, itemCount.getAndIncrement());
+        //Helper.addSeparatorTo(gridProperties, itemCount.getAndIncrement());
         return this;
     }
 
