@@ -33,8 +33,8 @@
                             <content>
                                 <GridPane fx:id="gridProperties">
                                     <columnConstraints>
-                                        <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="-Infinity" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="40.0" />
+                                        <ColumnConstraints fillWidth="true" hgrow="NEVER" minWidth="-Infinity" />
+                                        <ColumnConstraints fillWidth="true" hgrow="ALWAYS" minWidth="40.0" />
                                     </columnConstraints>
                                 </GridPane>
                             </content>

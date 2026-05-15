@@ -54,16 +54,16 @@ public class GuiGlueComplex implements PropertyGuiGlue<GuiGlueComplex> {
     }
 
     public GuiGlueComplex init(String namePrefix, GridPane gridProperties, AtomicInteger itemCount, boolean editable) {
-        gridProperties.getRowConstraints().add(new RowConstraints(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE, Priority.NEVER, VPos.BASELINE, false));
         GridPane subGrid = new GridPane();
         ColumnConstraints col1 = new ColumnConstraints();
         ColumnConstraints col2 = new ColumnConstraints();
-        col1.setFillWidth(false);
+        col1.setFillWidth(true);
         col1.setHgrow(Priority.NEVER);
         col1.setMinWidth(Double.NEGATIVE_INFINITY);
-        col2.setHgrow(Priority.SOMETIMES);
+        col2.setHgrow(Priority.ALWAYS);
         col2.setMinWidth(40);
         subGrid.getColumnConstraints().addAll(col1, col2);
+        gridProperties.getRowConstraints().add(new RowConstraints(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE, Priority.NEVER, VPos.BASELINE, false));
         gridProperties.add(new TitledPane(property.getName(), subGrid), 0, itemCount.getAndIncrement(), 2, 1);
         AtomicInteger subItemCount = new AtomicInteger();
         PropertyType pt = property.getType();
