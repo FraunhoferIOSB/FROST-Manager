@@ -380,9 +380,12 @@ public class ControllerCollection implements Initializable {
 
     private void loadEntities() {
         entities.clear();
+        int count = 0;
         for (Entity entity : currentQueryList.toList()) {
             entities.add(new EntityListEntry().setEntity(entity));
+            count++;
         }
+        LOGGER.info("Loaded {} Entities", count);
         createIdColumn();
         buttonNext.setDisable(!currentQueryList.hasNextLink());
         buttonDelete.setDisable(true);
@@ -431,7 +434,7 @@ public class ControllerCollection implements Initializable {
             Entity entity = param.getValue().getEntity();
             String display = entity.display();
             if (Utils.isNullOrEmpty(display)) {
-                display = entity.getType().entityName;
+                display = entity.getType().name;
             }
             return new ReadOnlyObjectWrapper<>(display);
         });
@@ -528,6 +531,7 @@ public class ControllerCollection implements Initializable {
                         setText(null);
                         setGraphic(null);
                         setStyle("-fx-background-color: transparent;");
+                        return;
                     } else {
                         setText(item);
                     }

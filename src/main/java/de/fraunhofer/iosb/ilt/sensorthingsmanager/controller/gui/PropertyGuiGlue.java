@@ -88,7 +88,7 @@ public interface PropertyGuiGlue<T extends PropertyGuiGlue<T>> {
             pt = ts.getUnderlyingType();
         }
         if (pt instanceof TypePrimitive ptsp) {
-            switch (ptsp.getName()) {
+            switch (ptsp.getFullName()) {
                 case EDM_BOOLEAN_NAME:
                     return new GuiGlueSimpleBoolean(entity, property)
                             .init(namePrfx, gridProperties, itemCount, editable);

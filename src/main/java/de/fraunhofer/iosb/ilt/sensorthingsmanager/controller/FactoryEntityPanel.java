@@ -40,7 +40,7 @@ public class FactoryEntityPanel {
             throw new IllegalArgumentException("Entity must have given type or be null.");
         }
         if (entity == null) {
-            return new Label("No " + type.entityName + ".");
+            return new Label("No " + type.name + ".");
         }
         FXMLLoader loader = new FXMLLoader(FactoryEntityPanel.class.getResource(ENTITY_PANE_FXML));
         Node content = (Pane) loader.load();

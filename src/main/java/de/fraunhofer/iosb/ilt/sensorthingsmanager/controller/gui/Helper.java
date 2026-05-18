@@ -81,7 +81,7 @@ public class Helper {
 
         EntityType type = childQuery.getEntityType();
         String paneTitle;
-        final String childTypeName = npe.getEntityType().getShortName();
+        final String childTypeName = npe.getEntityType().getName();
         if (childEntity == null) {
             paneTitle = npe.getName() + ": No " + childTypeName + " selected";
         } else {

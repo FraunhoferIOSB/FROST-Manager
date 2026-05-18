@@ -41,6 +41,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +66,8 @@ public class ControllerServer implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         collectionTabs.setTabMinWidth(20);
         collectionTabs.setTabMaxWidth(20);
-        collectionTabs.setTabMinHeight(150);
-        collectionTabs.setTabMaxHeight(150);
+        collectionTabs.setTabMinHeight(170);
+        collectionTabs.setTabMaxHeight(170);
     }
 
     public void setServerEntry(Server entry) {
@@ -84,7 +85,7 @@ public class ControllerServer implements Initializable {
                 if (et.getProperty(SensorThingsV11Sensing.NAME_NAME) != null) {
                     orderBy = "name asc";
                 }
-                addTabFor(et.mainSet, orderBy, service.query(et));
+                addTabFor(et.namespace, et.mainSet, orderBy, service.query(et));
             }
 
             if (service.hasModel(SensorThingsV11MultiDatastream.class)) {
@@ -95,18 +96,22 @@ public class ControllerServer implements Initializable {
         }
     }
 
-    private void addTabFor(String title, String orderBy, Query query) {
+    private void addTabFor(String namespace, String title, String orderBy, Query query) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
-            ControllerCollection controller = loader.<ControllerCollection> getController();
+            ControllerCollection controller = loader.getController();
             controller.setQuery(query, orderBy);
 
             Tab tab = new Tab();
-            final StackPane stackPane = new StackPane(new Group(new Label(title)));
-            stackPane.setMinWidth(140);
-            stackPane.setAlignment(Pos.CENTER_LEFT);
-            tab.setGraphic(stackPane);
+            final Label lblNamespace = new Label(namespace);
+            final Label lblTitle = new Label(title);
+            lblNamespace.setStyle("-fx-label-padding: 0 2 -2 2; -fx-padding : 0 2 -2 2; -fx-text-background-color: #555; -fx-font-size: 0.7em;");
+            lblTitle.setStyle("-fx-label-padding: -2 2 0 2; -fx-padding : -2 2 0 2;");
+            final VBox vbox = new VBox(lblNamespace, lblTitle);
+            vbox.setMinWidth(160);
+            vbox.setAlignment(Pos.CENTER_LEFT);
+            tab.setGraphic(vbox);
             tab.setContent(content);
             collectionTabs.getTabs().add(tab);
         } catch (IOException ex) {
@@ -132,7 +137,7 @@ public class ControllerServer implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AggregationManager.fxml"));
             BorderPane content = (BorderPane) loader.load();
-            ControllerAggManager controller = loader.<ControllerAggManager> getController();
+            ControllerAggManager controller = loader.getController();
             controller.setService(service);
 
             Tab tab = new Tab();

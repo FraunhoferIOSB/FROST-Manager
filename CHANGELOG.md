@@ -1,6 +1,9 @@
 # Version 0.15-SNAPSHOT
 
 **Updates**
+* Added support for multi-namespace models.
+* Improved GUI for complex properties.
+* Added support for adding and removing to many-to-many relations.
 
 
 # Version 0.14
