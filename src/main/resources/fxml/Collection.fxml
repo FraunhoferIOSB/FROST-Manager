@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -11,9 +12,9 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="395.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection">
+<AnchorPane prefHeight="580.0" prefWidth="744.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection">
     <children>
-        <SplitPane dividerPositions="0.3" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <SplitPane dividerPositions="0.3450134770889488" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <items>
                 <BorderPane SplitPane.resizableWithParent="false">
                     <top>
@@ -53,13 +54,17 @@
                         </HBox>
                     </top>
                     <bottom>
-                        <FlowPane BorderPane.alignment="CENTER">
+                        <FlowPane BorderPane.alignment="CENTER_LEFT">
                             <children>
                                 <Button fx:id="buttonDelete" disable="true" mnemonicParsing="false" onAction="#actionDelete" text="Delete" />
-                                <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="Create New" />
+                                <Button fx:id="buttonNew" mnemonicParsing="false" onAction="#actionNew" text="Create" />
                                 <Button fx:id="buttonAdd" mnemonicParsing="false" onAction="#actionAdd" text="Link" />
-                        <Button fx:id="buttonRemove" mnemonicParsing="false" onAction="#actionRemove" text="Unlink" />
-                        <Button fx:id="buttonSave" mnemonicParsing="false" onAction="#actionSave" text="Save" />
+                                <Button fx:id="buttonRemove" mnemonicParsing="false" onAction="#actionRemove" text="Unlink" />
+                                <Button fx:id="buttonSave" mnemonicParsing="false" onAction="#actionSave" text="Save">
+                                    <FlowPane.margin>
+                                        <Insets left="5.0" />
+                                    </FlowPane.margin>
+                                </Button>
                             </children>
                         </FlowPane>
                     </bottom>

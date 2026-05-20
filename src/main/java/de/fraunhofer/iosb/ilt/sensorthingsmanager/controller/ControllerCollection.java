@@ -570,10 +570,10 @@ public class ControllerCollection implements Initializable {
         this.canLinkNew = false;
         this.canDelete = true;
         this.orderby = orderBy;
-        buttonDelete.setVisible(canDelete);
-        buttonNew.setVisible(canCreate);
-        buttonAdd.setVisible(canLinkNew);
-        buttonRemove.setVisible(canLinkNew);
+        nodeVisible(buttonDelete, canDelete);
+        nodeVisible(buttonNew, canCreate);
+        nodeVisible(buttonAdd, canLinkNew);
+        nodeVisible(buttonRemove, canLinkNew);
         return this;
     }
 
@@ -597,11 +597,11 @@ public class ControllerCollection implements Initializable {
         this.showNavigationProperties = showNavigationProperties;
         this.canMultiSelect = multiSelect;
         this.orderby = orderBy;
-        buttonDelete.setVisible(canDelete);
-        buttonNew.setVisible(canCreate);
-        buttonAdd.setVisible(canLinkNew);
-        buttonRemove.setVisible(canLinkNew);
-        buttonSave.setVisible(canLinkNew || canCreate || canDelete);
+        nodeVisible(buttonDelete, canDelete);
+        nodeVisible(buttonNew, canCreate);
+        nodeVisible(buttonAdd, canLinkNew);
+        nodeVisible(buttonRemove, canLinkNew);
+        nodeVisible(buttonSave, canLinkNew || canCreate || canDelete);
         entityTable.getSelectionModel().setSelectionMode(canMultiSelect ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
         return this;
     }
@@ -634,5 +634,10 @@ public class ControllerCollection implements Initializable {
         List<Entity> values = new ArrayList<>();
         items.stream().forEach(i -> values.add(i.getEntity()));
         return values;
+    }
+
+    public static void nodeVisible(Node node, boolean visible) {
+        node.setVisible(visible);
+        node.setManaged(visible);
     }
 }
