@@ -1,4 +1,4 @@
-# Version 0.15-SNAPSHOT
+# Version 0.15
 
 **Updates**
 * Added support for multi-namespace models.
