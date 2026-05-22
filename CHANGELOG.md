@@ -1,6 +1,7 @@
 # Version 0.16-SNAPSHOT
 
 **Updates**
+* Fixed editing of open property types.
 
 
 # Version 0.15

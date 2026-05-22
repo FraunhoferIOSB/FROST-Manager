@@ -19,7 +19,7 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 
 import de.fraunhofer.iosb.ilt.frostclient.model.ComplexValue;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityProperty;
-import de.fraunhofer.iosb.ilt.frostclient.models.ext.MapValue;
+import de.fraunhofer.iosb.ilt.frostclient.model.property.type.TypeComplex;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.ObjectMapperFactory;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,11 +28,12 @@ import javafx.scene.layout.GridPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
- *
- * @author hylke
+ * Handles the GUI for open types.
  */
 public class GuiGlueOpenType implements PropertyGuiGlue<GuiGlueOpenType> {
 
@@ -78,8 +79,18 @@ public class GuiGlueOpenType implements PropertyGuiGlue<GuiGlueOpenType> {
         try {
             final String textInput = field.getText();
             if (!Utils.isNullOrEmpty(textInput)) {
-                ComplexValue properties = mapper.readValue(textInput, MapValue.class);
-                entity.setProperty(property, properties);
+                ValueDeserializer deserializer = property.getType().getDeserializer();
+                if (deserializer == null) {
+                    deserializer = TypeComplex.STA_MAP.getDeserializer();
+                }
+                try (final JsonParser parser = mapper.createParser(textInput)) {
+                    Object value = deserializer.deserialize(parser, mapper._deserializationContext());
+                    EntityProperty p = property;
+                    entity.setProperty(p, value);
+                } catch (Exception ex) {
+                    LOGGER.error("Not valid json.", ex);
+                }
+
             }
         } catch (JacksonException ex) {
             LOGGER.error("Not valid json.", ex);
