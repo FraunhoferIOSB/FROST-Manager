@@ -198,6 +198,7 @@ public class ControllerScene implements Initializable {
             Tab tab = new Tab(name);
             tab.setContent(content);
             serverTabs.getTabs().add(tab);
+            serverTabs.getSelectionModel().select(tab);
 
             buttonServers.setSelected(false);
             checkServersButton();

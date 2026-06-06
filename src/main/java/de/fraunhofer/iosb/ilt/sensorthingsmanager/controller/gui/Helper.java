@@ -87,7 +87,7 @@ public class Helper {
         } else {
             paneTitle = npe.getName() + ": " + childTypeName + '(' + formatKeyValuesForUrl(childEntity) + ')';
         }
-        Node pane = FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, false);
+        Node pane = FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, true);
         TitledPane tp = new TitledPane(paneTitle, pane);
         Button edit = new Button("🔧");
         tp.setGraphic(edit);
