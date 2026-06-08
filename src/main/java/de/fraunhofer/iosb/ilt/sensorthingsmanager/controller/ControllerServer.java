@@ -18,7 +18,9 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
 import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
+import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostclient.model.PkValue;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11MultiDatastream;
 import de.fraunhofer.iosb.ilt.frostclient.models.SensorThingsV11Sensing;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
@@ -29,6 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -61,6 +65,8 @@ public class ControllerServer implements Initializable {
     @FXML
     private TabPane collectionTabs;
     private SensorThingsService service;
+    private Map<EntityType, Tab> tabsByType = new HashMap<>();
+    private Map<EntityType, ControllerCollection> tabControllersByType = new HashMap<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -96,12 +102,36 @@ public class ControllerServer implements Initializable {
         }
     }
 
+    public SensorThingsService getService() {
+        return service;
+    }
+
+    public void openSingleEntity(Entity entity) {
+        if (entity == null) {
+            return;
+        }
+        PkValue pk = entity.getPrimaryKeyValues();
+        if (!pk.isFullySet()) {
+            LOGGER.info("Can not open entity {}, key not fully set.", entity);
+            return;
+        }
+        EntityType type = entity.getType();
+        ControllerCollection controller = tabControllersByType.get(type);
+        if (controller == null) {
+            LOGGER.info("No controller for {}.", entity);
+            return;
+        }
+        controller.selectEntity(entity);
+        Tab tab = tabsByType.get(type);
+        collectionTabs.getSelectionModel().select(tab);
+    }
+
     private void addTabFor(String namespace, String title, String orderBy, Query query) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.getController();
-            controller.setQuery(query, orderBy);
+            controller.setQuery(this, query, orderBy);
 
             Tab tab = new Tab();
             final Label lblNamespace = new Label(namespace);
@@ -114,6 +144,8 @@ public class ControllerServer implements Initializable {
             tab.setGraphic(vbox);
             tab.setContent(content);
             collectionTabs.getTabs().add(tab);
+            tabsByType.put(query.getEntityType(), tab);
+            tabControllersByType.put(query.getEntityType(), controller);
         } catch (IOException ex) {
             LOGGER.error("Failed to load Tab.", ex);
         }

@@ -59,6 +59,7 @@ public class ControllerEntity implements Initializable {
     private Entity entity;
     private EntityGuiController controller;
     private SensorThingsService service;
+    private ControllerServer parent;
 
     @FXML
     private void actionSave(ActionEvent event) {
@@ -81,6 +82,11 @@ public class ControllerEntity implements Initializable {
         }
     }
 
+    @FXML
+    private void actionSetHome(ActionEvent event) {
+        parent.openSingleEntity(entity);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
@@ -93,23 +99,24 @@ public class ControllerEntity implements Initializable {
     }
 
     /**
-     * @param service The service.
+     * @param parent The top-level controller for the server.
      * @param entity the entity to set
      * @param controller
      * @param showNavigationProperties Should navigation properties of the
      * selected Entity be shown, or just entityProperties.
      * @return this Controller.
      */
-    public ControllerEntity setEntity(SensorThingsService service, Entity entity, EntityGuiController controller, boolean showNavigationProperties) {
-        this.service = service;
+    public ControllerEntity setEntity(ControllerServer parent, Entity entity, EntityGuiController controller, boolean showNavigationProperties) {
+        this.parent = parent;
+        this.service = parent.getService();
         this.entity = entity;
         this.controller = controller;
         labelType.setText(entity.getType().getName());
         if (showNavigationProperties) {
-            controller.init(service, entity, gridProperties, accordionLinks, labelId, true);
+            controller.init(parent, entity, gridProperties, accordionLinks, labelId, true);
         } else {
             splitPaneMain.getItems().remove(accordionLinks);
-            controller.init(service, entity, gridProperties, null, labelId, false);
+            controller.init(parent, entity, gridProperties, null, labelId, false);
             buttonSave.setVisible(false);
         }
         controller.loadFields();

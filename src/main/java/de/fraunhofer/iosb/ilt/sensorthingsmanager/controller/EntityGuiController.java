@@ -17,7 +17,6 @@
  */
 package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller;
 
-import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import javafx.scene.control.Accordion;
@@ -43,13 +42,13 @@ public interface EntityGuiController {
 
     /**
      *
-     * @param service The service the entity belongs to.
+     * @param parent The top level server controller for the current server.
      * @param entity the entity.
      * @param gridProperties the grid for entity properties.
      * @param accordionLinks The accordion for navigation properties.
      * @param labelId The label that shows the entity id.
      * @param editable is the entity editable.
      */
-    public void init(SensorThingsService service, Entity entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable);
+    public void init(ControllerServer parent, Entity entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable);
 
 }

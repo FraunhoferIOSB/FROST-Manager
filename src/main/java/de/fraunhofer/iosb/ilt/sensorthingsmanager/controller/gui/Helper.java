@@ -24,6 +24,7 @@ import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationProperty;
 import de.fraunhofer.iosb.ilt.frostclient.query.Query;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerCollection;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerServer;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.EntityGuiController;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.FactoryEntityPanel;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.Utils;
@@ -72,6 +73,7 @@ public class Helper {
     }
 
     public static TitledPane createEditableEntityPane(
+            final ControllerServer parent,
             final Entity parentEntity,
             final NavigationProperty<Entity> npe,
             final Entity childEntity,
@@ -87,21 +89,21 @@ public class Helper {
         } else {
             paneTitle = npe.getName() + ": " + childTypeName + '(' + formatKeyValuesForUrl(childEntity) + ')';
         }
-        Node pane = FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, true);
+        Node pane = FactoryEntityPanel.getPane(parent, type, childEntity, true);
         TitledPane tp = new TitledPane(paneTitle, pane);
         Button edit = new Button("🔧");
         tp.setGraphic(edit);
         edit.setOnAction((ActionEvent event) -> {
-            Optional<List<Entity>> result = entitySearchDialog(childQuery, false, orderby);
+            Optional<List<Entity>> result = entitySearchDialog(parent, childQuery, false, orderby);
             if (result.isPresent() && !result.get().isEmpty()) {
                 Entity newChild = result.get().get(0);
                 setter.setChild(newChild);
                 try {
-                    tp.setContent(FactoryEntityPanel.getPane(childQuery.getService(), type, childEntity, false));
+                    tp.setContent(FactoryEntityPanel.getPane(parent, type, childEntity, false));
                 } catch (IOException ex) {
                     LoggerFactory.getLogger(EntityGuiController.class).error("Failed to load Collection Pane.", ex);
                 }
-                tp.setText(newChild.getType().getEntityName() + ": " + newChild.toString());
+                tp.setText(newChild.getType().getName() + ": " + newChild.toString());
             }
         });
 
@@ -145,16 +147,16 @@ public class Helper {
         return node;
     }
 
-    public static Pane createCollectionPaneFor(Query query, String orderBy) {
-        return createCollectionPaneFor(query, orderBy, false, null);
+    public static Pane createCollectionPaneFor(ControllerServer parent, Query query, String orderBy) {
+        return createCollectionPaneFor(parent, query, orderBy, false, null);
     }
 
-    public static Pane createCollectionPaneFor(Query query, String orderBy, boolean canLinkNew, ChildSetter childSetter) {
+    public static Pane createCollectionPaneFor(ControllerServer parent, Query query, String orderBy, boolean canLinkNew, ChildSetter childSetter) {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             ControllerCollection controller = loader.getController();
-            controller.setQuery(query, true, true, canLinkNew, true, orderBy);
+            controller.setQuery(parent, query, true, true, canLinkNew, true, orderBy);
             if (childSetter != null) {
                 controller.setChildSetter(childSetter);
             }
@@ -165,12 +167,12 @@ public class Helper {
         return null;
     }
 
-    public static Optional<List<Entity>> entitySearchDialog(Query query, boolean multiSelect, String orderBy) {
+    public static Optional<List<Entity>> entitySearchDialog(ControllerServer parent, Query query, boolean multiSelect, String orderBy) {
         try {
             FXMLLoader loader = new FXMLLoader(EntityGuiController.class.getResource("/fxml/Collection.fxml"));
             AnchorPane content = (AnchorPane) loader.load();
             final ControllerCollection controller = loader.getController();
-            controller.setQuery(query, false, false, false, multiSelect, orderBy);
+            controller.setQuery(parent, query, false, false, false, multiSelect, orderBy);
 
             Dialog<List<Entity>> dialog = new Dialog<>();
             dialog.setHeight(800);

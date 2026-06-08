@@ -20,12 +20,12 @@ package de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui;
 import static de.fraunhofer.iosb.ilt.frostclient.utils.StringHelper.formatKeyValuesForUrl;
 import static de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.gui.Helper.createEditableEntityPane;
 
-import de.fraunhofer.iosb.ilt.frostclient.SensorThingsService;
 import de.fraunhofer.iosb.ilt.frostclient.model.Entity;
 import de.fraunhofer.iosb.ilt.frostclient.model.EntityType;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.EntityPropertyMain;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationProperty;
 import de.fraunhofer.iosb.ilt.frostclient.model.property.NavigationPropertyEntitySet;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerServer;
 import de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.EntityGuiController;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -85,7 +85,7 @@ public class GuiControllerDefault implements EntityGuiController {
     }
 
     @Override
-    public void init(SensorThingsService service, Entity entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
+    public void init(ControllerServer parent, Entity entity, GridPane gridProperties, Accordion accordionLinks, Label labelId, boolean editable) {
         this.labelId = labelId;
         this.entity = entity;
         if (entityType != entity.getType()) {
@@ -104,12 +104,12 @@ public class GuiControllerDefault implements EntityGuiController {
                         order = "name asc";
                     }
                     final Entity linkedEntity = entity.getProperty(npe);
-                    TitledPane tp = createEditableEntityPane(entity, npe, linkedEntity, service.query(npe.getEntityType()), order, child -> entity.setProperty(npe, child));
+                    TitledPane tp = createEditableEntityPane(parent, entity, npe, linkedEntity, parent.getService().query(npe.getEntityType()), order, child -> entity.setProperty(npe, child));
                     accordionLinks.getPanes().add(tp);
                 }
                 if (entity.hasService()) {
                     for (NavigationPropertyEntitySet nps : entityType.getNavigationSets()) {
-                        Pane pane = Helper.createCollectionPaneFor(entity.query(nps), "", true, null);
+                        Pane pane = Helper.createCollectionPaneFor(parent, entity.query(nps), "", true, null);
                         accordionLinks.getPanes().add(new TitledPane(nps.getName(), pane));
                     }
                 }

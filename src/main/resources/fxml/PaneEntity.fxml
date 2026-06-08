@@ -10,17 +10,26 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerEntity">
+<BorderPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fraunhofer.iosb.ilt.sensorthingsmanager.controller.ControllerEntity">
     <top>
         <FlowPane hgap="5.0" BorderPane.alignment="CENTER">
             <children>
-                <Label fx:id="labelType" text="TypeName" />
-                <Label fx:id="labelId" text="XX" />
+                <Button mnemonicParsing="false" onAction="#actionSetHome" text="⇱" />
+                <Label fx:id="labelType" text="TypeName" underline="true">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <Label fx:id="labelId" text="XX" underline="true">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
             </children>
             <padding>
-                <Insets bottom="5.0" />
+                <Insets bottom="1.0" />
             </padding>
         </FlowPane>
     </top>

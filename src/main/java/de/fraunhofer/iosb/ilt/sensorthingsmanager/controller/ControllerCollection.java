@@ -63,8 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author scf
+ * Controller for entity lists.
  */
 public class ControllerCollection implements Initializable {
 
@@ -114,6 +113,7 @@ public class ControllerCollection implements Initializable {
     private final ObservableList<EntityListEntry> entities = FXCollections.observableArrayList();
     private EntitySet currentQueryList;
 
+    private ControllerServer parent;
     private SensorThingsService service;
     private Query query;
     private EntityType entityType;
@@ -301,7 +301,7 @@ public class ControllerCollection implements Initializable {
             return;
         }
         Query allQuery = service.query(entityType);
-        Optional<List<Entity>> result = entitySearchDialog(allQuery, true, orderby);
+        Optional<List<Entity>> result = entitySearchDialog(parent, allQuery, true, orderby);
         if (result.isPresent() && !result.get().isEmpty()) {
             List<Entity> newChildren = result.get();
             for (var child : newChildren) {
@@ -420,12 +420,27 @@ public class ControllerCollection implements Initializable {
         }
         try {
             Entity entity = newValue.getEntity();
-            Node pane = FactoryEntityPanel.getPane(service, entityType, entity, showNavigationProperties);
+            Node pane = FactoryEntityPanel.getPane(parent, entityType, entity, showNavigationProperties);
             paneSelected.setCenter(pane);
             buttonDelete.setDisable(false);
         } catch (IOException ex) {
             LOGGER.error("Failed to create pane for entity.", ex);
         }
+    }
+
+    public void selectEntity(Entity entity) {
+        final TableView.TableViewSelectionModel<EntityListEntry> selectionModel = entityTable.getSelectionModel();
+        for (EntityListEntry entry : entities) {
+            if (entry.getEntity().equals(entity)) {
+                selectionModel.clearSelection();
+                selectionModel.select(entry);
+                return;
+            }
+        }
+        final EntityListEntry newEntry = new EntityListEntry().setEntity(entity);
+        entities.add(newEntry);
+        selectionModel.clearSelection();
+        selectionModel.select(newEntry);
     }
 
     @Override
@@ -557,12 +572,14 @@ public class ControllerCollection implements Initializable {
     }
 
     /**
+     * @param parent The top-level controller for the server.
      * @param query the query to use to fetch entities. This includes the
      * service and the EntityType.
      * @param orderBy The ordering to use.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, String orderBy) {
+    public ControllerCollection setQuery(ControllerServer parent, Query query, String orderBy) {
+        this.parent = parent;
         this.query = query;
         this.service = query.getService();
         this.entityType = query.getEntityType();
@@ -578,6 +595,7 @@ public class ControllerCollection implements Initializable {
     }
 
     /**
+     * @param parent The top-level controller for the server.
      * @param query the query to set.
      * @param showNavigationProperties Should navigation properties of the
      * selected Entity be shown, or just entityProperties.
@@ -587,7 +605,8 @@ public class ControllerCollection implements Initializable {
      * @param orderBy The ordering to use for the query.
      * @return this ControllerCollection.
      */
-    public ControllerCollection setQuery(Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect, String orderBy) {
+    public ControllerCollection setQuery(ControllerServer parent, Query query, boolean showNavigationProperties, boolean canDelete, boolean canLinkNew, boolean multiSelect, String orderBy) {
+        this.parent = parent;
         this.query = query;
         this.service = query.getService();
         this.entityType = query.getEntityType();
