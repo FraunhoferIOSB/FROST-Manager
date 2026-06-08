@@ -44,14 +44,13 @@ public class Server extends AbstractConfigurable<Void, Void> {
     @EditorString.EdOptsString(dflt = "https://server.de/FROST-Server/v1.0")
     private String url;
 
-    @ConfigurableField(editor = EditorSubclass.class,
+    @ConfigurableField(editor = EditorSubclass.class, optional = true,
             label = "Auth",
-            description = "The method to use for authentication",
-            optional = false)
+            description = "The method to use for authentication")
     @EditorSubclass.EdOptsSubclass(iface = AuthMethod.class, nameField = "authClass", shortenClassNames = true)
     private AuthMethod authMethod;
 
-    @ConfigurableField(editor = EditorList.class,
+    @ConfigurableField(editor = EditorList.class, optional = true,
             label = "Data Models", description = "A list of data models, loaded in the given order.")
     @EditorList.EdOptsList(editor = EditorSubclass.class)
     @EditorSubclass.EdOptsSubclass(iface = DataModel.class, shortenClassNames = true)
