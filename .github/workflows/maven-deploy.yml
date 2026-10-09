@@ -1,4 +1,4 @@
-name: Deploy to Maven Central
+name: Deploy to GitHub
 
 # Controls when the action will run. 
 on:
@@ -59,3 +59,11 @@ jobs:
         path: target/${{ env.JAR_FILE }}
         archive: false
 
+
+    - name: Create Release
+      if: github.ref_type == 'tag'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{ github.ref_name }} -F CHANGELOG.md -d
+        gh release upload ${{ github.ref_name }} target/${{ env.JAR_FILE }}
