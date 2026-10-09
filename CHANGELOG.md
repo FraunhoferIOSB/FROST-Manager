@@ -1,4 +1,4 @@
-# Version 0.16-SNAPSHOT
+# Version 0.16
 
 **Updates**
 * Updated dependencies.
