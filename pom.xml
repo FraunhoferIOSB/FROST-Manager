@@ -61,6 +61,7 @@
         <version.maven.plugin.central-publishing>0.10.0</version.maven.plugin.central-publishing>
         <version.maven.plugin.compiler>3.15.0</version.maven.plugin.compiler>
         <version.maven.plugin.dependency>3.1.1</version.maven.plugin.dependency>
+        <version.maven.plugin.git-commit-id>10.0.0</version.maven.plugin.git-commit-id>
         <version.maven.plugin.gpg>3.2.8</version.maven.plugin.gpg>
         <version.maven.plugin.javadoc>3.12.0</version.maven.plugin.javadoc>
         <version.maven.plugin.javafx>0.0.8</version.maven.plugin.javafx>
@@ -149,6 +150,32 @@
                     <launcher>launcher</launcher>
                     <mainClass>${mainClass}</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>${version.maven.plugin.git-commit-id}</version>
+                <configuration>
+                    <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
+                    <prefix>git</prefix>
+                    <verbose>false</verbose>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.json</generateGitPropertiesFilename>
+                    <format>json</format>
+                    <gitDescribe>
+                        <skip>false</skip>
+                        <always>false</always>
+                        <dirty>-dirty</dirty>
+                    </gitDescribe>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>

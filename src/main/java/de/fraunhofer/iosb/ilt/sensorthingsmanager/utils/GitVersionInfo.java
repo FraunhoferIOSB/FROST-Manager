@@ -1,0 +1,87 @@
+/*
+ * Copyright (C) 2024 Fraunhofer Institut IOSB, Fraunhoferstr. 1, D 76131
+ * Karlsruhe, Germany.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package de.fraunhofer.iosb.ilt.sensorthingsmanager.utils;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+
+/**
+ * Tools for logging the Git commit used to build the software.
+ */
+public class GitVersionInfo {
+
+    /**
+     * A type reference for Map&lt;String, String&gt;.
+     */
+    public static final TypeReference<Map<String, String>> TYPE_MAP_STRING_STRING = new TypeReference<Map<String, String>>() {
+        // Empty on purpose.
+    };
+    public static final String PACKAGE_NAME = "SensorThingsImporter";
+
+    private static final String PATH_GIT_COMMIT_ID_DESCRIBE = "git.commit.id.describe";
+
+    /**
+     * The logger for this class.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitVersionInfo.class);
+
+    private static Map<String, String> gitData;
+
+    private GitVersionInfo() {
+        // Utility class, not to be instantiated.
+    }
+
+    /**
+     * Outputs the git version info to the log.
+     */
+    public static void logGitInfo() {
+        init();
+        LOGGER.info("{} Version: {}", PACKAGE_NAME, gitData.get(PATH_GIT_COMMIT_ID_DESCRIBE));
+    }
+
+    public static String getGitDescription() {
+        init();
+        return gitData.get(PATH_GIT_COMMIT_ID_DESCRIBE);
+    }
+
+    private static void init() {
+        if (gitData == null) {
+            gitData = readInfo();
+        }
+    }
+
+    private static Map<String, String> readInfo() {
+        ClassLoader classLoader = GitVersionInfo.class.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("git.json");
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> map;
+        try {
+            map = mapper.readValue(inputStream, TYPE_MAP_STRING_STRING);
+        } catch (JacksonException exc) {
+            LOGGER.error("Failed to read git info file.", exc);
+            map = new HashMap<>();
+        }
+        return map;
+    }
+}

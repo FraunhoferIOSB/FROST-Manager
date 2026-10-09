@@ -18,6 +18,7 @@
 package de.fraunhofer.iosb.ilt.sensorthingsmanager;
 
 import de.fraunhofer.iosb.ilt.configurable.Reflection;
+import de.fraunhofer.iosb.ilt.sensorthingsmanager.utils.GitVersionInfo;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -48,6 +49,7 @@ public class ManagerGui extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        GitVersionInfo.logGitInfo();
         launch(args);
     }
 
