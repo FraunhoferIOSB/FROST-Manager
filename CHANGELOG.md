@@ -1,6 +1,12 @@
 # Version 0.16-SNAPSHOT
 
 **Updates**
+* Updated dependencies.
+* Added git version info to logging output.
+* [CI] Updated build scripts to release to GitHub instead of Maven Central.
+* Made Auth and DataModel options optional for servers.
+* Added button to open navEntity in its main Tab.
+* Show navigation properties for single navProp targets.
 * Fixed editing of open property types.
 
 
