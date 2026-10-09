@@ -14,7 +14,7 @@ A manager for SensorThings API or other OData 4.01 compatible servers.
 
 ## Download
 
-The compiled jar can be downloaded from GitHub.
+The compiled jar can be downloaded from [GitHub](https://github.com/FraunhoferIOSB/FROST-Manager/releases).
 
 
 ## Running
