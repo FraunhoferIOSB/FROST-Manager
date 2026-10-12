@@ -65,7 +65,7 @@ public class ControllerEntity implements Initializable {
     private void actionSave(ActionEvent event) {
         controller.saveFields();
         try {
-            if (!entity.primaryKeyFullySet()) {
+            if (!entity.primaryKeyFullySet() || entity.getService() == null) {
                 service.create(entity);
                 controller.loadFields();
             } else {

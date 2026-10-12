@@ -1,6 +1,7 @@
 # Version 0.17-SNAPSHOT
 
 **Updates**
+* Fixed creating entities that require user-defined primary keys, such as users and roles.
 
 
 # Version 0.16
